@@ -1,0 +1,32 @@
+# Node modules directory
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+
+# Build outputs
+/dist
+/build
+
+# IDE files (e.g., VS Code, WebStorm, etc.)
+.vscode/
+.idea/
+
+# Temporary files
+*.swp
+*.swo
+*.bak
+
+# Test coverage output
+coverage/
+
+# Optional lock files (if you're using Yarn)
+yarn-error.log

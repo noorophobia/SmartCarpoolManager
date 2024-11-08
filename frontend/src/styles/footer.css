@@ -1,0 +1,9 @@
+.footer{
+         width: 100%;
+         display: flex;
+        padding: 10px 20px; /* Adjust padding as needed */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adjust the shadow for elevation effect */
+      z-index: 10; /* Ensures navbar stays above other elements if necessary */
+       top: 0;
+    
+}

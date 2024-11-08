@@ -1,0 +1,35 @@
+@import url('variables.css');
+
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+  .main {
+    font-family: "inter",sans-serif;
+    background-color: var(--main-bg); /* Correct variable */
+    color:var(--black)
+  }
+
+  .container{
+    display: flex;
+    }
+  .menuContainer{
+      width: 350px;
+      padding: 5px 20px ;
+      padding-top: 30px;
+      background-color: var( --menu-bg);
+      box-shadow: 4px 0 6px rgba(0, 0, 0, 0.2); /* Subtle shadow to create elevation */
+
+      border-right:2px solid var(--soft-color)
+  }
+  .contentContainer{
+    padding: 5px 20px;
+    width:100%
+  }

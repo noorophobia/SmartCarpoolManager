@@ -1,0 +1,38 @@
+
+.menu{
+    .item{
+        display:flex;
+        flex-direction: column;
+        gap: 10px;
+       
+        margin-bottom: 20px;
+     }
+    .title{
+        font-size: 16px;
+        font-weight: 200;
+        color: white;
+
+    }
+    .listItem{
+        display:flex;
+         align-items: center;
+         font-size: 18px;
+         color:white;
+        gap:10px;
+        padding:10px;
+        border-radius: 5px;
+        &:hover{
+            background-color: var(--soft-color);
+        }
+          
+    }
+    
+        .icon{
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+    
+    
+    
+}
