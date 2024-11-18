@@ -1,8 +1,20 @@
 import React from 'react';
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid,GridToolbar } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
+   import Button from '@mui/material/Button';
 
+import '../styles/passengers.css';
+import { shouldQuickFilterExcludeHiddenColumns } from '@mui/x-data-grid/hooks/features/filter/gridFilterUtils';
 const Passengers = () => {
+  const handleEdit = (id) => {
+    alert(`Edit row with ID: ${id}`);
+    // Add your edit functionality here
+  };
+
+  const handleDelete = (id) => {
+    alert(`Delete row with ID: ${id}`);
+    // Add your delete functionality here
+  };
   const columns = [
     { field: 'id', headerName: 'ID', width: 90 },
     {
@@ -18,11 +30,15 @@ const Passengers = () => {
       editable: true,
     },
     {
-      field: 'age',
-      headerName: 'Age',
-      type: 'number',
-      width: 110,
-      editable: true,
+      field: 'email',
+      headerName: 'Email',
+      width: 200,
+      editable: false, // Make it editable if required
+    },
+    {
+      field: 'gender',
+      headerName: 'Gender',
+      width: 120,
     },
     {
       field: 'fullName',
@@ -32,46 +48,81 @@ const Passengers = () => {
       width: 160,
       valueGetter: (value, row) => `${row.firstName || ''} ${row.lastName || ''}`,
     },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 200,
+      renderCell: (params) => (
+        <>
+          <Button
+            variant="contained"
+            color="primary"
+            size="small"
+            onClick={() => handleEdit(params.row.id)}
+            style={{ marginRight: 8 }}
+          >
+            Edit
+          </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+            size="small"
+            onClick={() => handleDelete(params.row.id)}
+          >
+            Delete
+          </Button>
+        </>
+      ),
+    }
   ];
 
 const rows = [
-  { id: 1, lastName: 'Snow', firstName: 'Jon', age: 14 },
-  { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 31 },
-  { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 31 },
-  { id: 4, lastName: 'Stark', firstName: 'Arya', age: 11 },
-  { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
-  { id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
-  { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
-  { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
-  { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
+  { id: 1, lastName: 'Snow', firstName: 'Jon', email: 'someone@gmail.com', gender: 'Female' },
+  { id: 2, lastName: 'Lannister', firstName: 'Cersei',  email: 'someone2@gmail.com', gender: 'Male' },
+  { id: 3, lastName: 'Lannister', firstName: 'Jaime',  email: 'someone1@gmail.com', gender: 'Others'},
+  { id: 4, lastName: 'Stark', firstName: 'Arya', email: 'someone2@gmail.com', gender: 'Female'},
+  { id: 5, lastName: 'Targaryen', firstName: 'Daenerys',  email: 'someone@gmail.com', gender: 'Female'},
+  { id: 6, lastName: 'Melisandre', firstName: null,  email: 'someone@gmail.com', gender: 'Female'},
+  { id: 7, lastName: 'Clifford', firstName: 'Ferrara',   email: 'someone@gmail.com', gender: 'Male' },
+  { id: 8, lastName: 'Frances', firstName: 'Rossini',  email: 'someone4@gmail.com', gender: 'Others' },
+  { id: 9, lastName: 'Roxie', firstName: 'Harvey',  email: 'someone@gmail.com', gender: 'Female' },
 ];
 
   return (
-    <div className="container">
-      <div>
-         <h1>Welcome to  Passengers</h1>
-    
-      <button className="button">Click Me</button>
+    <div className="main-content">
+    <div className="header">
+      <h1>Welcome to Passengers</h1>
+      <button className="button">Add new User</button>
     </div>
     <div>
-      <Box sx={{ height: 400, width: '100%' }}>
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        initialState={{
-          pagination: {
-            paginationModel: {
-              pageSize: 5,
-            },
-          },
-        }}
-        pageSizeOptions={[5]}
-        checkboxSelection
-        disableRowSelectionOnClick
-      />
-    </Box>
+    <div style={{ marginTop: '20px' }}>
+
+    <Box sx={{ height: 500, width: '100%'  }}>
+  <DataGrid
+    className="dataGrid"
+    rows={rows}
+    columns={columns}
+    slots={{toolbar:GridToolbar}}
+    slotProps={{toolbar:{showQuickFilter:true,
+      quickFilterProps:{ debounceMs:500}
+    }
+  }}
+    initialState={{
+      pagination: {
+        paginationModel: {
+          pageSize: 20,
+        },
+      },
+    }}
+    pageSizeOptions={[5, 10, 20]} // Allow users to choose 5, 10, or 20 records per page
+    checkboxSelection
+    disableRowSelectionOnClick
+  />
+</Box>
+</div>
     </div>
-    </div>
+  </div>
+  
   );
 }
 

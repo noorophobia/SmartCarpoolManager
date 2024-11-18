@@ -11,7 +11,7 @@ const Menu = () => {
              <span className="listItemTitle">Home </span>
           </Link>
 
-          <Link to="/" className="listItem"> 
+          <Link to="/profile" className="listItem"> 
             <img src="profile.svg" alt="icon" className="icon" />
              <span className="listItemTitle">Profile </span>
           </Link>
@@ -19,20 +19,20 @@ const Menu = () => {
        
          <div className="item">
           <div className="title">Lists</div>
-          <Link to="/" className="listItem"> 
+          <Link to="/passengers" className="listItem"> 
             <img src="passenger.svg" alt="icon" className="icon" />
              <span className="listItemTitle">Passengers </span>
           </Link>
 
-          <Link to="/" className="listItem"> 
+          <Link to="/drivers" className="listItem"> 
             <img src="driver.svg" alt="icon" className="icon" />
              <span className="listItemTitle">Drivers </span>
           </Link>
-          <Link to="/" className="listItem"> 
+          <Link to="/rides" className="listItem"> 
             <img src="ride.svg" alt="icon" className="icon" />
              <span className="listItemTitle">Ride History </span>
           </Link>
-          <Link to="/" className="listItem"> 
+          <Link to="/pending-applications" className="listItem"> 
             <img src="pending.svg" alt="icon" className="icon" />
              <span className="listItemTitle">Pending Applications </span>
           </Link>
@@ -40,7 +40,7 @@ const Menu = () => {
 
          <div className="item">
           <div className="title">Income Report</div>
-          <Link to="/" className="listItem"> 
+          <Link to="/revenue" className="listItem"> 
             <img src="revenue.svg" alt="icon" className="icon" />
              <span className="listItemTitle">Revenue </span>
           </Link>
@@ -49,7 +49,7 @@ const Menu = () => {
          </div>
          <div className="item">
           <div className="title">General</div>
-          <Link to="/" className="listItem"> 
+          <Link to="/settings" className="listItem"> 
             <img src="settings.svg" alt="icon" className="icon" />
              <span className="listItemTitle">Settings </span>
           </Link>
