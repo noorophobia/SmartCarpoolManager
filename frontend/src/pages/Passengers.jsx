@@ -29,12 +29,16 @@ const Passengers = () => {
       width: 150,
       editable: true,
     },
+    
     {
       field: 'email',
       headerName: 'Email',
       width: 200,
       editable: false, // Make it editable if required
     },
+    { field: 'phoneNumber', headerName: 'Phone Number', width: 150 },
+    { field: 'ratings', headerName: 'Ratings', width: 90 },
+
     {
       field: 'gender',
       headerName: 'Gender',
@@ -54,22 +58,29 @@ const Passengers = () => {
       width: 200,
       renderCell: (params) => (
         <>
-          <Button
-            variant="contained"
-            color="primary"
-            size="small"
-            onClick={() => handleEdit(params.row.id)}
-            style={{ marginRight: 8 }}
-          >
-            Edit
+         <Button   style={{
+            padding: 0,
+            minWidth: '40px',
+            height: '40px',
+            backgroundColor: 'transparent',
+          }} onClick={() => handleEdit(params.row.id)}>
+          <img
+            src="/edit_icon.svg" // Replace with the actual path to the driver icon
+            alt="Edit Button"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
           </Button>
-          <Button
-            variant="contained"
-            color="secondary"
-            size="small"
-            onClick={() => handleDelete(params.row.id)}
-          >
-            Delete
+          <Button   style={{
+            padding: 0,
+            minWidth: '40px',
+            height: '40px',
+            backgroundColor: 'transparent',
+          }} onClick={() => handleDelete(params.row.id)}>
+          <img
+            src="/delete_icon.svg" // Replace with the actual path to the driver icon
+            alt="Delete Button "
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
           </Button>
         </>
       ),
@@ -77,15 +88,15 @@ const Passengers = () => {
   ];
 
 const rows = [
-  { id: 1, lastName: 'Snow', firstName: 'Jon', email: 'someone@gmail.com', gender: 'Female' },
-  { id: 2, lastName: 'Lannister', firstName: 'Cersei',  email: 'someone2@gmail.com', gender: 'Male' },
-  { id: 3, lastName: 'Lannister', firstName: 'Jaime',  email: 'someone1@gmail.com', gender: 'Others'},
-  { id: 4, lastName: 'Stark', firstName: 'Arya', email: 'someone2@gmail.com', gender: 'Female'},
-  { id: 5, lastName: 'Targaryen', firstName: 'Daenerys',  email: 'someone@gmail.com', gender: 'Female'},
-  { id: 6, lastName: 'Melisandre', firstName: null,  email: 'someone@gmail.com', gender: 'Female'},
-  { id: 7, lastName: 'Clifford', firstName: 'Ferrara',   email: 'someone@gmail.com', gender: 'Male' },
-  { id: 8, lastName: 'Frances', firstName: 'Rossini',  email: 'someone4@gmail.com', gender: 'Others' },
-  { id: 9, lastName: 'Roxie', firstName: 'Harvey',  email: 'someone@gmail.com', gender: 'Female' },
+  { id: 1, lastName: 'Snow', firstName: 'Jon', email: 'someone@gmail.com',      phoneNumber: '+1234567890', ratings:3.5,   gender: 'Female' },
+  { id: 2, lastName: 'Lannister', firstName: 'Cersei',  email: 'someone2@gmail.com', phoneNumber: '+1234364890', ratings:5,gender: 'Male' },
+  { id: 3, lastName: 'Lannister', firstName: 'Jaime',  email: 'someone1@gmail.com',  phoneNumber: '+1234467890',ratings:5,gender: 'Others'},
+  { id: 4, lastName: 'Stark', firstName: 'Arya', email: 'someone2@gmail.com',  phoneNumber: '+1234567840',ratings:4,gender: 'Female'},
+  { id: 5, lastName: 'Targaryen', firstName: 'Daenerys',  email: 'someone@gmail.com', phoneNumber: '+1234547890',ratings:4.5, gender: 'Female'},
+  { id: 6, lastName: 'Melisandre', firstName: null,  email: 'someone@gmail.com',  phoneNumber: '+1234562890',ratings:3,gender: 'Female'},
+  { id: 7, lastName: 'Clifford', firstName: 'Ferrara',   email: 'someone@gmail.com',  phoneNumber: '+1234567890',ratings:5,gender: 'Male' },
+  { id: 8, lastName: 'Frances', firstName: 'Rossini',  email: 'someone4@gmail.com',  phoneNumber: '+1233567890',ratings:3.5,gender: 'Others' },
+  { id: 9, lastName: 'Roxie', firstName: 'Harvey',  email: 'someone@gmail.com', phoneNumber: '+1234563890',ratings:0, gender: 'Female' },
 ];
 
   return (
@@ -102,11 +113,14 @@ const rows = [
     className="dataGrid"
     rows={rows}
     columns={columns}
+    
     slots={{toolbar:GridToolbar}}
+    
     slotProps={{toolbar:{showQuickFilter:true,
       quickFilterProps:{ debounceMs:500}
     }
   }}
+ 
     initialState={{
       pagination: {
         paginationModel: {
@@ -117,6 +131,10 @@ const rows = [
     pageSizeOptions={[5, 10, 20]} // Allow users to choose 5, 10, or 20 records per page
     checkboxSelection
     disableRowSelectionOnClick
+    disableColumnFilter
+    disableColumnSelector
+    disableDensitySelector
+    
   />
 </Box>
 </div>
@@ -127,3 +145,4 @@ const rows = [
 }
 
 export default Passengers;
+// add phone number and ratings attributes 

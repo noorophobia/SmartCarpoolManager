@@ -16,8 +16,10 @@ import Footer from './components/Footer';
 import Signup from './pages/Signup';
 import Home from './pages/Home'
 import Menu from './components/Menu'
+import Map from './pages/Map'
 import PendingApplications from './pages/PendingApplications';
 import '../src/styles/global.css';  // Import the CSS file
+import UserDetails from './components/UserDetails';
 
 function Layout() {
   return (
@@ -57,6 +59,10 @@ function App() {
           element: <Drivers />,
         },
         {
+          path: "/details/:type/:id", // New route for details page
+          element: <UserDetails />,  // DetailsPage component
+        },
+        {
           path: "/rides",
           element: <Rides />,
         },
@@ -67,6 +73,10 @@ function App() {
         {
           path: "/pending-applications",
           element: <PendingApplications />,
+        },
+        {
+          path: "/map",
+          element: <Map />,
         },
         {
           path: "/*",

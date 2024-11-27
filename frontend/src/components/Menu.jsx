@@ -33,7 +33,7 @@ const Menu = () => {
              <span className="listItemTitle">Ride History </span>
           </Link>
           <Link to="/pending-applications" className="listItem"> 
-            <img src="pending.svg" alt="icon" className="icon" />
+            <img src="pending_icon.svg" alt="icon" className="icon" />
              <span className="listItemTitle">Pending Applications </span>
           </Link>
          </div>
