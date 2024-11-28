@@ -22,10 +22,7 @@ import '../src/styles/global.css';  // Import the CSS file
 import UserDetails from './components/UserDetails';
 import RatingsAndReviews from './pages/admin/RatingsAndReviews';
 import Revenue from './pages/revenue/OverallRevenue';
-import DailyRevenue from './pages/revenue/DailyRevenue';
-import WeeklyRevenue from './pages/revenue/WeeklyRevenue';
-import MonthlyRevenue from './pages/revenue/MonthlyRevenue';
-import YearlyRevenue from './pages/revenue/YearlyRevenue';
+ import YearlyRevenue from './pages/revenue/YearlyRevenue';
 
 function Layout() {
   return (
@@ -76,18 +73,7 @@ function App() {
           path: "/revenue",
           element: <Revenue />,
         },
-        {
-          path: "/revenue-daily",
-          element: <DailyRevenue />,
-        },
-        {
-          path: "/revenue-weekly",
-          element: <WeeklyRevenue />,
-        },
-        {
-          path: "/revenue-monthly",
-          element: <MonthlyRevenue />,
-        },
+        
         {
           path: "/revenue-yearly",
           element: <YearlyRevenue />,

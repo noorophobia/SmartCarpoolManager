@@ -3,6 +3,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import { Card, CardContent, Typography } from '@mui/material';
 import { startOfYear } from 'date-fns';
 import Box from "@mui/material/Box";
+import '../../styles/tables.css'
 
 // Sample data for rides
 const ridesData = [
@@ -45,7 +46,6 @@ const calculateYearlyStats = (filteredRides, year) => {
   const uniquePassengers = new Set(yearRides.map((ride) => ride.passengerID));
 
   return {
-  
     year,
     totalRides,
     completedRides,
@@ -58,8 +58,6 @@ const calculateYearlyStats = (filteredRides, year) => {
 
 const YearlyRevenue = () => {
   const columns = [
-    { field: 'id', headerName: 'Id', width: 90 },
-
     { field: 'year', headerName: 'Year', width: 150 },
     { field: 'totalRides', headerName: 'Total Rides', width: 180 },
     { field: 'completedRides', headerName: 'Completed Rides', width: 180 },
@@ -75,18 +73,21 @@ const YearlyRevenue = () => {
   );
 
   return (
-    <div>
+    <div className="main-content_revenue">
+    <div className="header">
+      <h1>Yearly Rides Revenue Report</h1>
+    </div>
       <Typography variant="h6" component="div" style={{ marginBottom: "20px" }}>
         Yearly Revenue Report
       </Typography>
 
       <Box sx={{ height: 500, width: "100%" }}>
-        <DataGrid
+        <DataGrid  className="dataGrid"
           rows={ridesDataForYear}
           columns={columns}
           pageSize={5}
-          checkboxSelection
-          disableRowSelectionOnClick
+           disableRowSelectionOnClick
+          getRowId={(row) => row.year} // Use the 'year' as the unique id for each row
         />
       </Box>
     </div>

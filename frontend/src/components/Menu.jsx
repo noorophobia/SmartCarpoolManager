@@ -49,16 +49,7 @@ const Menu = () => {
             <img src="revenue.svg" alt="icon" className="icon" />
              <span className="listItemTitle">Overall Revenue </span>
           </Link>
-          <Link to="/revenue-daily" className="listItem"> 
-            <img src="revenue.svg" alt="icon" className="icon" />
-             <span className="listItemTitle">Daily Revenue </span>
-          </Link><Link to="/revenue-weekly" className="listItem"> 
-            <img src="revenue.svg" alt="icon" className="icon" />
-             <span className="listItemTitle">Weekly Revenue </span>
-          </Link><Link to="/revenue-monthly" className="listItem"> 
-            <img src="revenue.svg" alt="icon" className="icon" />
-             <span className="listItemTitle">Monthly Revenue </span>
-          </Link>
+          
           <Link to="/revenue-yearly" className="listItem"> 
             <img src="revenue.svg" alt="icon" className="icon" />
              <span className="listItemTitle">Yearly Revenue </span>
