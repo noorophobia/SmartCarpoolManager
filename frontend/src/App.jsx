@@ -5,21 +5,27 @@ import {
   Outlet,
   Link,
 } from "react-router-dom";
- import Passengers from './pages/Passengers';
-import Drivers from './pages/Drivers';
-import Settings from './pages/Settings';
-import Rides from './pages/Rides';
+ import Passengers from './pages/admin/Passengers';
+import Drivers from './pages/admin/Drivers';
+import Settings from './pages/admin/Settings';
+import Rides from './pages/admin/Rides';
 import Default from './pages/Default';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
- import Login from './pages/Login';
-import Signup from './pages/Signup';
+ import Login from './pages/auth/Login';
+import Signup from './pages/auth/Signup';
 import Home from './pages/Home'
 import Menu from './components/Menu'
 import Map from './pages/Map'
-import PendingApplications from './pages/PendingApplications';
+import PendingApplications from './pages/admin/PendingApplications';
 import '../src/styles/global.css';  // Import the CSS file
 import UserDetails from './components/UserDetails';
+import RatingsAndReviews from './pages/admin/RatingsAndReviews';
+import Revenue from './pages/revenue/OverallRevenue';
+import DailyRevenue from './pages/revenue/DailyRevenue';
+import WeeklyRevenue from './pages/revenue/WeeklyRevenue';
+import MonthlyRevenue from './pages/revenue/MonthlyRevenue';
+import YearlyRevenue from './pages/revenue/YearlyRevenue';
 
 function Layout() {
   return (
@@ -67,6 +73,26 @@ function App() {
           element: <Rides />,
         },
         {
+          path: "/revenue",
+          element: <Revenue />,
+        },
+        {
+          path: "/revenue-daily",
+          element: <DailyRevenue />,
+        },
+        {
+          path: "/revenue-weekly",
+          element: <WeeklyRevenue />,
+        },
+        {
+          path: "/revenue-monthly",
+          element: <MonthlyRevenue />,
+        },
+        {
+          path: "/revenue-yearly",
+          element: <YearlyRevenue />,
+        },
+        {
           path: "/settings",
           element: <Settings />,
         },
@@ -77,6 +103,10 @@ function App() {
         {
           path: "/map",
           element: <Map />,
+        }, 
+        {
+          path: "/ratings-and-reviews",
+          element: <RatingsAndReviews />,
         },
         {
           path: "/*",

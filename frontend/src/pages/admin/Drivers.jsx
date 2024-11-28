@@ -6,7 +6,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
-
+import '../../styles/tables.css'
 // Dummy data for documents
 const documents = [
   { id: 1, name: 'CNIC', url: 'https://example.com/cnic' },
@@ -50,6 +50,21 @@ const Drivers = () => {
     { field: 'vehicleType', headerName: 'Vehicle Type', width: 150, editable: true },
     { field: 'licenseNumber', headerName: 'License Number', width: 180 },
     { field: 'totalSeatsCapacity', headerName: 'Total Seats Capacity', type: 'number', width: 180, editable: true },
+    {
+      field: 'totalRides',
+      headerName: 'Total Rides',
+      width: 150,
+    },
+    {
+      field: 'completedRides',
+      headerName: 'Completed Rides',
+      width: 180,
+    },
+    {
+      field: 'cancelledRides',
+      headerName: 'Cancelled Rides',
+      width: 180,
+    },
     { field: 'distanceRatePerKm', headerName: 'Rate Per KM', type: 'number', width: 180, editable: true },
     { field: 'timeRatePerMinute', headerName: 'Rate Per Minute', type: 'number', width: 180, editable: true },
     { field: 'fixedDriverFee', headerName: 'Fixed Driver Fee', type: 'number', width: 180, editable: true },
@@ -121,6 +136,12 @@ const Drivers = () => {
       vehicleType: 'Sedan',
       licenseNumber: 'ABC123',
       totalSeatsCapacity: 5,
+       totalRides:2,
+     
+       completedRides:2,
+        
+     cancelledRides:0,
+       
       distanceRatePerKm: 72,
       timeRatePerMinute: 10,
       fixedDriverFee: 50,
@@ -188,3 +209,4 @@ const Drivers = () => {
 };
 
 export default Drivers;
+// add total rides completed rides cancelled rides

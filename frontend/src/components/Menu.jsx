@@ -36,15 +36,33 @@ const Menu = () => {
             <img src="pending_icon.svg" alt="icon" className="icon" />
              <span className="listItemTitle">Pending Applications </span>
           </Link>
+          <Link to="/ratings-and-reviews" className="listItem"> 
+            <img src="ratings_icon.svg" alt="icon" className="icon" />
+             <span className="listItemTitle">Ratings and Reviews </span>
+          </Link>
          </div>
 
          <div className="item">
-          <div className="title">Income Report</div>
+ 
+          <div className="title">Revenue Report</div>
           <Link to="/revenue" className="listItem"> 
             <img src="revenue.svg" alt="icon" className="icon" />
-             <span className="listItemTitle">Revenue </span>
+             <span className="listItemTitle">Overall Revenue </span>
           </Link>
-
+          <Link to="/revenue-daily" className="listItem"> 
+            <img src="revenue.svg" alt="icon" className="icon" />
+             <span className="listItemTitle">Daily Revenue </span>
+          </Link><Link to="/revenue-weekly" className="listItem"> 
+            <img src="revenue.svg" alt="icon" className="icon" />
+             <span className="listItemTitle">Weekly Revenue </span>
+          </Link><Link to="/revenue-monthly" className="listItem"> 
+            <img src="revenue.svg" alt="icon" className="icon" />
+             <span className="listItemTitle">Monthly Revenue </span>
+          </Link>
+          <Link to="/revenue-yearly" className="listItem"> 
+            <img src="revenue.svg" alt="icon" className="icon" />
+             <span className="listItemTitle">Yearly Revenue </span>
+          </Link>
          
          </div>
          <div className="item">

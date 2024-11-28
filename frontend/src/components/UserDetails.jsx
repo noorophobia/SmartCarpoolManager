@@ -1,39 +1,42 @@
-import React from 'react';
-import { Card, CardContent, Typography, Button } from '@mui/material';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import '../styles/userDetails.css';  // Import CSS file
 
-const UserDetails = () => {
-  const navigate = useNavigate();
-  const { id, type } = useParams(); // Retrieve id and type (passenger/driver) from route
+const UserDetails = ({ userId, onClose }) => {
+  const [user, setUser] = useState(null);
 
-  // Mock data for demonstration
-  const mockData = {
-    1: { name: 'Ali Khan', phone: '123-456-7890', email: 'ali@example.com' },
-    2: { name: 'John Doe', phone: '987-654-3210', email: 'john@example.com' },
-  };
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      const dummyData = {
+        "1": { id: "1", name: "Ali Khan", email: "ali@example.com", role: "Passenger" },
+        "2": { id: "2", name: "John Doe", email: "john@example.com", role: "Driver" },
+        "124": { id: "124", name: "Sara Ahmed", email: "sara@example.com", role: "Passenger" },
+        "457": { id: "457", name: "Emily Clark", email: "emily@example.com", role: "Driver" },
+      };
+      setUser(dummyData[userId] || null);
+    };
 
-  const details = mockData[id]; // Fetch details using the ID
+    fetchUserDetails();
+  }, [userId]);
 
   return (
-    <Card sx={{ maxWidth: 500, margin: '20px auto', padding: 2 }}>
-      <CardContent>
-        <Typography variant="h5" component="div">
-          {type === 'passenger' ? 'Passenger Details' : 'Driver Details'}
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          <strong>Name:</strong> {details?.name || 'N/A'}
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          <strong>Phone:</strong> {details?.phone || 'N/A'}
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          <strong>Email:</strong> {details?.email || 'N/A'}
-        </Typography>
-        <Button variant="contained" color="primary" onClick={() => navigate(-1)} sx={{ mt: 2 }}>
-          Back to Rides
-        </Button>
-      </CardContent>
-    </Card>
+    <div className="modalOverlay">
+      <div className="modalContent">
+        {user ? (
+          <>
+            <h2 className="modalTitle">User Details</h2>
+            <p className="modalDetails"><strong>ID:</strong> {user.id}</p>
+            <p className="modalDetails"><strong>Name:</strong> {user.name}</p>
+            <p className="modalDetails"><strong>Email:</strong> {user.email}</p>
+            <p className="modalDetails"><strong>Role:</strong> {user.role}</p>
+            <div className="buttonContainer">
+              <button className="closeButton" onClick={onClose}>Close</button>
+            </div>
+          </>
+        ) : (
+          <p>Loading user details...</p>
+        )}
+      </div>
+    </div>
   );
 };
 

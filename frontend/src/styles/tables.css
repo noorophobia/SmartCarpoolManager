@@ -43,4 +43,6 @@
       flex-direction: row-reverse;
      }
   }
- 
+  .main-content_revenue{
+    margin-bottom: 200px;
+  }

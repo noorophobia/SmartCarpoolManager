@@ -3,8 +3,8 @@ import { DataGrid,GridToolbar } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
    import Button from '@mui/material/Button';
 
-import '../styles/passengers.css';
-import { shouldQuickFilterExcludeHiddenColumns } from '@mui/x-data-grid/hooks/features/filter/gridFilterUtils';
+   import '../../styles/tables.css'
+   import { shouldQuickFilterExcludeHiddenColumns } from '@mui/x-data-grid/hooks/features/filter/gridFilterUtils';
 const Passengers = () => {
   const handleEdit = (id) => {
     alert(`Edit row with ID: ${id}`);
@@ -53,6 +53,21 @@ const Passengers = () => {
       valueGetter: (value, row) => `${row.firstName || ''} ${row.lastName || ''}`,
     },
     {
+      field: 'totalRides',
+      headerName: 'Total Rides',
+      width: 150,
+    },
+    {
+      field: 'completedRides',
+      headerName: 'Completed Rides',
+      width: 180,
+    },
+    {
+      field: 'cancelledRides',
+      headerName: 'Cancelled Rides',
+      width: 180,
+    },
+    {
       field: 'actions',
       headerName: 'Actions',
       width: 200,
@@ -87,17 +102,22 @@ const Passengers = () => {
     }
   ];
 
-const rows = [
-  { id: 1, lastName: 'Snow', firstName: 'Jon', email: 'someone@gmail.com',      phoneNumber: '+1234567890', ratings:3.5,   gender: 'Female' },
-  { id: 2, lastName: 'Lannister', firstName: 'Cersei',  email: 'someone2@gmail.com', phoneNumber: '+1234364890', ratings:5,gender: 'Male' },
-  { id: 3, lastName: 'Lannister', firstName: 'Jaime',  email: 'someone1@gmail.com',  phoneNumber: '+1234467890',ratings:5,gender: 'Others'},
-  { id: 4, lastName: 'Stark', firstName: 'Arya', email: 'someone2@gmail.com',  phoneNumber: '+1234567840',ratings:4,gender: 'Female'},
-  { id: 5, lastName: 'Targaryen', firstName: 'Daenerys',  email: 'someone@gmail.com', phoneNumber: '+1234547890',ratings:4.5, gender: 'Female'},
-  { id: 6, lastName: 'Melisandre', firstName: null,  email: 'someone@gmail.com',  phoneNumber: '+1234562890',ratings:3,gender: 'Female'},
-  { id: 7, lastName: 'Clifford', firstName: 'Ferrara',   email: 'someone@gmail.com',  phoneNumber: '+1234567890',ratings:5,gender: 'Male' },
-  { id: 8, lastName: 'Frances', firstName: 'Rossini',  email: 'someone4@gmail.com',  phoneNumber: '+1233567890',ratings:3.5,gender: 'Others' },
-  { id: 9, lastName: 'Roxie', firstName: 'Harvey',  email: 'someone@gmail.com', phoneNumber: '+1234563890',ratings:0, gender: 'Female' },
-];
+
+  const rows = [
+    { id: 1, lastName: 'Snow', firstName: 'Jon', email: 'someone@gmail.com',    totalRides:2,
+       
+      completedRides:2,
+       
+    cancelledRides:0,   phoneNumber: '+1234567890', ratings:3.5,   gender: 'Female' },
+    { id: 2, lastName: 'Lannister', firstName: 'Cersei',  email: 'someone2@gmail.com',  totalRides:2,completedRides:1, cancelledRides:1,phoneNumber: '+1234364890', ratings:5,gender: 'Male' },
+    { id: 3, lastName: 'Lannister', firstName: 'Jaime',  email: 'someone1@gmail.com',  totalRides:0,completedRides:0, cancelledRides:0,phoneNumber: '+1234467890',ratings:5,gender: 'Others'},
+    { id: 4, lastName: 'Stark', firstName: 'Arya', email: 'someone2@gmail.com',  totalRides:200,completedRides:155, cancelledRides:45, phoneNumber: '+1234567840',ratings:4,gender: 'Female'},
+    { id: 5, lastName: 'Targaryen', firstName: 'Daenerys',  email: 'someone@gmail.com',  totalRides:2,completedRides:1, cancelledRides:1,phoneNumber: '+1234547890',ratings:4.5, gender: 'Female'},
+    { id: 6, lastName: 'Melisandre', firstName: null,  email: 'someone@gmail.com',   totalRides:2,completedRides:1, cancelledRides:1,phoneNumber: '+1234562890',ratings:3,gender: 'Female'},
+    { id: 7, lastName: 'Clifford', firstName: 'Ferrara',   email: 'someone@gmail.com',  totalRides:2,completedRides:1, cancelledRides:1, phoneNumber: '+1234567890',ratings:5,gender: 'Male' },
+    { id: 8, lastName: 'Frances', firstName: 'Rossini',  email: 'someone4@gmail.com',  totalRides:2,completedRides:1, cancelledRides:1, phoneNumber: '+1233567890',ratings:3.5,gender: 'Others' },
+    { id: 9, lastName: 'Roxie', firstName: 'Harvey',  email: 'someone@gmail.com',  totalRides:2,completedRides:1, cancelledRides:1,phoneNumber: '+1234563890',ratings:0, gender: 'Female' },
+  ];
 
   return (
     <div className="main-content">
@@ -145,4 +165,4 @@ const rows = [
 }
 
 export default Passengers;
-// add phone number and ratings attributes 
+// add total rides completed rides cancelled rides
