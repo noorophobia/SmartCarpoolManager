@@ -1,8 +1,14 @@
 {
+  "name": "smart-carpool-root",
+  "version": "1.0.0",
+  "private": true,
   "dependencies": {
     "@react-google-maps/api": "^2.20.3",
+    "axios": "^1.7.9",
     "date-fns": "^4.1.0",
-    "helmet": "^8.0.0"
+    "helmet": "^8.0.0",
+    "nodemon": "^3.1.7",
+    "react-router-dom": "^7.0.2"
   },
   "devDependencies": {
     "concurrently": "^9.1.0"
@@ -10,6 +16,6 @@
   "scripts": {
     "start": "concurrently \"npm run start-backend\" \"npm run start-frontend\"",
     "start-backend": "cd backend && nodemon index.js",
-    "start-frontend": "cd frontend && npm start"
+    "start-frontend": "cd frontend && npm run dev"
   }
 }

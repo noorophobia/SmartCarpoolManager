@@ -1,0 +1,86 @@
+/* General styles for the settings page */
+.admin-settings {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #fff;
+    color: #333;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .admin-settings h2, 
+  .admin-settings h3 {
+    text-align: center;
+    color: #007bff;
+    margin-bottom: 20px;
+  }
+  
+  /* Styles for inputs and selects in the settings page */
+  .admin-settings input[type="email"],
+  .admin-settings select, 
+  .admin-settings input[type="password"], 
+  .admin-settings button {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+  }
+  
+  .admin-settings input[type="email"]:hover, 
+  .admin-settings select:hover, 
+  .admin-settings input[type="password"]:hover {
+    border-color: #007bff;
+  }
+  
+  .admin-settings input[type="email"]:focus, 
+  .admin-settings select:focus, 
+  .admin-settings input[type="password"]:focus {
+    outline: none;
+    border-color: #0056b3;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+  
+  .admin-settings button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+  }
+  
+  .admin-settings button:hover {
+    background-color: #0056b3;
+  }
+  
+  .admin-settings button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  /* Error messages specific to the settings page */
+  .admin-settings .error {
+    color: red;
+    font-size: 14px;
+    margin-top: -10px;
+    margin-bottom: 10px;
+  }
+  
+  /* Media Queries for responsive design */
+  @media (max-width: 768px) {
+    .admin-settings {
+      padding: 15px;
+    }
+  
+    .admin-settings button, 
+    .admin-settings select, 
+    .admin-settings input[type="password"] {
+      font-size: 14px;
+      padding: 8px;
+    }
+  }
+  

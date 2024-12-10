@@ -74,7 +74,9 @@ const Revenue = () => {
 
     { field: "revenue", headerName: "Revenue (Rs)", width: 150, type: "number" },
   ];
-
+  columns.forEach(column => column.align = 'center'); // Set all columns to 'center' alignment
+  columns.forEach(column => column.headerAlign = 'center'); // Set all columns to 'center' alignment
+   
   return (
     <div className="main-content_revenue">
       <div className="header">

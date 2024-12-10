@@ -13,7 +13,7 @@
     }
   
     .title {
-      font-size: 16px;
+      font-size: 20px;
       font-weight: 200;
       color: white;
       margin-bottom: 10px; /* Add some space between the title and list items */
@@ -22,7 +22,7 @@
     .listItem {
       display: flex;
       align-items: center;
-      font-size: 18px;
+      font-size: 22px;
       color: white;
       gap: 10px;
       padding: 10px;

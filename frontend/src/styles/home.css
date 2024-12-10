@@ -44,10 +44,16 @@
         width: 50px;
         height: 50px;
         border-radius: 30px;
-        background-color: orange;
+        background-color: white;
         justify-self: end; /* Align the icon to the right */
     }
-    
+   .subheading{
+
+    grid-column: span 4; /* Make heading span across all columns */
+    font-size: 1.5em;
+    margin-left: 700px; /* Remove margin to minimize extra space */
+    padding-bottom: 5px; /* Optional: control spacing with padding */
+}
  
     /* Position the first set of boxes */
     .box1, .box2, .box3, .box4 {

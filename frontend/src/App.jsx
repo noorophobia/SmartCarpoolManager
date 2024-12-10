@@ -13,8 +13,7 @@ import Default from './pages/Default';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
  import Login from './pages/auth/Login';
-import Signup from './pages/auth/Signup';
-import Home from './pages/Home'
+ import Home from './pages/Home'
 import Menu from './components/Menu'
 import Map from './pages/Map'
 import PendingApplications from './pages/admin/PendingApplications';
@@ -23,7 +22,10 @@ import UserDetails from './components/UserDetails';
 import RatingsAndReviews from './pages/admin/RatingsAndReviews';
 import Revenue from './pages/revenue/OverallRevenue';
  import YearlyRevenue from './pages/revenue/YearlyRevenue';
-
+import DriverDetails from './components/DriverDetails';
+import RateSetting from './pages/admin/RateSetting';
+import PassengerDetails from './components/PassengerDetails';
+import RideDetails from './components/RideDetails';
 function Layout() {
   return (
     <div className="main">
@@ -98,16 +100,30 @@ function App() {
           path: "/*",
           element: <Default />,
         },
+        {
+         path:"/drivers/:id" ,
+         element:<DriverDetails />,
+
+        },
+        {
+          path: "/passenger-details/:id",
+          element:<PassengerDetails/>,
+         },
+         {
+          path: "/ride-details/:rideID",
+          element:<RideDetails/>,
+         },
+        {
+          path:"/rate-setting",
+          element:<RateSetting/>,
+         }
       ],
       
     }, {
       path: "/login",
       element: <Login />,
     },
-    {
-      path: "/signup",
-      element: <Signup />,
-    },
+    
   ]);
 
   return <RouterProvider router={router} />;

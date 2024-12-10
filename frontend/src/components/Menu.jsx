@@ -11,10 +11,11 @@ const Menu = () => {
              <span className="listItemTitle">Home </span>
           </Link>
 
-          <Link to="/profile" className="listItem"> 
+       {/*  <Link to="/profile" className="listItem"> 
             <img src="profile.svg" alt="icon" className="icon" />
              <span className="listItemTitle">Profile </span>
           </Link>
+         </div> */ } 
          </div>
        
          <div className="item">
@@ -39,6 +40,10 @@ const Menu = () => {
           <Link to="/ratings-and-reviews" className="listItem"> 
             <img src="ratings_icon.svg" alt="icon" className="icon" />
              <span className="listItemTitle">Ratings and Reviews </span>
+          </Link>
+          <Link to="/rate-setting" className="listItem"> 
+            <img src="rate_setting.svg" alt="icon" className="icon" />
+             <span className="listItemTitle">Vehicle Rate Settings </span>
           </Link>
          </div>
 
@@ -70,4 +75,4 @@ const Menu = () => {
   );
 }
 
-export default Menu;
+export default Menu; 

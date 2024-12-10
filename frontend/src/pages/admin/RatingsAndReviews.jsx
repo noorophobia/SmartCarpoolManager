@@ -62,7 +62,9 @@ const RatingsAndReviews = () => {
     },
     
   ];
-
+  columns.forEach(column => column.align = 'center'); // Set all columns to 'center' alignment
+  columns.forEach(column => column.headerAlign = 'center'); // Set all columns to 'center' alignment
+   
   return (
     <div className="main-content">
       <div className="header">

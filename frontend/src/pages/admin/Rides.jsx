@@ -2,52 +2,53 @@ import React, { useState } from "react";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Modal from "@mui/material/Modal";
-import UserDetails from "../../components/UserDetails";
+import { Link } from "react-router-dom"; // Import Link to navigate to the details page
 
 const Rides = () => {
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState(null);
-
-  const openUserDetailsModal = (userId) => {
-    setSelectedUserId(userId);
-    setModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setModalOpen(false);
-    setSelectedUserId(null);
-  };
-
   const columns = [
     { field: "rideID", headerName: "Ride ID", width: 120 },
     { field: "pickUpLocation", headerName: "Pick-Up Location", width: 200 },
     { field: "dropOffLocation", headerName: "Drop-Off Location", width: 200 },
     { field: "rideMode", headerName: "Ride Mode", width: 150 },
     { field: "rideStatus", headerName: "Ride Status", width: 150 },
-    { field: "noOfPassengers", headerName: "Passengers", width: 150 },
-    { field: "paymentID", headerName: "Payment ID", width: 150 },
-    { field: "amount", headerName: "Amount (Rs)", type: "number", width: 150 },
-    { field: "paymentType", headerName: "Payment Type", width: 150 },
-    { field: "paymentStatus", headerName: "Payment Status", width: 150 },
+    
     {
       field: "passenger",
       headerName: "Passenger (ID)",
-      width: 250,
+      flex: 1,  // Use flex instead of width for dynamic width
+      minWidth: 150,  // Minimum width to ensure the column is readable
       renderCell: (params) => (
-        <Button variant="text" color="primary" onClick={() => openUserDetailsModal(params.value)}>
-          {params.value}
-        </Button>
+        <Link to={`/passenger-details/${params.value}`}>
+          <Button variant="text" color="primary" size="small">
+            {params.value}
+          </Button>
+        </Link>
       ),
     },
     {
       field: "driver",
       headerName: "Driver (ID)",
-      width: 250,
+      flex: 1,  // Use flex for dynamic width
+      minWidth: 100,  // Minimum width to ensure the button is not too small
       renderCell: (params) => (
-        <Button variant="text" color="primary" onClick={() => openUserDetailsModal(params.value)}>
-          {params.value}
-        </Button>
+        <Link to={`/driver-details/${params.value}`}>
+          <Button variant="text" color="primary" size="small">
+            {params.value}
+          </Button>
+        </Link>
+      ),
+    },
+    
+    {
+      field: "viewDetails",
+      headerName: "View Details",
+      width: 200,
+      renderCell: (params) => (
+        <Link to={`/ride-details/${params.row.rideID}`}>
+          <Button variant="contained" color="primary" size="small">
+            View Details
+          </Button>
+        </Link>
       ),
     },
   ];
@@ -104,38 +105,12 @@ const Rides = () => {
                 quickFilterProps: { debounceMs: 500 },
               },
             }}
-            initialState={{
-              pagination: {
-                paginationModel: {
-                  pageSize: 20,
-                },
-              },
-            }}
             pageSizeOptions={[5, 10, 20]} // Allow users to choose 5, 10, or 20 records per page
-            checkboxSelection
+            //checkboxSelection
             disableRowSelectionOnClick
           />
         </Box>
       </div>
-
-      {/* UserDetails Modal */}
-      <Modal open={isModalOpen} onClose={closeModal}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            border: "2px solid #000",
-            boxShadow: 24,
-            p: 4,
-          }}
-        >
-          <UserDetails userId={selectedUserId} onClose={closeModal} />
-        </Box>
-      </Modal>
     </div>
   );
 };

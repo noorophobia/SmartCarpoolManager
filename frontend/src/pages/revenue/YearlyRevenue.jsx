@@ -58,7 +58,7 @@ const calculateYearlyStats = (filteredRides, year) => {
 
 const YearlyRevenue = () => {
   const columns = [
-    { field: 'year', headerName: 'Year', width: 150 },
+    { field: 'year', headerName: 'Year', width: 150  },
     { field: 'totalRides', headerName: 'Total Rides', width: 180 },
     { field: 'completedRides', headerName: 'Completed Rides', width: 180 },
     { field: 'cancelledRides', headerName: 'Cancelled Rides', width: 180 },
@@ -66,8 +66,9 @@ const YearlyRevenue = () => {
     { field: 'totalDrivers', headerName: 'Total Drivers', width: 180 },
     { field: 'totalPassengers', headerName: 'Total Passengers', width: 180 },
   ];
-
-  // Process ridesData for both 2023 and 2024
+  columns.forEach(column => column.align = 'center'); // Set all columns to 'center' alignment
+  columns.forEach(column => column.headerAlign = 'center'); // Set all columns to 'center' alignment
+   // Process ridesData for both 2023 and 2024
   const ridesDataForYear = [2023, 2024].map((year) =>
     calculateYearlyStats(ridesData, year)
   );
@@ -77,9 +78,7 @@ const YearlyRevenue = () => {
     <div className="header">
       <h1>Yearly Rides Revenue Report</h1>
     </div>
-      <Typography variant="h6" component="div" style={{ marginBottom: "20px" }}>
-        Yearly Revenue Report
-      </Typography>
+     
 
       <Box sx={{ height: 500, width: "100%" }}>
         <DataGrid  className="dataGrid"
