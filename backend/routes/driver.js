@@ -1,10 +1,10 @@
-// server.js or routes/drivers.js
+// routes/drivers.js
 
 const express = require('express');
 const mongoose = require('mongoose');
 const Driver = require('../models/Driver'); // Import the Driver model
 
- const router = express.Router();
+const router = express.Router();
 
 // Fetch all drivers
 router.get('/drivers', async (req, res) => {
@@ -16,38 +16,49 @@ router.get('/drivers', async (req, res) => {
   }
 });
 
-// Add a new driver
 router.post('/drivers', async (req, res) => {
   try {
-    console.log('Request body:', req.body);  // Inspect the data
+    const { name, gender, email, phoneNumber, cnic, dateOfBirth, ratings } = req.body;
+    
+    // Ensure all required fields are present
+    if (!dateOfBirth) {
+      return res.status(400).json({ message: 'Date of Birth required.' });
+    }
 
-    const { name, gender, email, phoneNumber, cnic } = req.body;
-    const newDriver = new Driver({ name, gender, email, phoneNumber, cnic });
+    const newDriver = new Driver({
+      name, gender, email, phoneNumber, cnic, dateOfBirth, ratings
+    });
 
-    console.log('New driver before save:', newDriver);
-
-    // Explicitly call the pre-save hook
-    await newDriver.validate();  // Ensure validation is done before saving
-    await newDriver.save();      // Save the driver after validation
-    res.status(201).json(newDriver);
+    await newDriver.save();
+    res.status(201).json(newDriver); // Return the created driver object with the timestamp
   } catch (error) {
-    console.error('Error creating driver:', error);
     res.status(500).json({ message: 'Error adding driver. Please try again.', error: error.message });
   }
 });
 
-  
 // Update driver details
 router.put('/drivers/:id', async (req, res) => {
   const { id } = req.params;
-  const { name, gender, email, phoneNumber,cnic } = req.body;
+  const { name, gender, email, phoneNumber, cnic, dateOfBirth, ratings } = req.body;
+
+  // Validate if all required fields are present
+  if (!name || !gender || !email || !phoneNumber || !cnic || !dateOfBirth || ratings === undefined) {
+    return res.status(400).json({ message: 'All fields are required' });
+  }
 
   try {
+    // Update the driver in the database
     const driver = await Driver.findByIdAndUpdate(
       id,
-      { name, gender, email, phoneNumber,cnic},
-      { new: true }
+      { name, gender, email, phoneNumber, cnic, dateOfBirth, ratings },
+      { new: true } // To return the updated driver
     );
+
+    // If no driver is found, return an error
+    if (!driver) {
+      return res.status(404).json({ message: 'Driver not found' });
+    }
+
     res.status(200).json(driver);
   } catch (error) {
     res.status(500).json({ message: 'Failed to update driver' });

@@ -1,20 +1,13 @@
+// models/Driver.js
+
 const mongoose = require('mongoose');
-const Counter = require('./counter'); // Import counter schema
 
 const driverSchema = new mongoose.Schema({
-  id: { 
-    type: Number, 
-     
-    validate: {
-      validator: Number.isInteger,
-      message: 'ID must be an integer.',
-    },
-  },
   name: { 
     type: String, 
     required: [true, 'Name is required.'], 
     maxlength: [50, 'Name cannot exceed 50 characters.'], 
-    trim: true // Removes leading and trailing whitespaces
+    trim: true
   },
   email: { 
     type: String, 
@@ -22,7 +15,7 @@ const driverSchema = new mongoose.Schema({
     unique: true, 
     maxlength: [50, 'Email cannot exceed 50 characters.'], 
     trim: true,
-    lowercase: true, // Converts the email to lowercase
+    lowercase: true,
     match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email address.']
   },
   gender: { 
@@ -38,7 +31,7 @@ const driverSchema = new mongoose.Schema({
     maxlength: [15, 'CNIC cannot exceed 15 characters.'], 
     required: [true, 'CNIC is required.'], 
     unique: true,
-    match: [/^\d{5}-\d{7}-\d{1}$/, 'CNIC must be in the format XXXXX-XXXXXXX-X.'] // Validates standard CNIC format
+    match: [/^\d{5}-\d{7}-\d{1}$/, 'CNIC must be in the format XXXXX-XXXXXXX-X.']
   },
   phoneNumber: { 
     type: String, 
@@ -46,41 +39,24 @@ const driverSchema = new mongoose.Schema({
     match: [
       /^((\+92)|0)(3[0-9]{2})[0-9]{7}$/, 
       'Phone number must be a valid Pakistani number in the format +92XXXXXXXXXX or 03XXXXXXXXX.'
-    ] // Validates Pakistani phone number format
+    ]
   },
-});
-
-// Function to get the next auto-incremented ID
-const getNextSequenceValue = async (modelName) => {
-  const counter = await Counter.findByIdAndUpdate(
-    { _id: modelName },        // Use the model name as the _id for the counter document
-    { $inc: { seq: 1 } },      // Increment the 'seq' field by 1
-    { new: true, upsert: true, setDefaultsOnInsert: true } // Ensure the document is created if it doesn't exist
-  );
-  return counter.seq;          // Return the incremented value
-};
-
-driverSchema.pre('save', async function (next) {
-  if (this.isNew) { // Only apply the ID logic if the document is new
-    try {
-      const nextId = await getNextSequenceValue('driver'); // Get the next ID from the counter
-      if (!nextId) {
-        return next(new Error('Failed to generate ID for new driver'));
-      }
-      console.log('Assigning new ID:', nextId);  // Debugging line
-      this.id = nextId;  // Assign the new ID
-      next();  // Proceed with saving the driver
-    } catch (err) {
-      console.error('Error getting next sequence value:', err);  // Log any errors
-      next(err);  // Pass the error to next middleware
-    }
-  } else {
-    next();  // If not a new document, continue with the save
+  dateOfBirth: { 
+    type: Date, 
+    required: [true, 'Date of Birth is required.'],
+  },
+  ratings: { 
+    type: Number, 
+    default: 0, 
+    min: 0, 
+    max: 5,  // assuming ratings are between 0 and 5
+  },
+  createdAt: { 
+    type: Date, 
+    default: Date.now  // Automatically set the current timestamp
   }
 });
 
-
-// Create and export the model
 const Driver = mongoose.model('Driver', driverSchema);
 
 module.exports = Driver;
