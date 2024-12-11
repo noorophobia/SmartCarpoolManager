@@ -54,7 +54,9 @@ const driverSchema = new mongoose.Schema({
   createdAt: { 
     type: Date, 
     default: Date.now  // Automatically set the current timestamp
-  }
+  },
+  compositeId: { type: String, unique: true }, // Add this field
+
 });
 
 const Driver = mongoose.model('Driver', driverSchema);

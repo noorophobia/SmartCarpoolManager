@@ -16,7 +16,14 @@ router.get('/drivers', async (req, res) => {
   }
 });
 
-router.post('/drivers', async (req, res) => {
+// Function to generatappe composite ID
+const generateCompositeId = async () => {
+  const driverCount = await Driver.countDocuments();
+  return `DR-${String(driverCount + 1).padStart(3, '0')}`; // Generate ID like DR-001, DR-002, etc.
+};
+
+// Add a new driver
+ router.post('/drivers', async (req, res) => {
   try {
     const { name, gender, email, phoneNumber, cnic, dateOfBirth, ratings } = req.body;
     
@@ -29,8 +36,26 @@ router.post('/drivers', async (req, res) => {
       name, gender, email, phoneNumber, cnic, dateOfBirth, ratings
     });
 
+    // Save the driver first
     await newDriver.save();
-    res.status(201).json(newDriver); // Return the created driver object with the timestamp
+
+    // Generate the composite ID after the driver has been saved
+    const compositeId = await generateCompositeId();
+
+    // Update the driver with the generated composite ID
+    const updatedDriver = await Driver.findByIdAndUpdate(
+      newDriver._id,
+      { compositeId: compositeId },
+      { new: true }  // Return the updated driver
+    );
+
+    // Send back the updated driver with both compositeId and _id (id)
+    res.status(201).json({
+      id: updatedDriver._id,        // MongoDB's _id
+      compositeId: updatedDriver.compositeId, // The custom composite ID
+      ...updatedDriver.toObject()  // Convert Mongoose document to plain object and spread the rest of the fields
+    });
+
   } catch (error) {
     res.status(500).json({ message: 'Error adding driver. Please try again.', error: error.message });
   }

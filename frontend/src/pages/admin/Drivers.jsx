@@ -38,20 +38,21 @@ const Drivers = () => {
         
         const mappedData = data.map(driver => ({
           id: driver._id,
+ 
+          compositeId: driver.compositeId, // Add compositeId here
           name: driver.name,
           gender: driver.gender,
           email: driver.email,
           phoneNumber: driver.phoneNumber,
-          cnic:driver.cnic,
-          dateOfBirth:driver.dateOfBirth,
+          cnic: driver.cnic,
+          dateOfBirth: driver.dateOfBirth,
         }));
-
+  
         setDrivers(mappedData); // Update state with the mapped data
-        
         const driverEmails = data.map(driver => driver.email);
         const driverPhoneNumbers = data.map(driver => driver.phoneNumber);
         const driverCnics = data.map(driver => driver.cnic);
-
+  
         setEmails(driverEmails);
         setPhoneNumbers(driverPhoneNumbers);
         setCnics(driverCnics);
@@ -59,9 +60,10 @@ const Drivers = () => {
         console.error('Failed to fetch drivers:', error);
       }
     };
-
+  
     fetchDrivers(); // Call the function to fetch data
   }, []);
+  
 
   // Handle navigation to the driver's details page
   const handleViewDetails = (id) => {
@@ -183,7 +185,7 @@ const handleClose = () => {
           setDrivers(updatedDrivers);
         } else {
           // Add new driver to the list
-          setDrivers([...drivers, result]);
+          setDrivers(prevDrivers => [...prevDrivers, result]); // Using prev state for a safer update
         }
         handleClose(); // Close the dialog
         setName('');
@@ -230,6 +232,8 @@ const handleClose = () => {
   };
   const columns = [
     { field: 'id', headerName: 'ID', width: 90 },
+    { field: 'compositeId', headerName: 'Composite ID', width: 150 },  // Add this line
+
     { field: 'name', headerName: 'Name', width: 150 },
     { field: 'gender', headerName: 'Gender', width: 120 },
     { field: 'email', headerName: 'Email', width: 180 },
@@ -307,6 +311,8 @@ const handleClose = () => {
             className="dataGrid"
             rows={drivers}
             columns={columns}
+            getRowId={(row) => row.compositeId} // Set the unique ID field
+
             slots={{ toolbar: GridToolbar }}
             pageSizeOptions={[5, 10, 20]}
             checkboxSelection
