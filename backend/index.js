@@ -3,9 +3,10 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
-require('dotenv').config();
+ require('dotenv').config();
 
- 
+const driversRoutes = require('./routes/driver'); // Import driver routes
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -25,7 +26,8 @@ app.use(helmet({
 
 app.use(cors()); // Enable CORS for all origins (you can specify origins here)
 app.use(express.json()); // Parse JSON request bodies
-
+// Use the drivers route
+app.use(driversRoutes);
 // MongoDB connection
 console.log('MongoDB URI:', process.env.MONGO_URI);
 mongoose.connect(process.env.MONGO_URI)
