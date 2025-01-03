@@ -6,7 +6,7 @@ const Menu = () => {
     <div className="menu">
          <div className="item">
           <div className="title">Main</div>
-          <Link to="/" className="listItem"> 
+          <Link to="/home" className="listItem"> 
             <img src="home.svg" alt="icon" className="icon" />
              <span className="listItemTitle">Home </span>
           </Link>

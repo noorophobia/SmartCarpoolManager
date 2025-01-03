@@ -190,5 +190,20 @@ router.delete('/vehicles/:id', async (req, res) => {
     res.status(500).json({ message: 'Failed to delete vehicle', error: error.message });
   }
 });
+// Fetch vehicles by driverId
+router.get('/vehicles/driver/:driverId', async (req, res) => {
+  const { driverId } = req.params;
+
+  try {
+    const vehicles = await Vehicle.find({ driverId }).populate('driverId', 'name email'); // Populate driver details
+    if (vehicles.length === 0) {
+      return res.status(404).json({ message: 'No vehicles found for the given driver ID' });
+    }
+    res.status(200).json(vehicles);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch vehicles', error: error.message });
+  }
+});
+
 
 module.exports = router;

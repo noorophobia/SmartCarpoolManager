@@ -49,13 +49,14 @@ const driverSchema = new mongoose.Schema({
     type: Number, 
     default: 0, 
     min: 0, 
-    max: 5,  // assuming ratings are between 0 and 5
+    max: 5,   
   },
   createdAt: { 
     type: Date, 
-    default: Date.now  // Automatically set the current timestamp
+    default: Date.now   
   },
-  compositeId: { type: String, unique: true }, // Add this field
+  compositeId: { type: String, unique: true }, 
+  isApproved: { type:Boolean, default:false},
 
 });
 

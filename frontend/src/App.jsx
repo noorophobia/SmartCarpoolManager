@@ -56,7 +56,7 @@ function App() {
       element: <Layout />, // Use <Layout /> here
       children: [
         {
-          path: "",
+          path: "/",
           element: <Home />,
         },
         {

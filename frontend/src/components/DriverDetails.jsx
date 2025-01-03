@@ -1,25 +1,81 @@
-import React, { useState } from 'react';
+import React, { useState ,useEffect} from 'react';
 import { useParams } from 'react-router-dom';
-import { Button, Box, Grid, Card, CardContent, Typography, Divider, CardMedia, Avatar, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Button, Box, Grid,Grid2, Card, CardContent, Typography, Divider, CardMedia, Avatar, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Carousel } from 'react-responsive-carousel';
+import "react-responsive-carousel/lib/styles/carousel.min.css"; // import the carousel styles
 
 const DriverDetails = () => {
   const { id } = useParams();
+  const [driver1, setDriver1] = useState(null); // Store fetched driver data
+  const [vehicle, setVehicle] = useState(null); // Store fetched driver data
+  const [openCarDialog, setOpenCarDialog] = useState(false); // Dialog open state
+  const [carouselImages, setCarouselImages] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [loading, setLoading] = useState(true); // Loading state
+  const [error, setError] = useState(null); // Error state
+  console.log('Driver ID:', id);
+
+  useEffect(() => {
+    const fetchDriver = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/drivers/${id}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch driver details');
+        }
+        const data = await response.json();
+        console.log(data);
+console.log(response);
+        setDriver1(data);
+       } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    const fetchVehicle = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/vehicles/driver/${id}`);
+        const data = await response.json();
+        console.log('Fetched Vehicle Data:', data);
+        
+        // Access the first item in the array (if there is any data)
+        if (data && data.length > 0) {
+          setVehicle(data[0]); // Set vehicle state to the first object in the array
+        } else {
+          setVehicle(null); // Handle case where no vehicle data is found
+        }
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+
+    fetchDriver();
+    fetchVehicle();
+  }, [id]);
+
+  if(driver1){
+  console.log("driver 1 "+ driver1.name)
+ }
+ if(vehicle){
+console.log("vehicle"+vehicle.driverPhoto
+);
+console.log("brand"+vehicle.brand);
+ }
+ const handleOpenCarDialog = () => {
+  setOpenCarDialog(true);
+};
+
+const handleCloseCarDialog = () => {
+  setOpenCarDialog(false);
+};
   
-  // Dummy driver data
-  const driver = {
+  
+;  const driver = {
     id: 1,
-    name: 'John Doe',
-    gender: 'Male',
-    email: 'john.doe@example.com',
-    phoneNumber: '+1234567890',
-    cnic: '12345-1234567-1',
-    ratings: 4,
-    vehicleBrand: 'Toyota',
-    vehicleName: 'Corolla',
-    vehicleColor: 'Red',
-    vehicleID: 'V1234',
-    vehicleType: 'Sedan',
-    licenseNumber: 'ABC123',
+     
     totalSeatsCapacity: 5,
     totalRides: 2,
     completedRides: 2,
@@ -43,13 +99,22 @@ const DriverDetails = () => {
   const [selectedDocument, setSelectedDocument] = useState(null);
 
   const handleOpenDialog = (doc) => {
-    setSelectedDocument(doc);
-    setOpenDialog(true);
+     setOpenDialog(true);
   };
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
-    setSelectedDocument(null);
+   };
+  const handleCategoryChange = (category) => {
+    if (category === 'CNIC') {
+ 
+      setCarouselImages([ `http://localhost:5000/uploads/${vehicle.cnicFront}` , `http://localhost:5000/uploads/${vehicle.cnicBack}`]);
+      setSelectedCategory('CNIC');
+    } else if (category === 'Vehicle Registration') {
+      setCarouselImages([ `http://localhost:5000/uploads/${vehicle.vehicleRegistrationFront}` , `http://localhost:5000/uploads/${vehicle.vehicleRegistrationBack}`]);
+
+       setSelectedCategory('Vehicle Registration');
+    }
   };
 
   return (
@@ -57,84 +122,139 @@ const DriverDetails = () => {
       <Typography variant="h4" gutterBottom>
         Driver Details
       </Typography>
-
+  
       {/* Driver and Vehicle Information Section */}
-      <Grid container spacing={4}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: '20px' }}>
         {/* Driver Details Section */}
-        <Grid item xs={12} sm={6}>
+        <Box sx={{ flex: 1 }}>
           <Card sx={{ height: '100%' }}>
             <CardContent sx={{ backgroundColor: '#f5f5f5' }}>
-              <Box sx={{ backgroundColor: '#2F4E6F', color: 'white', padding: '8px', borderRadius: '4px' }}>
+              <Box sx={{ backgroundColor: '#2F4E6F', color: 'white', padding: '16px', borderRadius: '4px' }}>
                 <Typography variant="h6" gutterBottom>Driver Information</Typography>
               </Box>
               <Divider />
-              <Grid container spacing={2} alignItems="center">
+              <Box display="flex" alignItems="center">
                 {/* Driver Image */}
-                <Grid item xs={4}>
-                  <Avatar
-                    alt={driver.name}
-                    src={driver.driverImage}
-                    sx={{ width: 120, height: 120 }}
-                  />
-                </Grid>
+                <Box sx={{ width: '25%' }}>
+                  {driver1 && vehicle && (
+                    <Avatar
+                      alt={driver1.name}
+                      src={`http://localhost:5000/uploads/${vehicle.driverPhoto}`}
+                      sx={{ width: 150, height: 150, marginLeft: 4 }}
+                    />
+                  )}
+                </Box>
                 {/* Driver Details */}
-                <Grid item xs={8}>
-                  <div>
-                    <Typography><strong>Driver ID:</strong> {driver.id}</Typography>
-                    <Typography><strong>Name:</strong> {driver.name}</Typography>
-                    <Typography><strong>Gender:</strong> {driver.gender}</Typography>
-                    <Typography><strong>Email:</strong> {driver.email}</Typography>
-                    <Typography><strong>Phone Number:</strong> {driver.phoneNumber}</Typography>
-                    <Typography><strong>CNIC:</strong> {driver.cnic}</Typography>
-                    <Typography><strong>Date of Birth:</strong> {driver.dateOfBirth}</Typography>
-                    <Typography><strong>Ratings:</strong> {driver.ratings}</Typography>
-                  </div>
-                </Grid>
-              </Grid>
+                <Box sx={{ width: '75%',marginLeft:4 }}>
+                  {driver1 && (
+                    <div>
+                      <Typography sx={{ fontSize: '1rem', marginBottom: 1, marginTop: 3 }}>
+                        <strong>Driver ID:</strong> {driver1.compositeId}
+                      </Typography>
+                      <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}><strong>Name:</strong> {driver1.name}</Typography>
+                      <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}><strong>Gender:</strong> {driver1.gender}</Typography>
+                      <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}><strong>Email:</strong> {driver1.email}</Typography>
+                      <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}><strong>Phone Number:</strong> {driver1.phoneNumber}</Typography>
+                      <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}><strong>CNIC:</strong> {driver1.cnic}</Typography>
+                      <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}><strong>Date of Birth:</strong> {driver1.dateOfBirth}</Typography>
+                      <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}><strong>Ratings:</strong> {driver1.ratings}</Typography>
+                    </div>
+                  )}
+                </Box>
+              </Box>
+              <Box display="flex" justifyContent="flex-end">
+                <Button variant="contained" color="primary" onClick={handleOpenDialog}>
+                  View Documents
+                </Button>
+              </Box>
             </CardContent>
           </Card>
-        </Grid>
-
+        </Box>
+  
         {/* Vehicle Details Section */}
-        <Grid item xs={12} sm={6}>
+        <Box sx={{ flex: 1 }}>
           <Card sx={{ height: '100%' }}>
             <CardContent sx={{ backgroundColor: '#f5f5f5' }}>
-              <Box sx={{ backgroundColor: '#2F4E6F', color: 'white', padding: '8px', borderRadius: '4px' }}>
+              <Box sx={{ backgroundColor: '#2F4E6F', color: 'white', padding: '16px', borderRadius: '4px' }}>
                 <Typography variant="h6" gutterBottom>Vehicle Information</Typography>
               </Box>
               <Divider />
-              <Grid container spacing={2} alignItems="center">
+              <Box display="flex" alignItems="center">
                 {/* Car Image */}
-                <Grid item xs={4}>
-                  <CardMedia
-                    component="img"
-                    height="140"
-                    image={driver.carImage}
-                    alt="Car Image"
-                  />
-                </Grid>
+                <Box sx={{ width: '25%' }}>
+                  {vehicle && (
+                    <CardMedia
+                      component="img"
+                      height="140"
+                      image={`http://localhost:5000/uploads/${vehicle.vehiclePhotos[0]}`}
+                      alt="Car Image"
+                    />
+                  )}
+                </Box>
                 {/* Vehicle Details */}
-                <Grid item xs={8}>
-                  <div>
-                    <Typography><strong>Brand:</strong> {driver.vehicleBrand}</Typography>
-                    <Typography><strong>Name:</strong> {driver.vehicleName}</Typography>
-                    <Typography><strong>Color:</strong> {driver.vehicleColor}</Typography>
-                    <Typography><strong>Vehicle ID:</strong> {driver.vehicleID}</Typography>
-                    <Typography><strong>Type:</strong> {driver.vehicleType}</Typography>
-                    <Typography><strong>License Number:</strong> {driver.licenseNumber}</Typography>
-                    <Typography><strong>Total Seats Capacity:</strong> {driver.totalSeatsCapacity}</Typography>
-                  </div>
-                </Grid>
-              </Grid>
+                <Box sx={{ width: '75%' ,marginLeft:4 }}>
+                  {vehicle &&
+                  <div style={{ marginLeft: 16 }}>
+                    <Typography sx={{ fontSize: '1rem', marginBottom: 1, marginTop: 4 }}>
+                      <strong>Brand:</strong> {vehicle.brand}
+                    </Typography>
+                    <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}>
+                      <strong>Name:</strong> {vehicle.vehicleName}
+                    </Typography>
+                    <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}>
+                      <strong>Color:</strong> {vehicle.vehicleColor}
+                    </Typography>
+                    
+                    <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}>
+                      <strong>Type:</strong> {driver.vehicleType}
+                    </Typography>
+                    <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}>
+                      <strong>Production Year:</strong> {vehicle.vehicleProductionYear}
+                    </Typography>
+                    <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}>
+                      <strong>License Number:</strong> {vehicle.licenseNumber}
+                    </Typography>
+                    <Typography sx={{ fontSize: '1rem', marginBottom: 4 }}>
+                      <strong>Total Seats Capacity:</strong> {vehicle.vehicleType}
+                    </Typography>
+                    <Box display="flex" justifyContent="flex-end">
+                      <Button variant="contained" color="primary" onClick={handleOpenCarDialog}>
+                        See Vehicle Photos
+                      </Button>
+                    </Box>
+                  </div>}
+                </Box>
+              </Box>
             </CardContent>
           </Card>
-        </Grid>
-      </Grid>
-
+        </Box>
+      </Box>
+  
       {/* Ride Statistics and Rates Section */}
-      <Grid container spacing={4} sx={{ marginTop: '20px' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: '20px', marginTop: '20px' }}>
         {/* Ride Statistics Section */}
-        <Grid item xs={12} sm={6}>
+        <Box sx={{ flex: 1 }}>
+          <Card sx={{ height: '100%' }}>
+            <CardContent sx={{ backgroundColor: '#f5f5f5' }}>
+              <Box sx={{ backgroundColor: '#2F4E6F', color: 'white', padding: '8px', borderRadius: '4px' }}>
+                <Typography variant="h6" gutterBottom>Rates</Typography>
+              </Box>
+              <Divider />
+               <div>
+               <Typography sx={{ fontSize: '1rem', marginBottom: 1, marginTop: 2,marginLeft:4}}><strong>Distance Rate per KM:</strong> {driver.distanceRatePerKm}</Typography>
+              <Typography sx={{ fontSize: '1rem', marginBottom: 1, marginTop: 2,marginLeft:4}}><strong>Time Rate per Minute:</strong> {driver.timeRatePerMinute}</Typography>
+              <Typography sx={{ fontSize: '1rem', marginBottom: 1, marginTop: 2,marginLeft:4}}><strong>Fixed Driver Fee:</strong> {driver.fixedDriverFee}</Typography>
+              <Typography sx={{ fontSize: '1rem', marginBottom: 1, marginTop: 2,marginLeft:4}}><strong>Peak Rate Multiplier:</strong> {driver.peakRateMultiplier}</Typography>
+              <Typography sx={{ fontSize: '1rem', marginBottom: 1, marginTop: 2,marginLeft:4}}><strong>Discounts:</strong> {driver.discounts}</Typography>
+              
+             
+              </div>
+            </CardContent>
+          </Card>
+        </Box>
+  
+        {/* Rates Section */}
+        <Box sx={{ flex: 1 }}>
           <Card sx={{ height: '100%' }}>
             <CardContent sx={{ backgroundColor: '#f5f5f5' }}>
               <Box sx={{ backgroundColor: '#2F4E6F', color: 'white', padding: '8px', borderRadius: '4px' }}>
@@ -142,75 +262,74 @@ const DriverDetails = () => {
               </Box>
               <Divider />
               <div>
-                <Typography><strong>Total Rides:</strong> {driver.totalRides}</Typography>
-                <Typography><strong>Completed Rides:</strong> {driver.completedRides}</Typography>
-                <Typography><strong>Cancelled Rides:</strong> {driver.cancelledRides}</Typography>
+              <Typography sx={{ fontSize: '1rem', marginBottom: 1, marginTop: 2,marginLeft:4}}><strong>Total Rides:</strong> {driver.totalRides}</Typography>
+                 <Typography sx={{ fontSize: '1rem', marginBottom: 1,marginTop: 2,marginLeft:4}}><strong>Completed Rides:</strong> {driver.completedRides}</Typography>
+                 <Typography sx={{ fontSize: '1rem', marginBottom: 1,marginTop: 2,marginLeft:4,marginBottom:11}}><strong>Cancelled Rides:</strong> {driver.cancelledRides}</Typography>
               </div>
             </CardContent>
           </Card>
-        </Grid>
-
-        {/* Rates Section */}
-        <Grid item xs={12} sm={6}>
-          <Card sx={{ height: '100%' }}>
-            <CardContent sx={{ backgroundColor: '#f5f5f5' }}>
-              <Box sx={{ backgroundColor: '#2F4E6F', color: 'white', padding: '8px', borderRadius: '4px' }}>
-                <Typography variant="h6" gutterBottom>Rates</Typography>
-              </Box>
-              <Divider />
-              <div>
-                <Typography><strong>Distance Rate per KM:</strong> {driver.distanceRatePerKm}</Typography>
-                <Typography><strong>Time Rate per Minute:</strong> {driver.timeRatePerMinute}</Typography>
-                <Typography><strong>Fixed Driver Fee:</strong> {driver.fixedDriverFee}</Typography>
-                <Typography><strong>Peak Rate Multiplier:</strong> {driver.peakRateMultiplier}</Typography>
-                <Typography><strong>Discounts:</strong> {driver.discounts}</Typography>
+        </Box>
+      </Box>
+    <Dialog open={openCarDialog} onClose={handleCloseCarDialog} fullWidth maxWidth="md">
+    <DialogTitle>Vehicle Photos</DialogTitle>
+    <DialogContent>
+      {vehicle?.vehiclePhotos?.length === 1 ? (
+        // Single image view
+        <img
+           src={`http://localhost:5000/uploads/${vehicle.vehiclePhotos[0]}`}
+          alt={`Vehicle Photo 1`}
+          style={{ width: '100%', height: 'auto' }}
+        />
+      ) : (
+        // Multiple images carousel
+        vehicle?.vehiclePhotos?.length > 1 && (
+          <Carousel>
+            {vehicle.vehiclePhotos.map((photo, index) => (
+              <div key={index}>
+                <img
+                  src={`http://localhost:5000/uploads/${photo}`}
+                  alt={`Vehicle Photo ${index + 1}`}
+                  style={{ width: '50%', height: 'auto' }}
+                />
               </div>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-
-      {/* Documents Section */}
-      <Card sx={{ marginTop: '20px', height: '100%' }}>
-        <CardContent sx={{ backgroundColor: '#f5f5f5' }}>
-          <Box sx={{ backgroundColor: '#2F4E6F', color: 'white', padding: '8px', borderRadius: '4px' }}>
-            <Typography variant="h6" gutterBottom>Documents</Typography>
-          </Box>
-          <Divider />
-          <ul>
-            {driver.documents.map((doc) => (
-              <li key={doc.id}>
-                <Button onClick={() => handleOpenDialog(doc)}>{doc.name}</Button>
-              </li>
             ))}
-          </ul>
-        </CardContent>
-      </Card>
-
+          </Carousel>
+        )
+      )}
+    </DialogContent>
+    <DialogActions>
+      <Button onClick={handleCloseCarDialog} color="primary">Close</Button>
+    </DialogActions>
+  </Dialog>
       {/* Document Dialog */}
       <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="md">
-        <DialogTitle>{selectedDocument ? selectedDocument.name : 'Document View'}</DialogTitle>
+        <DialogTitle>{`Documents - ${selectedCategory}`}</DialogTitle>
         <DialogContent>
-          {selectedDocument && (
-            <iframe
-              src={selectedDocument.url}
-              width="100%"
-              height="400px"
-              title={selectedDocument.name}
-            />
-          )}
+          {/* Carousel displaying selected images */}
+          <Carousel>
+            {carouselImages.map((image, index) => (
+              <div key={index}>
+                <img src={image} alt={`carousel-item-${index}`} style={{ width: '100%' }} />
+              </div>
+            ))}
+          </Carousel>
         </DialogContent>
         <DialogActions>
+          {/* Buttons to switch between different categories of images */}
+          <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', padding: '10px' }}>
+            <Button variant="outlined" onClick={() => handleCategoryChange('CNIC')}>CNIC</Button>
+            <Button variant="outlined" onClick={() => handleCategoryChange('Vehicle Registration')} style={{ marginLeft: '10px' }}>Vehicle Registration</Button>
+          </Box>
           <Button onClick={handleCloseDialog} color="primary">Close</Button>
         </DialogActions>
       </Dialog>
-
+  
       {/* Back Button */}
       <Button variant="contained" color="primary" onClick={() => window.history.back()} style={{ marginTop: '20px' }}>
         Back
       </Button>
     </div>
   );
-};
+};  
 
 export default DriverDetails;

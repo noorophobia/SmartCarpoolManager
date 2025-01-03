@@ -5,12 +5,12 @@ import '../styles/addDriver.css'
 const AddDriver = () => {
   const [name, setName] = useState('');
   const [gender, setGender] = useState('');
-  const [email, setEmail] = useState('');
+   const [email, setEmail] = useState('');
   const [cnic, setCnic] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [ratings, setRatings] = useState(0);
-  const [vehicleBrand, setVehicleBrand] = useState('');
+  const [brand, setVehicleBrand] = useState('');
   const [vehicleName, setVehicleName] = useState('');
   const [vehicleColor, setVehicleColor] = useState('');
    const [vehicleType, setVehicleType] = useState('');
@@ -36,7 +36,7 @@ const AddDriver = () => {
     cnic: "",
     dateOfBirth: "",
     vehicleName: "",
-    vehicleBrand:"",
+    brand:"",
     vehicleColor:"",
     vehicleType:"",
 
@@ -86,7 +86,7 @@ const currentYear = new Date().getFullYear();
       cnic: "",
       dateOfBirth: "",
       vehicleName: "",
-      vehicleBrand:"",
+      brand:"",
     vehicleColor:"",
     vehicleType:"",
       vehicleProductionYear: "",
@@ -149,8 +149,8 @@ const currentYear = new Date().getFullYear();
       setErrorMessages((prev) => ({ ...prev, vehicleName: "Vehicle Name is required" }));
       hasError = true;
     }
-    if(!vehicleBrand){
-      setErrorMessages((prev) => ({ ...prev, vehicleBrand: "Vehicle Brand is required" }));
+    if(!brand){
+      setErrorMessages((prev) => ({ ...prev, brand: "Vehicle Brand is required" }));
       hasError = true;
     }
     if(!vehicleColor){
@@ -208,7 +208,7 @@ const currentYear = new Date().getFullYear();
   
 
     // Append vehicle fields to formData
-  formData.append('vehicleBrand', vehicleBrand);
+  formData.append('brand', brand);
   formData.append('vehicleName', vehicleName);
   formData.append('vehicleColor', vehicleColor);
    formData.append('vehicleType', vehicleType);
@@ -535,11 +535,11 @@ const currentYear = new Date().getFullYear();
                     label="Vehicle Brand"
                     variant="outlined"
                     fullWidth
-                    value={vehicleBrand}
+                    value={brand}
                     onChange={(e) => setVehicleBrand(e.target.value)}
                     margin="normal"
-                    error={!!errorMessages.vehicleBrand}
-                    helperText={errorMessages.vehicleBrand}
+                    error={!!errorMessages.brand}
+                    helperText={errorMessages.brand}
                   />
                   <TextField
                     label="Vehicle Name"

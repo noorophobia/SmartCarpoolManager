@@ -14,6 +14,8 @@ const PORT = process.env.PORT || 5000;
 
 // Set the Content Security Policy header using helmet
 app.use(helmet({
+  crossOriginResourcePolicy: false, // fixed getting image from backend server
+
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
@@ -26,20 +28,31 @@ app.use(helmet({
   }
 }));
 
-app.use(cors()); // Enable CORS for all origins (you can specify origins here)
+app.use(cors({
+  origin: 'http://localhost:5173' , // Allow only frontend domain
+  methods: ['GET', 'POST', 'DELETE', 'PUT'], // Allow DELETE method
+//y methods
+  allowedHeaders: ['Content-Type', 'Authorization']
+
+}));
+
+// Then your static routes
+app.use('/uploads', express.static('uploads'));
+
 app.use(express.json()); // Parse JSON request bodies
 // Use the drivers route
 app.use(driversRoutes);
 app.use(vehiclesRoutes);
-app.use('/uploads', express.static('uploads'));
-
+app.get('/uploads/:imageName', (req, res) => {
+  const imageName = req.params.imageName;
+  const imagePath = path.join(__dirname, 'uploads', imageName);
+  res.sendFile(imagePath);
+});
 // MongoDB connection
 console.log('MongoDB URI:', process.env.MONGO_URI);
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected'))
   .catch((err) => console.log('Failed to connect to MongoDB:', err));
-
-// Use user routes
  
 // Test route
 app.get('/', (req, res) => {
