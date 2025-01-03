@@ -18,14 +18,18 @@ import Menu from './components/Menu'
 import Map from './pages/Map'
 import PendingApplications from './pages/admin/PendingApplications';
 import '../src/styles/global.css';  // Import the CSS file
-import UserDetails from './components/UserDetails';
-import RatingsAndReviews from './pages/admin/RatingsAndReviews';
+ import RatingsAndReviews from './pages/admin/RatingsAndReviews';
 import Revenue from './pages/revenue/OverallRevenue';
  import YearlyRevenue from './pages/revenue/YearlyRevenue';
 import DriverDetails from './components/DriverDetails';
 import RateSetting from './pages/admin/RateSetting';
 import PassengerDetails from './components/PassengerDetails';
 import RideDetails from './components/RideDetails';
+ import AddEditDriver from './components/AddPassenger';
+import AddDriver from './components/AddDriver';
+import EditDriver from './components/EditDriver';
+
+
 function Layout() {
   return (
     <div className="main">
@@ -64,9 +68,13 @@ function App() {
           element: <Drivers />,
         },
         {
-          path: "/details/:type/:id", // New route for details page
-          element: <UserDetails />,  // DetailsPage component
+          path: "/add-driver/", // New route for details page
+          element: <AddDriver />,  
+        }, {
+          path: "/edit-driver/:id", // New route for editing driver page
+          element: <EditDriver />,  
         },
+ 
         {
           path: "/rides",
           element: <Rides />,
@@ -116,7 +124,9 @@ function App() {
         {
           path:"/rate-setting",
           element:<RateSetting/>,
-         }
+         },
+         
+         
       ],
       
     }, {

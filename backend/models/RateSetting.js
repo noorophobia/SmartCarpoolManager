@@ -10,6 +10,8 @@ const rateSettingsSchema = new mongoose.Schema({
       },
       distanceRatePerKm: { type: Number, required: true },
       timeRatePerMinute: { type: Number, required: true },
+      totalSeatsCapacity: { type: Number, required: true },
+
       fixedDriverFee: { type: Number, required: true },
       peakRateMultiplier: { type: Number, required: true },
       discounts: { type: Number, required: true },

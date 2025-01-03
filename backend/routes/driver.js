@@ -15,6 +15,25 @@ router.get('/drivers', async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch drivers' });
   }
 });
+// Fetch a single driver by ID
+router.get('/drivers/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Find the driver by the compositeId or MongoDB _id
+    const driver = await Driver.findById(id);  // MongoDB's findById method
+
+    // If the driver is not found, return a 404 error
+    if (!driver) {
+      return res.status(404).json({ message: 'Driver not found' });
+    }
+
+    res.status(200).json(driver);  // Return the driver details as JSON
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch driver details', error: error.message });
+  }
+});
+
 
 // Function to generatappe composite ID
 const generateCompositeId = async () => {
@@ -26,7 +45,8 @@ const generateCompositeId = async () => {
  router.post('/drivers', async (req, res) => {
   try {
     const { name, gender, email, phoneNumber, cnic, dateOfBirth, ratings } = req.body;
-    
+    console.log("req body "+req.body);
+    console.log(dateOfBirth);
     // Ensure all required fields are present
     if (!dateOfBirth) {
       return res.status(400).json({ message: 'Date of Birth required.' });

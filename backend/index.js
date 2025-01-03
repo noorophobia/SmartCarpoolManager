@@ -6,6 +6,8 @@ const helmet = require('helmet');
  require('dotenv').config();
 
 const driversRoutes = require('./routes/driver'); // Import driver routes
+const vehiclesRoutes=require('./routes/vehicle')
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -28,6 +30,9 @@ app.use(cors()); // Enable CORS for all origins (you can specify origins here)
 app.use(express.json()); // Parse JSON request bodies
 // Use the drivers route
 app.use(driversRoutes);
+app.use(vehiclesRoutes);
+app.use('/uploads', express.static('uploads'));
+
 // MongoDB connection
 console.log('MongoDB URI:', process.env.MONGO_URI);
 mongoose.connect(process.env.MONGO_URI)
