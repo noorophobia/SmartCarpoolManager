@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
- 
+
 import '../../styles/tables.css';
 
 const Drivers = () => {
@@ -15,12 +15,29 @@ const Drivers = () => {
   useEffect(() => {
     const fetchDrivers = async () => {
       try {
-        const response = await fetch('http://localhost:5000/drivers');
+        // Get the token from localStorage (or sessionStorage)
+        const token = localStorage.getItem('token');  // Or sessionStorage.getItem('token')
+        
+        //   alert('You are not authenticated');
+          if (!token) {
+            // If no token is found, redirect to the login page
+            navigate('/login');
+            return;
+          }
+          
+
+        const response = await fetch('http://localhost:5000/drivers', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`, // Add the token to the Authorization header
+            'Content-Type': 'application/json',
+          },
+        });
+        
         const data = await response.json();
         
         const mappedData = data.map(driver => ({
           id: driver._id,
- 
           compositeId: driver.compositeId, // Add compositeId here
           name: driver.name,
           gender: driver.gender,
@@ -29,15 +46,8 @@ const Drivers = () => {
           cnic: driver.cnic,
           dateOfBirth: driver.dateOfBirth,
         }));
-  
+
         setDrivers(mappedData); // Update state with the mapped data
-        const driverEmails = data.map(driver => driver.email);
-        const driverPhoneNumbers = data.map(driver => driver.phoneNumber);
-        const driverCnics = data.map(driver => driver.cnic);
-  
-        setEmails(driverEmails);
-        setPhoneNumbers(driverPhoneNumbers);
-        setCnics(driverCnics);
       } catch (error) {
         console.error('Failed to fetch drivers:', error);
       }
@@ -45,31 +55,35 @@ const Drivers = () => {
   
     fetchDrivers(); // Call the function to fetch data
   }, []);
-  
 
   // Handle navigation to the driver's details page
   const handleViewDetails = (id) => {
     navigate(`/drivers/${id}`);
   };
 
-  
- 
+  const handleEdit = (id) => {
+    navigate(`/edit-driver/${id}`);
+    console.log("editing "+id);
+  };
 
-
-const handleEdit = (id) => {
-  navigate(`/edit-driver/${id}`);
-  console.log("editing "+id);
-};
-
-
-  
-   // Handle delete action
+  // Handle delete action
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm('Are you sure you want to delete this driver?');
     if (confirmDelete) {
       try {
+        const token = localStorage.getItem('token');  // Retrieve token for delete request
+        
+        if (!token) {
+          alert('You are not authenticated');
+          return;
+        }
+
         const response = await fetch(`http://localhost:5000/drivers/${id}`, {
           method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,  // Add the token to the Authorization header
+            'Content-Type': 'application/json',
+          },
         });
         if (response.ok) {
           setDrivers(drivers.filter(driver => driver.id !== id)); // Remove the deleted driver from state
@@ -82,9 +96,9 @@ const handleEdit = (id) => {
       }
     }
   };
-  const columns = [
-     { field: 'compositeId', headerName: 'ID', width: 150 },  // Add this line
 
+  const columns = [
+    { field: 'compositeId', headerName: 'ID', width: 150 },
     { field: 'name', headerName: 'Name', width: 150 },
     { field: 'gender', headerName: 'Gender', width: 120 },
     { field: 'email', headerName: 'Email', width: 180 },
@@ -112,9 +126,7 @@ const handleEdit = (id) => {
         <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
           <Button
             style={{ padding: 0, minWidth: '40px', height: '40px', backgroundColor: 'transparent' }}
-            
             onClick={() => handleEdit(params.row.id)}
-            
           >
             <img
               src="/edit_icon.svg"
@@ -135,12 +147,12 @@ const handleEdit = (id) => {
             onClick={() => handleDelete(params.row.id)}
           >
             <img
-              src="/delete_icon.svg" // Replace with the actual path to the delete icon
+              src="/delete_icon.svg"
               alt="Delete Button"
               style={{
-                width: '30px', // Adjust the size of the image
+                width: '30px',
                 height: '30px',
-                objectFit: 'contain', // Ensure the image fits within the button
+                objectFit: 'contain',
               }}
             />
           </Button>
@@ -155,8 +167,6 @@ const handleEdit = (id) => {
         <h1>Drivers</h1>
         <Button variant="contained" color="primary" onClick={() => navigate('/add-driver')}>
           Add New Driver
-
-
         </Button>
       </div>
 
@@ -167,16 +177,13 @@ const handleEdit = (id) => {
             rows={drivers}
             columns={columns}
             getRowId={(row) => row.compositeId} // Set the unique ID field
-
             slots={{ toolbar: GridToolbar }}
-            pageSizeOptions={[5, 10, 20,100]}
+            pageSizeOptions={[5, 10, 20, 100]}
             checkboxSelection
             disableRowSelectionOnClick
           />
         </Box>
       </div>
-
-      
     </div>
   );
 };

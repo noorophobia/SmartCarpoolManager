@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import "../../styles/login.css"; // Ensure the path is correct
 
@@ -10,13 +9,30 @@ const Login = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    alert(`Email: ${email} Password: ${password}`); // For debugging
+
     try {
-      const res = await axios.post("/api/admin/login", { email, password });
-      alert(res.data.message);
-      localStorage.setItem("token", res.data.token);
-      navigate("/home");
+      // Make the fetch request with POST method
+      const res = await fetch("http://localhost:5000/api/admin/login", {
+        method: "POST", // HTTP method
+        headers: {
+          "Content-Type": "application/json", // Specify content type
+        },
+        body: JSON.stringify({ email, password }), // Send email and password as JSON
+      });
+
+      // Check if the response is successful
+      if (!res.ok) {
+        throw new Error("Failed to login");
+      }
+
+      // Parse JSON response
+      const data = await res.json();
+      alert(data.message); // Show success message
+      localStorage.setItem("token", data.token); // Save token in localStorage
+      navigate("/"); // Navigate to home page after successful login
     } catch (err) {
-      alert(err.response?.data?.error || "An error occurred");
+      alert(err.message || "An error occurred");
     }
   };
 

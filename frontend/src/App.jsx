@@ -3,8 +3,11 @@ import {
   createBrowserRouter,
   RouterProvider,
   Outlet,
+  useNavigate,
   Link,
 } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+
  import Passengers from './pages/admin/Passengers';
 import Drivers from './pages/admin/Drivers';
 import Settings from './pages/admin/Settings';
@@ -30,7 +33,27 @@ import AddDriver from './components/AddDriver';
 import EditDriver from './components/EditDriver';
 
 
-function Layout() {
+   
+const Layout = () => {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true); // State to track the loading state
+
+  useEffect(() => {
+    const token = localStorage.getItem("token"); // Check if token exists
+    if (!token) {
+      // Redirect to login if not authenticated
+      navigate("/login");
+    }else {
+      // If authenticated, stop loading
+      setLoading(false);
+    }
+  }, [navigate]); // Runs once when the component mounts
+
+  if (loading) {
+    // While loading, show nothing or a loading spinner
+    return null; // You can also return a loading spinner here if desired
+  }
+
   return (
     <div className="main">
       <Navbar />

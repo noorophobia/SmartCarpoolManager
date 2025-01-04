@@ -1,81 +1,97 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; 
+
 import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
 import '../../styles/tables.css';
 
 const RateSetting = () => {
   const [rateSettings, setRateSettings] = useState({
-    ACCar: {
+    'AC Car': {
       distanceRatePerKm: 0,
       timeRatePerMinute: 0,
       fixedDriverFee: 0,
       peakRateMultiplier: 0,
       discounts: 0,
+      totalSeatsCapacity:0,
+
     },
-    EconomyCar: {
+    'Economy Car': {
       distanceRatePerKm: 0,
       timeRatePerMinute: 0,
       fixedDriverFee: 0,
-      peakRateMultiplier: 0,
+        peakRateMultiplier: 0,
       discounts: 0,
+      totalSeatsCapacity:0,
+
     },
     Rickshaw: {
       distanceRatePerKm: 0,
       timeRatePerMinute: 0,
+
       fixedDriverFee: 0,
+ 
       peakRateMultiplier: 0,
       discounts: 0,
+      totalSeatsCapacity:0,
+
     },
     Bike: {
       distanceRatePerKm: 0,
       timeRatePerMinute: 0,
       fixedDriverFee: 0,
+ 
       peakRateMultiplier: 0,
       discounts: 0,
+      totalSeatsCapacity:0,
+
     },
   });
+  const navigate = useNavigate();
 
   const [errors, setErrors] = useState({
-    ACCar: {},
-    EconomyCar: {},
+    'AC Car': {},
+    'Economy Car': {},
     Rickshaw: {},
     Bike: {},
   });
 
   useEffect(() => {
-    // Simulate fetching data by setting dummy data
-    const dummyData = {
-      ACCar: {
-        distanceRatePerKm: 5,
-        timeRatePerMinute: 2,
-        fixedDriverFee: 10,
-        peakRateMultiplier: 1.2,
-        discounts: 0.1,
-      },
-      EconomyCar: {
-        distanceRatePerKm: 4,
-        timeRatePerMinute: 1.5,
-        fixedDriverFee: 8,
-        peakRateMultiplier: 1.1,
-        discounts: 0.05,
-      },
-      Rickshaw: {
-        distanceRatePerKm: 3,
-        timeRatePerMinute: 1.2,
-        fixedDriverFee: 5,
-        peakRateMultiplier: 1.3,
-        discounts: 0.08,
-      },
-      Bike: {
-        distanceRatePerKm: 2,
-        timeRatePerMinute: 1,
-        fixedDriverFee: 4,
-        peakRateMultiplier: 1.1,
-        discounts: 0.02,
-      },
+    const token = localStorage.getItem('token'); // Retrieve token from localStorage
+   if (!token) {
+    // If no token is found, redirect to the login page
+    navigate('/login');
+    return;
+  }
+  
+
+    const fetchRateSettings = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/rate-settings', {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the token in the request header
+          },
+        });        const fetchedData = response.data.vehicleTypes.reduce((acc, type) => {
+          acc[type.type] = {
+            distanceRatePerKm: type.distanceRatePerKm,
+            timeRatePerMinute: type.timeRatePerMinute,
+            fixedDriverFee: type.fixedDriverFee,
+            peakRateMultiplier: type.peakRateMultiplier,
+            discounts: type.discounts,
+            totalSeatsCapacity:type.totalSeatsCapacity,
+            
+
+          };
+          return acc;
+        }, {});
+        setRateSettings(fetchedData);
+      } catch (error) {
+        console.error('Error fetching rate settings:', error);
+      //  alert('Failed to fetch rate settings. Please try again later.');
+      }
     };
-    
-    // Set the dummy data
-    setRateSettings(dummyData);
+    fetchRateSettings();
+        
   }, []);
 
   const handleChange = (vehicleType, field, value) => {
@@ -122,7 +138,23 @@ const RateSetting = () => {
       alert('Please fix the errors before submitting.');
       return;
     }
-
+    try {
+      const formattedData = {
+        vehicleTypes: Object.keys(rateSettings).map(type => ({
+          type,
+          ...rateSettings[type],
+        })),
+      };
+      await axios.put('http://localhost:5000/api/rate-settings', formattedData, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Include the token in the request header
+        },
+      });
+      } catch (error) {
+      console.error('Error updating rate settings:', error);
+      alert('Failed to update rate settings. Please try again later.');
+    }
+  
     // Here we just log the data instead of sending it to a server
     console.log('Updated Rate Settings:', rateSettings);
     alert('Rate settings updated successfully!');
@@ -144,6 +176,8 @@ const RateSetting = () => {
                 <TableCell sx={{ fontSize: '1.2rem', fontWeight: 'bold' }}>Fixed Driver Fee</TableCell>
                 <TableCell sx={{ fontSize: '1.2rem', fontWeight: 'bold' }}>Peak Rate Multiplier</TableCell>
                 <TableCell sx={{ fontSize: '1.2rem', fontWeight: 'bold' }}>Discounts</TableCell>
+                <TableCell sx={{ fontSize: '1.2rem', fontWeight: 'bold' }}>Total Seats</TableCell>
+
               </TableRow>
             </TableHead>
             <TableBody>

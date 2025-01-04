@@ -8,8 +8,7 @@ The **Smart Carpool Manager** is a web-based interface designed for managing and
 - [Tech Stack](#tech-stack)
 - [Setup](#setup)
 - [Usage](#usage)
-- [License](#license)
-
+ 
 ## Features
 - **User Management**: Admins can view, edit, and delete user profiles, including passengers and drivers.
 - **Driver Management**: Admins can add, edit, or remove drivers from the system. They can also review driver stats (total rides, completed rides, etc.).

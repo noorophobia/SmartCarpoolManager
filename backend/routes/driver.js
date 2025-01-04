@@ -3,11 +3,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const Driver = require('../models/Driver'); // Import the Driver model
-
+const verifyToken= require('../middleware/auth');
 const router = express.Router();
 
 // Fetch all drivers
-router.get('/drivers', async (req, res) => {
+router.get('/drivers',verifyToken, async (req, res) => {
   try {
     const drivers = await Driver.find();
     res.status(200).json(drivers);
@@ -16,7 +16,7 @@ router.get('/drivers', async (req, res) => {
   }
 });
 // Fetch a single driver by ID
-router.get('/drivers/:id', async (req, res) => {
+router.get('/drivers/:id', verifyToken,async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -42,7 +42,7 @@ const generateCompositeId = async () => {
 };
 
 // Add a new driver
- router.post('/drivers', async (req, res) => {
+ router.post('/drivers',verifyToken, async (req, res) => {
   try {
     const { name, gender, email, phoneNumber, cnic, dateOfBirth, ratings } = req.body;
     console.log("req body "+req.body);
@@ -82,7 +82,7 @@ const generateCompositeId = async () => {
 });
 
 // Update driver details
-router.put('/drivers/:id', async (req, res) => {
+router.put('/drivers/:id', verifyToken,async (req, res) => {
   const { id } = req.params;
   const { name, gender, email, phoneNumber, cnic, dateOfBirth, ratings } = req.body;
 
@@ -111,7 +111,7 @@ router.put('/drivers/:id', async (req, res) => {
 });
 
 // Delete a driver
-router.delete('/drivers/:id', async (req, res) => {
+router.delete('/drivers/:id',verifyToken, async (req, res) => {
   const { id } = req.params;
 
   try {

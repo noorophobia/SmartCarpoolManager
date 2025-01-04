@@ -1,5 +1,8 @@
 import React, { useState ,useEffect} from 'react';
 import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; 
+
 import { Button, Box, Grid,Grid2, Card, CardContent, Typography, Divider, CardMedia, Avatar, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // import the carousel styles
@@ -11,15 +14,30 @@ const DriverDetails = () => {
   const [openCarDialog, setOpenCarDialog] = useState(false); // Dialog open state
   const [carouselImages, setCarouselImages] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [rateSettings, setRateSettings] = useState(null); // Store rate settings
+
   const [loading, setLoading] = useState(true); // Loading state
   const [error, setError] = useState(null); // Error state
+    const navigate = useNavigate();
+  
   console.log('Driver ID:', id);
-
+  const token = localStorage.getItem('token');
+  
   useEffect(() => {
+   if (!token) {
+    navigate('/login');
+    return;
+  }
     const fetchDriver = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/drivers/${id}`);
-        if (!response.ok) {
+        const response = await fetch(`http://localhost:5000/drivers/${id}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`, // Add the token to the Authorization header
+            'Content-Type': 'application/json',
+          },
+        });
+                if (!response.ok) {
           throw new Error('Failed to fetch driver details');
         }
         const data = await response.json();
@@ -34,13 +52,19 @@ console.log(response);
     };
     const fetchVehicle = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/vehicles/driver/${id}`);
-        const data = await response.json();
+        const response = await fetch(`http://localhost:5000/vehicles/driver/${id}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`, // Add the token to the Authorization header
+            'Content-Type': 'application/json',
+          },
+        });        const data = await response.json();
         console.log('Fetched Vehicle Data:', data);
         
         // Access the first item in the array (if there is any data)
         if (data && data.length > 0) {
           setVehicle(data[0]); // Set vehicle state to the first object in the array
+ 
         } else {
           setVehicle(null); // Handle case where no vehicle data is found
         }
@@ -51,11 +75,32 @@ console.log(response);
       }
     };
     
+    
 
     fetchDriver();
     fetchVehicle();
+ 
   }, [id]);
-
+  useEffect(() => {
+    if (vehicle) {
+      // Fetch rate settings once the vehicle is available
+      fetchRateSettings();
+    }
+  }, [vehicle]);  
+  const fetchRateSettings = async () => {
+    if (vehicle && vehicle.vehicleType) {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/rate-settings/${vehicle.vehicleType}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+                console.log('Fetched Rate Settings:', response.data); // Debug log for fetched rate settings
+        setRateSettings(response.data);  // Set rate settings
+      } catch (error) {
+        console.error('Error fetching rate settings:', error);
+        setError('Error fetching rate settings');
+      }
+    }
+  };
   if(driver1){
   console.log("driver 1 "+ driver1.name)
  }
@@ -64,6 +109,7 @@ console.log("vehicle"+vehicle.driverPhoto
 );
 console.log("brand"+vehicle.brand);
  }
+ 
  const handleOpenCarDialog = () => {
   setOpenCarDialog(true);
 };
@@ -206,7 +252,7 @@ const handleCloseCarDialog = () => {
                     </Typography>
                     
                     <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}>
-                      <strong>Type:</strong> {driver.vehicleType}
+                      <strong>Type:</strong> {vehicle.vehicleType}
                     </Typography>
                     <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}>
                       <strong>Production Year:</strong> {vehicle.vehicleProductionYear}
@@ -240,15 +286,16 @@ const handleCloseCarDialog = () => {
                 <Typography variant="h6" gutterBottom>Rates</Typography>
               </Box>
               <Divider />
+              {rateSettings &&
                <div>
-               <Typography sx={{ fontSize: '1rem', marginBottom: 1, marginTop: 2,marginLeft:4}}><strong>Distance Rate per KM:</strong> {driver.distanceRatePerKm}</Typography>
-              <Typography sx={{ fontSize: '1rem', marginBottom: 1, marginTop: 2,marginLeft:4}}><strong>Time Rate per Minute:</strong> {driver.timeRatePerMinute}</Typography>
-              <Typography sx={{ fontSize: '1rem', marginBottom: 1, marginTop: 2,marginLeft:4}}><strong>Fixed Driver Fee:</strong> {driver.fixedDriverFee}</Typography>
-              <Typography sx={{ fontSize: '1rem', marginBottom: 1, marginTop: 2,marginLeft:4}}><strong>Peak Rate Multiplier:</strong> {driver.peakRateMultiplier}</Typography>
-              <Typography sx={{ fontSize: '1rem', marginBottom: 1, marginTop: 2,marginLeft:4}}><strong>Discounts:</strong> {driver.discounts}</Typography>
-              
-             
-              </div>
+                <Typography sx={{ fontSize: '1rem',marginTop:2, marginBottom: 1 ,marginLeft:4}}><strong>Vehicle Type :</strong> {vehicle.vehicleType}</Typography>
+
+          <Typography sx={{ fontSize: '1rem', marginBottom: 1 ,marginLeft:4}}><strong>Distance Rate per Km:</strong> {rateSettings.distanceRatePerKm}</Typography>
+          <Typography sx={{ fontSize: '1rem', marginBottom: 1,marginLeft:4 }}><strong>Time Rate per Minute:</strong> {rateSettings.timeRatePerMinute}</Typography>
+          <Typography sx={{ fontSize: '1rem', marginBottom: 1,marginLeft:4 }}><strong>Fixed Driver Fee:</strong> {rateSettings.fixedDriverFee}</Typography>
+          <Typography sx={{ fontSize: '1rem', marginBottom: 1,marginLeft:4 }}><strong>Peak Rate Multiplier:</strong> {rateSettings.peakRateMultiplier}</Typography>
+          <Typography sx={{ fontSize: '1rem', marginBottom: 1,marginLeft:4 }}><strong>Discounts:</strong> {rateSettings.discounts}</Typography>
+               </div>}
             </CardContent>
           </Card>
         </Box>
@@ -264,7 +311,7 @@ const handleCloseCarDialog = () => {
               <div>
               <Typography sx={{ fontSize: '1rem', marginBottom: 1, marginTop: 2,marginLeft:4}}><strong>Total Rides:</strong> {driver.totalRides}</Typography>
                  <Typography sx={{ fontSize: '1rem', marginBottom: 1,marginTop: 2,marginLeft:4}}><strong>Completed Rides:</strong> {driver.completedRides}</Typography>
-                 <Typography sx={{ fontSize: '1rem', marginBottom: 1,marginTop: 2,marginLeft:4,marginBottom:11}}><strong>Cancelled Rides:</strong> {driver.cancelledRides}</Typography>
+                 <Typography sx={{ fontSize: '1rem',marginTop: 2,marginLeft:4,marginBottom:11}}><strong>Cancelled Rides:</strong> {driver.cancelledRides}</Typography>
               </div>
             </CardContent>
           </Card>

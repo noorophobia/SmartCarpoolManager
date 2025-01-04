@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const Vehicle = require('../models/Vehicle'); // Import the Vehicle model
 const multer = require('multer');
+const verifyToken= require('../middleware/auth');
 
 const router = express.Router();
 
@@ -14,7 +15,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage }); // Create multer instance to handle file uploads
 
 // Fetch all vehicles
-router.get('/vehicles', async (req, res) => {
+router.get('/vehicles',verifyToken, async (req, res) => {
   try {
     const vehicles = await Vehicle.find().populate('driverId', 'name email'); // Populate driver details (optional)
     res.status(200).json(vehicles);
@@ -40,7 +41,7 @@ router.post(
     { name: 'vehicleRegistrationFront', maxCount: 1 },
     { name: 'vehicleRegistrationBack', maxCount: 1 },
     { name: 'vehiclePhotos', maxCount: 5 }, // Allow multiple vehicle photos
-  ]),
+  ]),verifyToken,
   async (req, res) => {
     try {
       // Log incoming data and uploaded files for debugging
@@ -114,7 +115,7 @@ res.status(500).json({ message: 'Error adding Vehicle. Please try again.', error
 
 
 // Update vehicle details
-router.put('/vehicles/:id', async (req, res) => {
+router.put('/vehicles/:id', verifyToken,async (req, res) => {
   const { id } = req.params;
   const {
     brand,
@@ -175,7 +176,7 @@ router.put('/vehicles/:id', async (req, res) => {
 });
 
 // Delete a vehicle
-router.delete('/vehicles/:id', async (req, res) => {
+router.delete('/vehicles/:id', verifyToken,async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -191,7 +192,7 @@ router.delete('/vehicles/:id', async (req, res) => {
   }
 });
 // Fetch vehicles by driverId
-router.get('/vehicles/driver/:driverId', async (req, res) => {
+router.get('/vehicles/driver/:driverId', verifyToken,async (req, res) => {
   const { driverId } = req.params;
 
   try {

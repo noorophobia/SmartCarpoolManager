@@ -3,14 +3,19 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
- require('dotenv').config();
+const bcrypt = require('bcryptjs');
+   require('dotenv').config();
 
-const driversRoutes = require('./routes/driver'); // Import driver routes
+ const rateSettingsRoute = require('./routes/rate-settings');  
+const driversRoutes = require('./routes/driver');  
 const vehiclesRoutes=require('./routes/vehicle')
-
+const adminRoutes = require('./routes/admin');  // Import the admin routes
+ 
+const { insertAdmin } = require('./routes/insertAdmin');  // Import the insertAdmin function
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+ 
 
 // Set the Content Security Policy header using helmet
 app.use(helmet({
@@ -30,7 +35,7 @@ app.use(helmet({
 
 app.use(cors({
   origin: 'http://localhost:5173' , // Allow only frontend domain
-  methods: ['GET', 'POST', 'DELETE', 'PUT'], // Allow DELETE method
+  methods: ['GET', 'POST', 'DELETE', 'PUT','OPTIONS'], // Allow DELETE method
 //y methods
   allowedHeaders: ['Content-Type', 'Authorization']
 
@@ -42,7 +47,10 @@ app.use('/uploads', express.static('uploads'));
 app.use(express.json()); // Parse JSON request bodies
 // Use the drivers route
 app.use(driversRoutes);
+app.use('/api', rateSettingsRoute);
 app.use(vehiclesRoutes);
+app.use("/api/admin", adminRoutes);
+
 app.get('/uploads/:imageName', (req, res) => {
   const imageName = req.params.imageName;
   const imagePath = path.join(__dirname, 'uploads', imageName);
@@ -51,9 +59,11 @@ app.get('/uploads/:imageName', (req, res) => {
 // MongoDB connection
 console.log('MongoDB URI:', process.env.MONGO_URI);
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('MongoDB connected'))
-  .catch((err) => console.log('Failed to connect to MongoDB:', err));
- 
+.then(() => {
+  console.log('MongoDB connected');
+  //insertAdmin();  // Call insertAdmin 
+})  .catch((err) => console.log('Failed to connect to MongoDB:', err));
+  
 // Test route
 app.get('/', (req, res) => {
   res.send('Welcome to the backend server!');

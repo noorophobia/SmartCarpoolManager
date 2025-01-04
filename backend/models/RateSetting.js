@@ -10,15 +10,22 @@ const rateSettingsSchema = new mongoose.Schema({
       },
       distanceRatePerKm: { type: Number, required: true },
       timeRatePerMinute: { type: Number, required: true },
-      totalSeatsCapacity: { type: Number, required: true },
+      totalSeatsCapacity: { type: Number, required: true ,    default: 0,
+      },
 
       fixedDriverFee: { type: Number, required: true },
       peakRateMultiplier: { type: Number, required: true },
       discounts: { type: Number, required: true },
     }
   ],
-  lastUpdated: { type: Date, default: Date.now }, // Optional field for tracking updates
-});
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
+  }});
 
 const RateSettings = mongoose.model('RateSettings', rateSettingsSchema);
 module.exports = RateSettings;
