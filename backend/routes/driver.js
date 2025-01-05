@@ -84,8 +84,10 @@ const generateCompositeId = async () => {
 // Update driver details
 router.put('/drivers/:id', verifyToken,async (req, res) => {
   const { id } = req.params;
+  console.log(req.body);
   const { name, gender, email, phoneNumber, cnic, dateOfBirth, ratings } = req.body;
-
+  console.log(req.files);  // For uploaded files
+  
   // Validate if all required fields are present
   if (!name || !gender || !email || !phoneNumber || !cnic || !dateOfBirth || ratings === undefined) {
     return res.status(400).json({ message: 'All fields are required' });

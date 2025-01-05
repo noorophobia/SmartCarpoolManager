@@ -2,6 +2,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path');
+
 const helmet = require('helmet');
 const bcrypt = require('bcryptjs');
    require('dotenv').config();

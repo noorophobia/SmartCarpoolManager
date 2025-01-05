@@ -7,6 +7,7 @@ import {
   Link,
 } from "react-router-dom";
 import React, { useEffect, useState } from "react";
+import { jwtDecode } from "jwt-decode";
 
  import Passengers from './pages/admin/Passengers';
 import Drivers from './pages/admin/Drivers';
@@ -47,8 +48,22 @@ const Layout = () => {
       // If authenticated, stop loading
       setLoading(false);
     }
-  }, [navigate]); // Runs once when the component mounts
 
+    
+    const decoded = jwtDecode(token); // Decode the full JWT token (header + payload)
+    console.log(decoded); // Log the full decoded token to check all claims
+
+    // Access the 'exp' claim from the decoded payload
+    const exp = decoded.exp;
+    console.log('Expiration Date:', new Date(exp * 1000)); 
+    const currentTime = Date.now() / 1000; // Get the current time in seconds
+    if (exp < currentTime) {
+      // If the token is expired, remove it from localStorage and redirect to login page
+      localStorage.removeItem('token');
+      alert("Session Expired");
+      navigate('/login')}
+   
+  }, [navigate]); // Runs once when the component mounts
   if (loading) {
     // While loading, show nothing or a loading spinner
     return null; // You can also return a loading spinner here if desired

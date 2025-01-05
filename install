@@ -1,2 +1,2 @@
 npm install bcryptjs express-session
-axios 
+axios npm install jwt-decode frontend

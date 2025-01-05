@@ -25,6 +25,7 @@ const Drivers = () => {
             return;
           }
           
+          console.log('Token:', token);
 
         const response = await fetch('http://localhost:5000/drivers', {
           method: 'GET',
@@ -35,17 +36,21 @@ const Drivers = () => {
         });
         
         const data = await response.json();
-        
-        const mappedData = data.map(driver => ({
-          id: driver._id,
-          compositeId: driver.compositeId, // Add compositeId here
-          name: driver.name,
-          gender: driver.gender,
-          email: driver.email,
-          phoneNumber: driver.phoneNumber,
-          cnic: driver.cnic,
-          dateOfBirth: driver.dateOfBirth,
-        }));
+        console.log(data);
+
+        const mappedData = Array.isArray(data)
+        ? data.map(driver => ({
+            id: driver._id,
+            compositeId: driver.compositeId, // Add compositeId here
+            name: driver.name,
+            gender: driver.gender,
+            email: driver.email,
+            phoneNumber: driver.phoneNumber,
+            cnic: driver.cnic,
+            dateOfBirth: driver.dateOfBirth,
+          }))
+        : [];
+      
 
         setDrivers(mappedData); // Update state with the mapped data
       } catch (error) {
