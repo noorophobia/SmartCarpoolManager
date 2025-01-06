@@ -3,6 +3,12 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { TextField, Button, MenuItem, Paper, Box, Typography, Alert, Grid, Card, CardContent, CardMedia, CardHeader } from '@mui/material';
 import '../../styles/addDriver.css'
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+ 
+
 const EditDriver = () => {
     const [name, setName] = useState('');
     const [gender, setGender] = useState('');
@@ -12,6 +18,10 @@ const EditDriver = () => {
     const[driverEmail,setDriverEmail]=useState('');
     const[driverCnic,setDriverCnic]=useState('');
     const[driverPhoneNumber,setDriverPhoneNumber]=useState('');
+    const [dialogOpen, setDialogOpen] = useState(false);
+const [dialogMessage, setDialogMessage] = useState('');
+const [dialogSeverity, setDialogSeverity] = useState('success');  // 'success' or 'error'
+
     
     const [dateOfBirth, setDateOfBirth] = useState('');
     const [ratings, setRatings] = useState(0);
@@ -80,8 +90,7 @@ const updateState = (key, value) => {
         // Get the token from localStorage (or sessionStorage)
         const token = localStorage.getItem('token');  // Or sessionStorage.getItem('token')
         
-        //   alert('You are not authenticated');
-          if (!token) {
+           if (!token) {
             // If no token is found, redirect to the login page
             navigate('/login');
             return;
@@ -158,8 +167,7 @@ const updateState = (key, value) => {
       fetchAllDrivers();
       fetchVehicle();
       console.log("vehicle is"+vehicle)
-      if(vehicle){
-    }
+     
 
     }
   }, [id]);
@@ -361,8 +369,7 @@ setVehicleRegistrationFront(vehicle.vehicleRegistrationFront);
     try {
       const token = localStorage.getItem('token');  // Or sessionStorage.getItem('token')
         
-      //   alert('You are not authenticated');
-        if (!token) {
+         if (!token) {
           // If no token is found, redirect to the login page
           navigate('/login');
           return;
@@ -380,6 +387,7 @@ setVehicleRegistrationFront(vehicle.vehicleRegistrationFront);
         }
       );
 
+
       // Handle response
       if (response.status === 200) {
         console.log('Driver updated successfully');
@@ -392,14 +400,12 @@ setVehicleRegistrationFront(vehicle.vehicleRegistrationFront);
    try {
       const token = localStorage.getItem('token');  // Or sessionStorage.getItem('token')
         
-      //   alert('You are not authenticated');
-        if (!token) {
+         if (!token) {
           // If no token is found, redirect to the login page
           navigate('/login');
           return;
         }
-        alert(formData)
-    
+     
         const response = await axios.put(
           `http://localhost:5000/vehicles/${vehicle._id}`, 
           formData,
@@ -413,14 +419,19 @@ setVehicleRegistrationFront(vehicle.vehicleRegistrationFront);
       
         if (response.status === 200) {
           console.log('Vehicle updated successfully');
+          setDialogMessage('Driver updated successfully');
+          setDialogSeverity('success');
+          setDialogOpen(true);
+         
         }
       
     } catch (error) {
       console.error('Error saving data:', error);
       setError('Error saving data. Please try again.');
     }
-  };
 
+   };
+   
   const handleCnicChange = (e) => {
     let value = e.target.value.replace(/\D/g, ''); // Remove non-digit characters
     if (value.length > 5) value = value.slice(0, 5) + '-' + value.slice(5); // Insert first hyphen
@@ -583,9 +594,11 @@ setVehicleRegistrationFront(vehicle.vehicleRegistrationFront);
                         accept="image/*"
                         onChange={(e) => {
                             const file = e.target.files[0];
-                            setCnicFront(file); // Update with selected file
+                            setDriverPhoto(file); // Update with selected file
                             console.log('Selected file:', file);
                             updateState('driverPhotoBool', true); // Mark as edited
+                            console.log('State'+state.driverPhotoBool);
+
                         }}
                         style={{ display: 'none' }}
                         id="driver-photo-upload"
@@ -596,27 +609,25 @@ setVehicleRegistrationFront(vehicle.vehicleRegistrationFront);
                 </div>
 
                 {/* Image Preview Logic */}
-                {driverPhoto && state.driverPhotoBool ? (
+                {driverPhoto && driverPhoto instanceof File && state.driverPhotoBool ? (
     // Preview for newly selected image
     <Box sx={{ marginTop: 1 }}>
         <img
             src={URL.createObjectURL(driverPhoto)} // Create preview URL for selected image
-            alt="CNIC Front Photo Preview"
+            alt="Driver  Photo Preview"
             width="100%"
         />
     </Box>
-) : driverPhoto ? (
-    // Preview for existing image from backend if cnicFront is not null
-    <Box sx={{ marginTop: 1 }}>
+) : driverPhoto && !state.driverPhotoBool ? (
+  <Box sx={{ marginTop: 1 }}>
         <img
             src={`http://localhost:5000/uploads/${encodeURIComponent(driverPhoto)}`} // Backend URL
-            alt="CNIC Front Preview"
+            alt="Driver  Preview"
             width="100%"
         />
     </Box>
 ) : (
-    // Fallback or message if cnicFront is null
-    <Box sx={{ marginTop: 1 }}>
+     <Box sx={{ marginTop: 1 }}>
         <p>No Driver Image</p>
     </Box>
 )}
@@ -646,7 +657,9 @@ setVehicleRegistrationFront(vehicle.vehicleRegistrationFront);
                             const file = e.target.files[0];
                             setCnicFront(file); // Update with selected file
                             console.log('Selected file:', file);
+
                             updateState('cnicFrontBool', true); // Mark as edited
+                            
                         }}
                         style={{ display: 'none' }}
                         id="cnicfront-photo-upload"
@@ -1087,6 +1100,22 @@ setVehicleRegistrationFront(vehicle.vehicleRegistrationFront);
 
 
       </form>
+       {/* Dialog for success or error message */}
+       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
+        <DialogTitle>{dialogSeverity === 'success' ? 'Success' : 'Error'}</DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">{dialogMessage}</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => {
+            setDialogOpen(false);
+            navigate("/drivers");
+
+          }} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Paper>
   </Box>
 );

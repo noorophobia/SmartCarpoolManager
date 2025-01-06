@@ -107,10 +107,18 @@ router.post(
   }
 );
 
-
-// Route to handle vehicle update
-router.put('/vehicles/:id', verifyToken, upload.array('vehiclePhotos'), async (req, res) => {
+router.put('/vehicles/:id', verifyToken, upload.fields([ // Notice the 'fields' instead of 'array'
+  { name: 'cnicFront', maxCount: 1 },
+  { name: 'cnicBack', maxCount: 1 },
+  { name: 'driverPhoto', maxCount: 1 },
+  { name: 'vehicleRegistrationFront', maxCount: 1 },
+  { name: 'vehicleRegistrationBack', maxCount: 1 },
+  { name: 'vehiclePhotos', maxCount: 5 }
+]), async (req, res) => {
   const { id } = req.params;
+  console.log('Request Body:', req.body);  // For debugging the request body
+  console.log('Uploaded Files:', req.files); // For debugging the uploaded files
+
   const {
     brand,
     vehicleName,
@@ -119,36 +127,40 @@ router.put('/vehicles/:id', verifyToken, upload.array('vehiclePhotos'), async (r
     vehicleProductionYear,
     licenseNumber,
     driverId,
-    cnicFront,
-    cnicBack,
-    driverPhoto,
-    vehicleRegistrationFront,
-    vehicleRegistrationBack,
   } = req.body;
 
-  const vehiclePhotos = req.files.map(file => file.filename);
-  console.log("vehiclephtotos at badkend " + vehiclePhotos)
+  // Collect the files (check if they exist in req.files)
+  const vehiclePhotos = req.files.vehiclePhotos
+    ? req.files.vehiclePhotos.map(file => file.filename)
+    : [];  // If no files, set an empty array
+
+  // Check if the required files are present
+  const updatedData = {
+    brand,
+    vehicleName,
+    vehicleColor,
+    vehicleType,
+    vehicleProductionYear,
+    licenseNumber,
+    driverId,
+  };
+
+  // Only update files if they are included in the request
+  if (req.files.cnicFront) updatedData.cnicFront = req.files.cnicFront[0].filename;
+  if (req.files.cnicBack) updatedData.cnicBack = req.files.cnicBack[0].filename;
+  if (req.files.driverPhoto) updatedData.driverPhoto = req.files.driverPhoto[0].filename;
+  if (req.files.vehicleRegistrationFront) {
+    updatedData.vehicleRegistrationFront = req.files.vehicleRegistrationFront[0].filename;
+  }
+  if (req.files.vehicleRegistrationBack) {
+    updatedData.vehicleRegistrationBack = req.files.vehicleRegistrationBack[0].filename;
+  }
+  if (vehiclePhotos.length > 0) {
+    updatedData.vehiclePhotos = vehiclePhotos;
+  }
 
   try {
-    const updatedVehicle = await Vehicle.findByIdAndUpdate(
-      id,
-      {
-        brand,
-        vehicleName,
-        vehicleColor,
-        vehicleType,
-        vehicleProductionYear,
-        licenseNumber,
-        driverId,
-        cnicFront,
-        cnicBack,
-        driverPhoto,
-        vehicleRegistrationFront,
-        vehicleRegistrationBack,
-        vehiclePhotos,
-      },
-      { new: true }
-    );
+    const updatedVehicle = await Vehicle.findByIdAndUpdate(id, updatedData, { new: true });
 
     if (!updatedVehicle) {
       return res.status(404).json({ message: 'Vehicle not found' });
@@ -156,9 +168,11 @@ router.put('/vehicles/:id', verifyToken, upload.array('vehiclePhotos'), async (r
 
     res.status(200).json(updatedVehicle);
   } catch (error) {
-    res.status(500).json({ message: 'Failed to update vehicle' });
+    console.error('Error while updating vehicle:', error);
+    res.status(500).json({ message: 'Failed to update vehicle', error: error.message });
   }
 });
+
 
 // Delete a vehicle
 router.delete('/vehicles/:id', verifyToken,async (req, res) => {

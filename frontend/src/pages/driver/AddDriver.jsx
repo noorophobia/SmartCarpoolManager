@@ -65,10 +65,12 @@ const AddDriver = () => {
         },
       });
       const data = await response.json();
-     
-     setEmails( data.map(driver => driver.email))
-      setPhoneNumbers (data.map(driver => driver.phoneNumber));
-      setCnics(data.map(driver => driver.cnic));
+      if (Array.isArray(data)) {
+        setEmails(data.map(driver => driver.email));
+        setPhoneNumbers(data.map(driver => driver.phoneNumber));
+        setCnics(data.map(driver => driver.cnic));
+      }
+      
 
     } catch (error) {
       console.error('Failed to fetch driver:', error);
@@ -234,20 +236,24 @@ const currentYear = new Date().getFullYear();
       try {
         // Retrieve the token (example: from local storage)
         const token = localStorage.getItem('token'); // Adjust according to how you're storing the token
-      
-        const driverResponse = await fetch('http://localhost:5000/drivers', {
-          method: 'POST',
-          headers: { 
+      alert(newDriver);
+      alert(token)
+      const driverResponse = await axios.post(
+        'http://localhost:5000/drivers',
+        { ...newDriver }, // Data to be sent in the body
+        {
+          headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`, // Include the token here
           },
-          body: JSON.stringify({ ...newDriver }),
-        });
-      
-        const driverResult = await driverResponse.json();
-      
-        if (driverResponse.ok) {
+        }
+      );
+    
+      const driverResult = driverResponse.data;
+    
+      if (driverResponse.status === 201) {
           formData.append('driverId', driverResult._id);
+          console.log(formdata)
       
           const vehicleResponse = await axios.post('http://localhost:5000/vehicles', formData, {
             headers: {

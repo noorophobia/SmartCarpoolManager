@@ -44,9 +44,11 @@ const generateCompositeId = async () => {
 // Add a new driver
  router.post('/drivers',verifyToken, async (req, res) => {
   try {
+    console.log("body"+req.body);
     const { name, gender, email, phoneNumber, cnic, dateOfBirth, ratings } = req.body;
      console.log(dateOfBirth);
     // Ensure all required fields are present
+
     if (!dateOfBirth) {
       return res.status(400).json({ message: 'Date of Birth required.' });
     }
@@ -57,8 +59,7 @@ const createdAt=new Date();
       isApproved,// Explicitly set default if missing
       createdAt, // Ensure createdAt is always set to the current time
     });
-console.log("new"+newDriver);
-    // Save the driver first
+     // Save the driver first
     await newDriver.save();
 
     // Generate the composite ID after the driver has been saved
@@ -133,8 +134,7 @@ router.delete('/drivers/:id',verifyToken, async (req, res) => {
 
 // Fetch a driver by Composite ID
 router.get('/drivers/composite/:compositeId', verifyToken, async (req, res) => {
-  console.log("Received compositeId:"); // This should log the compositeId value
-
+ 
   const { compositeId } = req.params;
 
   console.log("Received compositeId:", compositeId); // This should log the compositeId value
@@ -143,6 +143,7 @@ router.get('/drivers/composite/:compositeId', verifyToken, async (req, res) => {
     // Find the driver by compositeId
     const driver = await Driver.findOne({ compositeId: compositeId });  // Find driver based on compositeId
 
+ console.log(driver);
     // If the driver is not found, return a 404 error
     if (!driver) {
       return res.status(404).json({ message: 'Driver not found' });

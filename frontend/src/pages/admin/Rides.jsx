@@ -3,6 +3,8 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
+
 import axios from "axios";
 
 const Rides = () => {
@@ -10,42 +12,47 @@ const Rides = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedDriverId, setSelectedDriverId] = useState(null); // Track clicked driver ID
+  const navigate = useNavigate(); // Initialize navigate
 
-  const token = localStorage.getItem("authToken"); // Assuming the token is stored in localStorage
+  const token = localStorage.getItem("token"); // Assuming the token is stored in localStorage
 
   // Fetch driver details based on the selected driver ID
   useEffect(() => {
-    if (selectedDriverId) {
-      const fetchDriver = async () => {
-        setLoading(true);
-        try {
-          const response = await axios.get
-           (`http://localhost:5000/drivers/composite/${selectedDriverId}`, {
-          
+    const fetchDriver = async () => {
+      setLoading(true);
+      try {
+        console.log(`Fetching driver for ID: ${selectedDriverId}`);
+        const response = await axios.get(
+          `http://localhost:5000/drivers/composite/${selectedDriverId}`,
+          {
             headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
             },
-          });
-
-          if (!response.ok) {
-            throw new Error('Failed to fetch driver details');
           }
-
-              setDriver( response.dataa); // Set the fetched driver data
-          console.log(response.data
-            ); // Log the driver data
-        } catch (err) {
-          setError(err.message); // Handle error
-        } finally {
-          setLoading(false); // Set loading state to false
-        }
-      };
-
+        );
+  // Handle response
+  if (response.status === 200) {
+    console.log('Driver updated successfully');
+      setDriver(response.data); // Set the fetched driver data
+        console.log("Fetched driver data: ", response.data); // Log the driver data
+        console.log("Driver ID: ", response.data._id);
+     // Use response.data._id directly instead of waiting for the state to update
+        navigate(`/drivers/${response.data._id}`);
+}
+      } catch (err) {
+        setError(err.message); // Handle error
+      } finally {
+        setLoading(false); // Set loading state to false
+      }
+    }
+  
+    
       fetchDriver();
     }
-  }, [selectedDriverId, token]); // Re-run the effect when the selectedDriverId changes
-
+  , [selectedDriverId, token]); // Re-run the effect when the selectedDriverId changes
+ // Navigate when driver details are available
+ 
   const columns = [
     { field: "rideID", headerName: "Ride ID", width: 120 },
     { field: "pickUpLocation", headerName: "Pick-Up Location", width: 200 },
@@ -75,9 +82,9 @@ const Rides = () => {
           variant="text"
           color="primary"
           size="small"
-          onClick={() => setSelectedDriverId(params.value)} // Set driver ID when clicked
+          onClick={() => setSelectedDriverId(params.value)} // Set selectedDriverId on click
         >
-          {params.value} {/* Display the driver ID from the row */}
+          {params.value}
         </Button>
       ),
     },
@@ -149,9 +156,15 @@ const Rides = () => {
       {driver && (
         <div>
           <h2>Driver Details</h2>
-          <p><strong>ID:</strong> {driver.id}</p>
-          <p><strong>Name:</strong> {driver.name}</p>
-          <p><strong>License:</strong> {driver.licenseNumber}</p>
+          <p>
+            <strong>ID:</strong> {driver.id}
+          </p>
+          <p>
+            <strong>Name:</strong> {driver.name}
+          </p>
+          <p>
+            <strong>License:</strong> {driver.licenseNumber}
+          </p>
           {/* You can display more driver details here */}
         </div>
       )}
