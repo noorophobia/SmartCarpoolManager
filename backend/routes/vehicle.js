@@ -113,44 +113,38 @@ res.status(500).json({ message: 'Error adding Vehicle. Please try again.', error
 }
 });
 
-
-// Update vehicle details
-router.put('/vehicles/:id', verifyToken,async (req, res) => {
+// Route to handle vehicle update
+router.put('/vehicles/:id', verifyToken, upload.array('vehiclePhotos'), async (req, res) => {
   const { id } = req.params;
-   const {
+  const {
     brand,
     vehicleName,
     vehicleColor,
-     vehicleType,
+    vehicleType,
     vehicleProductionYear,
     licenseNumber,
-     driverId,
+    driverId,
     cnicFront,
     cnicBack,
     driverPhoto,
     vehicleRegistrationFront,
     vehicleRegistrationBack,
-    vehiclePhotos,
   } = req.body;
 
-   // Validate if all required fields are present
-  if (!vehicleName || !licenseNumber  === undefined) {
-    return res.status(400).json({ message: 'All fields are required' });
-  }
-   console.log(req.body)
+  const vehiclePhotos = req.files.map(file => file.filename);
+  console.log("vehiclephtotos at badkend " + vehiclePhotos)
+
   try {
-    // Update the vehicle in the database
     const updatedVehicle = await Vehicle.findByIdAndUpdate(
       id,
       {
         brand,
         vehicleName,
         vehicleColor,
-        vehicleID,
         vehicleType,
         vehicleProductionYear,
         licenseNumber,
-         driverId,
+        driverId,
         cnicFront,
         cnicBack,
         driverPhoto,
@@ -158,10 +152,9 @@ router.put('/vehicles/:id', verifyToken,async (req, res) => {
         vehicleRegistrationBack,
         vehiclePhotos,
       },
-      { new: true } // To return the updated vehicle
+      { new: true }
     );
- 
-    // If no vehicle is found, return an error
+
     if (!updatedVehicle) {
       return res.status(404).json({ message: 'Vehicle not found' });
     }

@@ -178,7 +178,7 @@ const updateState = (key, value) => {
 setDriverPhoto(vehicle.driverPhoto);
 setVehicleRegistrationBack(vehicle.vehicleRegistrationBack);
 setVehicleRegistrationFront(vehicle.vehicleRegistrationFront);
- 
+ setVehiclePhotos(vehicle.vehiclePhotos);
     
  }
    },vehicle)
@@ -209,7 +209,7 @@ setVehicleRegistrationFront(vehicle.vehicleRegistrationFront);
     });
     let hasError = false;
 
-    if(!email.match(driverEmail)){
+    if(!email===driverEmail){
 
     if (emails.includes(email)) {
        
@@ -218,14 +218,14 @@ setVehicleRegistrationFront(vehicle.vehicleRegistrationFront);
       hasError = true;
       
     }}
-    if(!phoneNumber.match(driverPhoneNumber)){
+    if(!phoneNumber===driverPhoneNumber){
     if (phoneNumbers.includes(phoneNumber)) {
         
       setErrorMessages((prev) => ({ ...prev, phoneNumber: "Phone Number is already in use" }));
       hasError = true;
     }
   }
-  if(!cnic.match(driverCnic)){
+  if(!cnic===driverCnic){
     if (cnics.includes(cnic)) {
       setErrorMessages((prev) => ({ ...prev, cnic: "CNIC is already in use" }));
       hasError = true;
@@ -285,7 +285,7 @@ setVehicleRegistrationFront(vehicle.vehicleRegistrationFront);
       hasError = true;
      }
      
-     if (vehiclePhotos.length === 0) {
+     if (!vehiclePhotos) {
       setErrorMessages((prev) => ({
         ...prev,
         vehiclePhotos: 'Please upload at least one vehicle photo.',
@@ -399,21 +399,22 @@ setVehicleRegistrationFront(vehicle.vehicleRegistrationFront);
           return;
         }
         alert(formData)
-      const response = await axios.put(
-        `http://localhost:5000/vehicles/${vehicle._id}`, // Replace driverId with actual driver ID
-        vehicleData,
-        {
-          headers: {
-            'Content-Type': 'application/json', // Important for FormData
-            'Authorization': `Bearer ${token}`, // Add your token if needed
+    
+        const response = await axios.put(
+          `http://localhost:5000/vehicles/${vehicle._id}`, 
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: `Bearer ${token}`,
+            },
           }
+        );
+      
+        if (response.status === 200) {
+          console.log('Vehicle updated successfully');
         }
-      );
-
-      // Handle response
-      if (response.status === 200) {
-        console.log('vehicle updated successfully');
-      }
+      
     } catch (error) {
       console.error('Error saving data:', error);
       setError('Error saving data. Please try again.');
@@ -994,8 +995,7 @@ setVehicleRegistrationFront(vehicle.vehicleRegistrationFront);
           {/* Display existing photos if vehiclePhotosBool is false */}
           {state.vehiclePhotosBool === false && vehicle?.vehiclePhotos?.length > 0 && (
             <Box sx={{ marginTop: 1 }}>
-              <Typography variant="body2">Existing Photos:</Typography>
-              <ul style={{ display: 'flex', padding: 0, listStyleType: 'none', flexWrap: 'wrap' }}>
+               <ul style={{ display: 'flex', padding: 0, listStyleType: 'none', flexWrap: 'wrap' }}>
                 {vehicle.vehiclePhotos.map((photo, index) => (
                   <li key={index} style={{ marginRight: 10, marginBottom: 10, position: 'relative' }}>
                     <img
