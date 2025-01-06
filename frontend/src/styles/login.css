@@ -1,10 +1,17 @@
-/* Scope styles to the .login-page class */
+ html, body {
+  height: 100%;
+ 
+  margin: 0;
+}
 .login-page {
-    height: 100vh;
-    display: flex;
+  height: 100vh;
+     display: flex;
     justify-content: center;
     align-items: center;
-    background: linear-gradient(to right, #3D52A0, #1F4D75, #8697C4);
+     padding-top: 60px; /* Space for the navbar */
+     background: linear-gradient(to right, #3D52A0, #1F4D75, #8697C4);
+
+
   }
   
   .login-page .login-container {
@@ -12,6 +19,7 @@
     padding: 2rem;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    
     width: 100%;
     max-width: 400px;
     text-align: center;

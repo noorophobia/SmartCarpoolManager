@@ -9,4 +9,11 @@
      --black: #101111; 
      --menu-bg: #2b5f8c
   }
-  
+  /* Define dark theme variables */
+[data-theme="dark"] {
+    --main-bg: #121212;
+    --menu-bg: #1e1e1e;
+    --content-bg: #2a2a2a;
+    --black: #ffffff;
+    --soft-color: #444444;
+  }

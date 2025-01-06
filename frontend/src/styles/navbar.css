@@ -5,15 +5,17 @@
     align-items: center;
     justify-content: space-between;
     padding: 10px 20px;
-    background-color: hsl(210, 5%, 68%);
+    background: var(--soft-color);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     z-index: 1000; /* Ensure it appears above other elements */
     top: 0;
-    position: fixed;
+    position: absolute;
+    
     height: 90px; /* Set a fixed height for consistency */
 }
 
-/* Ensure content below navbar doesn't overlap */
+ 
+ /* Ensure content below navbar doesn't overlap */
 body {
     margin: 0; /* Reset any default margin */
     padding-top: 90px; /* Match the navbar height */

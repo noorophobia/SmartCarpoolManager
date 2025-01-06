@@ -2,91 +2,145 @@
     display: grid;
     gap: 20px;
     grid-template-columns: repeat(4, 1fr); /* 4 equal columns */
-    grid-template-rows: auto 200px 200px auto 300px; /* Adding a new 'auto' row for the second heading */
-    padding: 20px; /* Add padding to the container if needed */
-    position: relative; /* Allows positioning elements inside */
-
-    .heading {
-        grid-column: span 4; /* Make heading span across all columns */
-        font-size: 1.5em;
-        margin: 0; /* Remove margin to minimize extra space */
-        padding-bottom: 5px; /* Optional: control spacing with padding */
-    }
-
-    .box {
-        display: grid;
-        grid-template-columns: 1fr auto; /* Text takes most of the space, icon takes minimal */
-        grid-template-rows: auto auto; /* Two rows: one for the heading, one for the number + icon */
-        grid-template-areas:
-            "heading heading"
-            "number icon";
-        padding: 20px;
-        margin: 5px;
-        border-radius: 10px;
-        border: 1px solid var(--dark-bg);
-        background: var(--soft-color);
-    }
-    
-    .box-heading {
-        grid-area: heading;
-        font-size: 18px;
-        font-weight: bold;
-
-     }
-    
-    .number {
-        grid-area: number;
-        font-size: 24px;
-     }
-    
-    .icon {
-        grid-area: icon;
-        width: 50px;
-        height: 50px;
-        border-radius: 30px;
-        background-color: white;
-        justify-self: end; /* Align the icon to the right */
-    }
-   .subheading{
-
-    grid-column: span 4; /* Make heading span across all columns */
-    font-size: 1.5em;
-    margin-left: 700px; /* Remove margin to minimize extra space */
-    padding-bottom: 5px; /* Optional: control spacing with padding */
+    grid-template-rows: auto auto auto; /* Adjust rows to auto for dynamic height */
+    padding: 20px;
+    position: relative;
 }
- 
-    /* Position the first set of boxes */
-    .box1, .box2, .box3, .box4 {
-        grid-row: 2;
-    }
 
-    .box5, .box6, .box7, .box8 {
-        grid-row: 3;
-    }
+.heading {
+    grid-column: span 4; /* Make heading span across all columns */
+    font-size: 30px;
+    grid-row: 1; /* Explicitly place the heading in the first row */
 
-    /* Position second heading closer to the previous boxes */
-    .heading:nth-of-type(2) {
-        grid-row: 4; /* Explicitly place second heading in the new row */
-    }
-    .box-heading:nth-of-type(9){
-        margin-bottom: 15px;
-     }
-    
-    .heading{
-        font-size: 30px;
-        
-        font-weight: bold;
-    }
-  
-  /* Last row for charts */
-.box9 {
-    grid-row: 5; /* Place charts in the last row */
-    grid-column: span 4; /* Each spans 2 columns */
-     height: 100%; /* Ensure the container fills the row height */
-    padding: 0; /* Remove any extra padding */
-      min-height: 300px; /* Adjust this to ensure sufficient space */
+    font-weight: bold;
+    margin: 0;
+    padding-bottom: 5px;
+}
 
+.subheading {
+    grid-column: span 4; /* Make subheading span across all columns */
+    grid-row: 4;/* Explicitly place subheading in the second row */
+    font-size: 1.5em;
+    margin-left: 0; /* Remove margin */
+    padding-bottom: 5px;
+}
+/* Box Layout */
+.box {
+    display: grid;
+    grid-template-columns: 1fr auto; /* Text takes most of the space, icon takes minimal */
+    grid-template-rows: auto auto; /* Two rows: one for the heading, one for the number + icon */
+    grid-template-areas:
+        "heading heading"
+        "number icon";
+    padding: 20px;
+    margin: 5px;
+    border-radius: 10px;
+    border: 1px solid var(--dark-bg);
+    background: var(--soft-color);
+}
+
+.box-heading {
+    grid-area: heading;
+    font-size: 18px;
+    font-weight: bold;
+
+ }
+ .title{
+    grid-area: heading;
+    font-size: 18px;
+    font-weight: bold;
+    justify-self: center;
+    margin-top: 10px;
+    margin-bottom: 5px;
+
+ }
+
+.number {
+    grid-area: number;
+    font-size: 24px;
+    margin-top: 10px;
+}
+
+.icon {
+    grid-area: icon;
+    width: 70px;
+    height: 70px;
+      justify-self: end; /* Align the icon to the right */
+}
+.recharts-legend {
+    margin-top: 20px;  /* Add margin to the entire legend */
   }
   
-    
+
+/* Position the first set of boxes */
+.box1, .box2, .box3, .box4 {
+    grid-row: 2;
+}
+
+/* Position the second set of boxes */
+.box5, .box6, .box7, .box8 {
+    grid-row: 3;
+}
+
+/* Last row for charts */
+.box9 {
+    grid-row: 5; /* Place the charts in the last row */
+    grid-column: span 3;
+    min-height: 300px; /* Adjust height for proper spacing */
+    padding: 0;
+}
+.box10 {
+    grid-row: 5; /* Adjust grid position */
+    grid-column: span 1;/* Span two columns */
+    min-height: 400px; /* Ensure enough height for the chart and legend */
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center content horizontally */
+    justify-content: space-between; /* Add spacing between chart and legend */
+  }
+  
+ .legend {
+    display: flex;
+    justify-content: center; /* Center legend below the chart */
+    align-items: center;
+    margin-top: 20px; /* Add space between pie chart and legend */
+  }
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    margin: 0 15px; /* Space between legend items */
+  }
+  
+  .color-box {
+    width: 16px; /* Square size */
+    height: 16px;
+    margin-right: 8px; /* Space between box and text */
+    border-radius: 2px; /* Optional: Slight rounding */
+  }
+  
+  .legend-text {
+    font-size: 14px;
+    font-weight: normal; /* Adjust font weight for better readability */
+  }
+  
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .home {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns on smaller screens */
+    }
+    .box9, .box10 {
+        grid-column: span 2; /* Ensure both charts span across 2 columns */
+    }
+}
+
+@media (max-width: 768px) {
+    .home {
+        grid-template-columns: 1fr; /* 1 column for mobile screens */
+    }
+    .box9, .box10 {
+        grid-column: span 1; /* Each chart takes up 1 column */
+    }
 }

@@ -1,22 +1,62 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import { Link } from "react-router-dom"; // Import Link to navigate to the details page
+import { Link } from "react-router-dom";
+import axios from "axios";
 
 const Rides = () => {
+  const [driver, setDriver] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [selectedDriverId, setSelectedDriverId] = useState(null); // Track clicked driver ID
+
+  const token = localStorage.getItem("authToken"); // Assuming the token is stored in localStorage
+
+  // Fetch driver details based on the selected driver ID
+  useEffect(() => {
+    if (selectedDriverId) {
+      const fetchDriver = async () => {
+        setLoading(true);
+        try {
+          const response = await axios.get
+           (`http://localhost:5000/drivers/composite/${selectedDriverId}`, {
+          
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to fetch driver details');
+          }
+
+              setDriver( response.dataa); // Set the fetched driver data
+          console.log(response.data
+            ); // Log the driver data
+        } catch (err) {
+          setError(err.message); // Handle error
+        } finally {
+          setLoading(false); // Set loading state to false
+        }
+      };
+
+      fetchDriver();
+    }
+  }, [selectedDriverId, token]); // Re-run the effect when the selectedDriverId changes
+
   const columns = [
     { field: "rideID", headerName: "Ride ID", width: 120 },
     { field: "pickUpLocation", headerName: "Pick-Up Location", width: 200 },
     { field: "dropOffLocation", headerName: "Drop-Off Location", width: 200 },
     { field: "rideMode", headerName: "Ride Mode", width: 150 },
     { field: "rideStatus", headerName: "Ride Status", width: 150 },
-    
     {
       field: "passenger",
       headerName: "Passenger (ID)",
-      flex: 1,  // Use flex instead of width for dynamic width
-      minWidth: 150,  // Minimum width to ensure the column is readable
+      flex: 1,
+      minWidth: 150,
       renderCell: (params) => (
         <Link to={`/passenger-details/${params.value}`}>
           <Button variant="text" color="primary" size="small">
@@ -28,17 +68,19 @@ const Rides = () => {
     {
       field: "driver",
       headerName: "Driver (ID)",
-      flex: 1,  // Use flex for dynamic width
-      minWidth: 100,  // Minimum width to ensure the button is not too small
+      flex: 1,
+      minWidth: 100,
       renderCell: (params) => (
-        <Link to={`/driver-details/${params.value}`}>
-          <Button variant="text" color="primary" size="small">
-            {params.value}
-          </Button>
-        </Link>
+        <Button
+          variant="text"
+          color="primary"
+          size="small"
+          onClick={() => setSelectedDriverId(params.value)} // Set driver ID when clicked
+        >
+          {params.value} {/* Display the driver ID from the row */}
+        </Button>
       ),
     },
-    
     {
       field: "viewDetails",
       headerName: "View Details",
@@ -61,13 +103,8 @@ const Rides = () => {
       dropOffLocation: "Liberty Market",
       rideMode: "Carpool",
       rideStatus: "Ongoing",
-      noOfPassengers: 3,
-      paymentID: "PAY5678",
-      amount: 150.0,
-      paymentType: "Credit Card",
-      paymentStatus: "Completed",
       passenger: "1",
-      driver: "2",
+      driver: "DR-002", // Driver ID
     },
     {
       id: 2,
@@ -76,13 +113,8 @@ const Rides = () => {
       dropOffLocation: "Gulberg",
       rideMode: "Single",
       rideStatus: "Completed",
-      noOfPassengers: 1,
-      paymentID: "PAY5679",
-      amount: 500.0,
-      paymentType: "Cash",
-      paymentStatus: "Completed",
       passenger: "124",
-      driver: "457",
+      driver: "DR-003", // Another Driver ID
     },
   ];
 
@@ -106,11 +138,23 @@ const Rides = () => {
               },
             }}
             pageSizeOptions={[5, 10, 20]} // Allow users to choose 5, 10, or 20 records per page
-            //checkboxSelection
             disableRowSelectionOnClick
           />
         </Box>
       </div>
+
+      {/* Display the driver details below */}
+      {loading && <p>Loading driver details...</p>}
+      {error && <p>Error: {error}</p>}
+      {driver && (
+        <div>
+          <h2>Driver Details</h2>
+          <p><strong>ID:</strong> {driver.id}</p>
+          <p><strong>Name:</strong> {driver.name}</p>
+          <p><strong>License:</strong> {driver.licenseNumber}</p>
+          {/* You can display more driver details here */}
+        </div>
+      )}
     </div>
   );
 };

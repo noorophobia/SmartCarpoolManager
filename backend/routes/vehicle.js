@@ -30,88 +30,83 @@ const generateCompositeId = async () => {
   return `VH-${String(VehicleCount + 1).padStart(3, '0')}`; // Generate ID like DR-001, DR-002, etc.
 };
 
- 
-// Handle vehicle POST requests with image uploads
 router.post(
   '/vehicles',
-  upload.fields([ // Keep other fields for CNIC, driverPhoto, etc.
+  upload.fields([
     { name: 'cnicFront', maxCount: 1 },
     { name: 'cnicBack', maxCount: 1 },
     { name: 'driverPhoto', maxCount: 1 },
     { name: 'vehicleRegistrationFront', maxCount: 1 },
     { name: 'vehicleRegistrationBack', maxCount: 1 },
-    { name: 'vehiclePhotos', maxCount: 5 }, // Allow multiple vehicle photos
-  ]),verifyToken,
+    { name: 'vehiclePhotos', maxCount: 5 },
+  ]),
+  verifyToken,
   async (req, res) => {
     try {
-      // Log incoming data and uploaded files for debugging
       console.log('Request Body:', req.body);
       console.log('Uploaded Files:', req.files);
 
-      // Destructure required fields from the body
       const {
         brand,
         vehicleName,
         vehicleColor,
-         
         vehicleType,
         vehicleProductionYear,
         licenseNumber,
         driverId,
       } = req.body;
 
-      // Check if all required files are uploaded
       if (!req.files.cnicFront || !req.files.cnicBack || !req.files.driverPhoto) {
-        return res.status(400).json({ message: 'Missing required files.' });
+        return res.status(400).json({ message: 'Required files are missing.' });
       }
 
-      // Process vehiclePhotos array if photos are uploaded
       const vehiclePhotos = req.files.vehiclePhotos
-        ? req.files.vehiclePhotos.map(file => file.filename) // Collect filenames of vehicle photos
+        ? req.files.vehiclePhotos.map(file => file.filename)
         : [];
 
-      // Create a new vehicle instance and set the image paths
+      // Generate a unique vehicle ID
+      const vehicleID = await generateCompositeId();
+
+      // Create a new vehicle instance with all fields, including the generated vehicleID
       const newVehicle = new Vehicle({
         brand,
         vehicleName,
         vehicleColor,
-         vehicleType,
+        vehicleType,
         vehicleProductionYear,
         licenseNumber,
         driverId,
-        cnicFront: req.files.cnicFront ? req.files.cnicFront[0].filename : '',
-        cnicBack: req.files.cnicBack ? req.files.cnicBack[0].filename : '',
-        driverPhoto: req.files.driverPhoto ? req.files.driverPhoto[0].filename : '',
+        vehicleID, // Assign the generated ID here
+        cnicFront: req.files.cnicFront[0].filename,
+        cnicBack: req.files.cnicBack[0].filename,
+        driverPhoto: req.files.driverPhoto[0].filename,
         vehicleRegistrationFront: req.files.vehicleRegistrationFront
           ? req.files.vehicleRegistrationFront[0].filename
           : '',
         vehicleRegistrationBack: req.files.vehicleRegistrationBack
           ? req.files.vehicleRegistrationBack[0].filename
           : '',
-        vehiclePhotos, // Assign the vehicle photos array
+        vehiclePhotos,
       });
- 
-      // Save the new vehicle to the database
+
+      // Save the vehicle to the database
       await newVehicle.save();
-      const compositeId = await generateCompositeId();
- // Update the driver with the generated composite ID
- const updatedVehicle = await Vehicle.findByIdAndUpdate(
-  newVehicle._id,
-  { vehicleID: compositeId },
-  { new: true }  // Return the updated driver
+
+      res.status(201).json({
+        id: newVehicle._id,
+        vehicleID: newVehicle.vehicleID,
+        ...newVehicle.toObject(),
+      });
+    } catch (error) {
+      console.error('Error while adding vehicle:', error);
+      res.status(500).json({
+        message: 'Error adding Vehicle. Please try again.',
+        error: error.message,
+      });
+    }
+  }
 );
 
-// Send back the updated driver with both compositeId and _id (id)
-res.status(201).json({
-  id: updatedVehicle._id,        // MongoDB's _id
-  vehicleID: updatedVehicle.vehicleID, // The custom composite ID
-  ...updatedVehicle.toObject()  // Convert Mongoose document to plain object and spread the rest of the fields
-});
-
-} catch (error) {
-res.status(500).json({ message: 'Error adding Vehicle. Please try again.', error: error.message });
-}
-});
 
 // Route to handle vehicle update
 router.put('/vehicles/:id', verifyToken, upload.array('vehiclePhotos'), async (req, res) => {
@@ -193,6 +188,24 @@ router.get('/vehicles/driver/:driverId', verifyToken,async (req, res) => {
     res.status(200).json(vehicles);
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch vehicles', error: error.message });
+  }
+});
+// Delete all vehicles associated with a specific driverId
+router.delete('/vehicles/driver/:driverId', verifyToken, async (req, res) => {
+  const { driverId } = req.params;
+
+  try {
+    // Delete all vehicles where the driverId matches
+    const result = await Vehicle.deleteMany({ driverId });
+
+    // Check if any vehicles were deleted
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ message: 'No vehicles found for the given driver ID' });
+    }
+
+    res.status(200).json({ message: 'Vehicles deleted successfully', deletedCount: result.deletedCount });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to delete vehicles', error: error.message });
   }
 });
 

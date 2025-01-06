@@ -2,10 +2,20 @@ import React, { useState } from "react";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import { Link } from "react-router-dom";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardHeader from "@mui/material/CardHeader";
+import Typography from "@mui/material/Typography";
+ const RatingsAndReviews = () => {
+  // State for handling dialog open/close and selected row data
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedRide, setSelectedRide] = useState(null);
 
-const RatingsAndReviews = () => {
-  // Mock data
+  // Mock data for the rides
   const rows = [
     {
       id: 1,
@@ -29,7 +39,7 @@ const RatingsAndReviews = () => {
       driverID: "457",
       driverName: "Emily Clark",
       driverRating: 4.2,
-      driverReview: "Good passenger, but a bit late.",
+      driverReview: "Good passenger, but a bit late. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
     },
   ];
 
@@ -38,18 +48,7 @@ const RatingsAndReviews = () => {
     { field: "rideID", headerName: "Ride ID", width: 120 },
     { field: "passengerName", headerName: "Passenger Name", width: 180 },
     { field: "driverName", headerName: "Driver Name", width: 180 },
-    {
-      field: "passengerRating",
-      headerName: "Passenger Rating",
-      width: 180,
-      type: "number",
-    },
-    {
-      field: "driverRating",
-      headerName: "Driver Rating",
-      width: 180,
-      type: "number",
-    },
+   
     {
       field: "passengerReview",
       headerName: "Passenger Review",
@@ -60,16 +59,42 @@ const RatingsAndReviews = () => {
       headerName: "Driver Review",
       width: 250,
     },
-    
+    {
+      field: "view",
+      headerName: "Action",
+      width: 90,
+      renderCell: (params) => (
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => handleViewDetails(params.row)}
+        >
+          View
+        </Button>
+      ),
+    },
   ];
-  columns.forEach(column => column.align = 'center'); // Set all columns to 'center' alignment
-  columns.forEach(column => column.headerAlign = 'center'); // Set all columns to 'center' alignment
-   
+
+  // Handle opening the dialog and setting the selected ride data
+  const handleViewDetails = (row) => {
+    setSelectedRide(row);
+    setOpenDialog(true);
+  };
+
+  // Handle closing the dialog
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
+  // Center the columns
+  columns.forEach((column) => (column.align = "left"));
+  columns.forEach((column) => (column.headerAlign = "left"));
+
   return (
     <div className="main-content">
       <div className="header">
         <h1>Ratings and Reviews</h1>
-       </div>
+      </div>
       <div style={{ marginTop: "20px" }}>
         <Box sx={{ height: 500, width: "100%" }}>
           <DataGrid
@@ -91,19 +116,71 @@ const RatingsAndReviews = () => {
               },
             }}
             pageSizeOptions={[5, 10, 20]} // Allow users to choose 5, 10, or 20 records per page
-             disableRowSelectionOnClick
-           
+            disableRowSelectionOnClick
             disableColumnFilter
             disableColumnSelector
             disableDensitySelector
-            
           />
         </Box>
-        </div>
+      </div>
+
+      {/* Dialog for displaying ratings and reviews */}
+      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="md" fullWidth>
+        <DialogTitle  
+        >Ratings and Reviews Details</DialogTitle>
+        <DialogContent sx={{ padding: "30px" ,marginTop:"30px"
+
+        }}>
+          {selectedRide && (
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              {/* Passenger Info Card */}
+              <Card style={{ width: "48%" ,background:"#E0E0E0"
+
+               }}>
+                <CardHeader title="Passenger Review
+                " />
+                <CardContent>
+                  <Typography variant="body1">
+                    <strong>Passenger Name:</strong> {selectedRide.passengerName}
+                  </Typography>
+                  <Typography variant="body1">
+                    <strong>Passenger Rating:</strong> {selectedRide.passengerRating}
+                  </Typography>
+                  <Typography variant="body1">
+                    <strong>Passenger Review:</strong> {selectedRide.passengerReview}
+                  </Typography>
+                </CardContent>
+              </Card>
+
+              {/* Driver Info Card */}
+              <Card style={{ width: "48%",background:"#E0E0E0"
+
+               }}>
+                <CardHeader title="Driver Review
+                " />
+                <CardContent>
+                  <Typography variant="body1">
+                    <strong>Driver Name:</strong> {selectedRide.driverName}
+                  </Typography>
+                  <Typography variant="body1">
+                    <strong>Driver Rating:</strong> {selectedRide.driverRating}
+                  </Typography>
+                  <Typography variant="body1">
+                    <strong>Driver Review:</strong> {selectedRide.driverReview}
+                  </Typography>
+                </CardContent>
+              </Card>
             </div>
-           
-          );
-        }
-        
-        export default RatingsAndReviews;
- 
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+  );
+};
+
+export default RatingsAndReviews;

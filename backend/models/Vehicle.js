@@ -8,7 +8,7 @@ const vehicleSchema = new mongoose.Schema({
     vehicleType: {
       type: String,
       required: true,
-      enum: ['AC Car', 'Mini Car', 'Rickshaw', 'Bike'], // Added enum for vehicle types
+      enum: ['AC Car', 'Economy Car', 'Rickshaw', 'Bike'], // Added enum for vehicle types
       maxlength: 50,
     },
     vehicleProductionYear: { type: Number, required: false }, // optional field

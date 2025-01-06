@@ -45,17 +45,19 @@ const generateCompositeId = async () => {
  router.post('/drivers',verifyToken, async (req, res) => {
   try {
     const { name, gender, email, phoneNumber, cnic, dateOfBirth, ratings } = req.body;
-    console.log("req body "+req.body);
-    console.log(dateOfBirth);
+     console.log(dateOfBirth);
     // Ensure all required fields are present
     if (!dateOfBirth) {
       return res.status(400).json({ message: 'Date of Birth required.' });
     }
-
+const isApproved=true;
+const createdAt=new Date();
     const newDriver = new Driver({
-      name, gender, email, phoneNumber, cnic, dateOfBirth, ratings
+      name, gender, email, phoneNumber, cnic, dateOfBirth, ratings,
+      isApproved,// Explicitly set default if missing
+      createdAt, // Ensure createdAt is always set to the current time
     });
-
+console.log("new"+newDriver);
     // Save the driver first
     await newDriver.save();
 
@@ -82,23 +84,27 @@ const generateCompositeId = async () => {
 });
 
 // Update driver details
-router.put('/drivers/:id', verifyToken,async (req, res) => {
+router.put('/drivers/:id', verifyToken, async (req, res) => {
   const { id } = req.params;
-  console.log(req.body);
   const { name, gender, email, phoneNumber, cnic, dateOfBirth, ratings } = req.body;
-  console.log(req.files);  // For uploaded files
-  
-  // Validate if all required fields are present
-  if (!name || !gender || !email || !phoneNumber || !cnic || !dateOfBirth || ratings === undefined) {
-    return res.status(400).json({ message: 'All fields are required' });
-  }
 
   try {
+    // Build the update object dynamically to avoid overwriting missing fields
+    const updateFields = {
+      ...(name && { name }),
+      ...(gender && { gender }),
+      ...(email && { email }),
+      ...(phoneNumber && { phoneNumber }),
+      ...(cnic && { cnic }),
+      ...(dateOfBirth && { dateOfBirth }),
+      ...(ratings !== undefined && { ratings }),  
+     };
+
     // Update the driver in the database
     const driver = await Driver.findByIdAndUpdate(
       id,
-      { name, gender, email, phoneNumber, cnic, dateOfBirth, ratings },
-      { new: true } // To return the updated driver
+      updateFields,
+      { new: true } // Return the updated driver
     );
 
     // If no driver is found, return an error
@@ -108,9 +114,10 @@ router.put('/drivers/:id', verifyToken,async (req, res) => {
 
     res.status(200).json(driver);
   } catch (error) {
-    res.status(500).json({ message: 'Failed to update driver' });
+    res.status(500).json({ message: 'Failed to update driver', error: error.message });
   }
 });
+
 
 // Delete a driver
 router.delete('/drivers/:id',verifyToken, async (req, res) => {
@@ -123,5 +130,29 @@ router.delete('/drivers/:id',verifyToken, async (req, res) => {
     res.status(500).json({ message: 'Failed to delete driver' });
   }
 });
+
+// Fetch a driver by Composite ID
+router.get('/drivers/composite/:compositeId', verifyToken, async (req, res) => {
+  console.log("Received compositeId:"); // This should log the compositeId value
+
+  const { compositeId } = req.params;
+
+  console.log("Received compositeId:", compositeId); // This should log the compositeId value
+
+  try {
+    // Find the driver by compositeId
+    const driver = await Driver.findOne({ compositeId: compositeId });  // Find driver based on compositeId
+
+    // If the driver is not found, return a 404 error
+    if (!driver) {
+      return res.status(404).json({ message: 'Driver not found' });
+    }
+
+    res.status(200).json(driver);  // Return the driver details as JSON
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch driver details', error: error.message });
+  }
+});
+
 
 module.exports = router;

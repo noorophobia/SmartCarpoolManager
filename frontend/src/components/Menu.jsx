@@ -6,7 +6,7 @@ const Menu = () => {
     <div className="menu">
          <div className="item">
           <div className="title">Main</div>
-          <Link to="/home" className="listItem"> 
+          <Link to="/" className="listItem"> 
             <img src="/public/home.svg" alt="icon" className="icon" />
              <span className="listItemTitle">Home </span>
           </Link>
@@ -43,9 +43,15 @@ const Menu = () => {
           </Link>
           <Link to="/rate-setting" className="listItem"> 
             <img src="/public/rate_setting.svg" alt="icon" className="icon" />
-             <span className="listItemTitle">Vehicle Rate Settings </span>
+             <span className="listItemTitle">Vehicle Rates        </span>
           </Link>
          </div>
+         <Link to="/contact-us" className="listItem" style={{ marginBottom: '20px', marginTop:'10px'
+
+          }}>
+            <img src="/public/ratings_icon.svg" alt="icon" className="icon" />
+             <span className="listItemTitle">Complaints </span>
+          </Link>
 
          <div className="item">
  

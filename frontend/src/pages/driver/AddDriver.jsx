@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Button, MenuItem, Paper, Box, Typography, Alert, Grid, Card, CardContent, CardMedia, CardHeader } from '@mui/material';
-import '../styles/addDriver.css'
+import '../../styles/addDriver.css';
+import axios from 'axios';
 const AddDriver = () => {
   const [name, setName] = useState('');
   const [gender, setGender] = useState('');
@@ -51,24 +52,30 @@ const AddDriver = () => {
   });
  // Fetch drivers data from the Express server when the component mounts
  useEffect(() => {
-  const fetchDrivers = async () => {
+      
+  const fetchAllDrivers = async () => {
     try {
-      const response = await fetch('http://localhost:5000/drivers');
-      const data = await response.json();
-       
-        const driverEmails = data.map(driver => driver.email);
-        const driverPhoneNumbers = data.map(driver => driver.phoneNumber);
-        const driverCnics = data.map(driver => driver.cnic);
+      const token = localStorage.getItem('token'); // Adjust according to how you're storing the token
 
-      setEmails(driverEmails);
-      setPhoneNumbers(driverPhoneNumbers);
-      setCnics(driverCnics);
+       const response = await fetch(`http://localhost:5000/drivers`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,  // Add the token to the Authorization header
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await response.json();
+     
+     setEmails( data.map(driver => driver.email))
+      setPhoneNumbers (data.map(driver => driver.phoneNumber));
+      setCnics(data.map(driver => driver.cnic));
+
     } catch (error) {
-      console.error('Failed to fetch drivers:', error);
+      console.error('Failed to fetch driver:', error);
     }
   };
 
-  fetchDrivers(); // Call the function to fetch data
+  fetchAllDrivers(); // Call the function to fetch data
 }, []);
 
 const currentYear = new Date().getFullYear();
@@ -224,36 +231,44 @@ const currentYear = new Date().getFullYear();
   });
       console.log(vehiclePhotos)
  
-    try {
-      const driverResponse = await fetch('http://localhost:5000/drivers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...newDriver }),
-      });
-      const driverResult = await driverResponse.json();
-
-      if (driverResponse.ok) {
-        formData.append('driverId', driverResult._id);
-
-        const vehicleResponse = await fetch('http://localhost:5000/vehicles', {
+      try {
+        // Retrieve the token (example: from local storage)
+        const token = localStorage.getItem('token'); // Adjust according to how you're storing the token
+      
+        const driverResponse = await fetch('http://localhost:5000/drivers', {
           method: 'POST',
-           body: formData,
-         });
-        const vehicleResult = await vehicleResponse.json();
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`, // Include the token here
+          },
+          body: JSON.stringify({ ...newDriver }),
+        });
+      
+        const driverResult = await driverResponse.json();
+      
+        if (driverResponse.ok) {
+          formData.append('driverId', driverResult._id);
+      
+          const vehicleResponse = await axios.post('http://localhost:5000/vehicles', formData, {
+            headers: {
+              'Authorization': `Bearer ${token}`, // Add the token to headers
+              'Content-Type': 'multipart/form-data', // Inform server about formData
+            },
+          });
+      
+          // Handle the response
+          if (vehicleResponse.status === 201) {
+            navigate('/drivers'); // Navigate back to the drivers list after success
+          } else {
+            setError(vehicleResponse.data.message || 'Error saving vehicle. Please try again.');
+          }
+        }  
         
-        if (vehicleResponse.ok) {
-          navigate('/drivers'); // Navigate back to drivers list page after success
-        } else {
-          setError(vehicleResult.message || 'Error saving vehicle. Please try again.');
-        }
-      } else {
-        setError(driverResult.message || 'Error saving driver. Please try again.');
+      } catch (error) {
+        console.error('Error saving data:', error);
+        setError('Error saving data. Please try again.');
       }
-    } catch (error) {
-      console.error('Error saving data:', error);
-      setError('Error saving data. Please try again.');
-    }
-  };
+    };      
 
   const handleCnicChange = (e) => {
     let value = e.target.value.replace(/\D/g, ''); // Remove non-digit characters
@@ -573,8 +588,10 @@ const currentYear = new Date().getFullYear();
                     error={!!errorMessages.vehicleType}
                     helperText={errorMessages.vehicleType}
                   >
+ 
                     <MenuItem value="AC Car">AC Car</MenuItem>
-                    <MenuItem value="Mini Car">Mini Car</MenuItem>
+                    <MenuItem value="Economy Car">Economy
+                     Car</MenuItem>
                     <MenuItem value="Rickshaw">Rickshaw</MenuItem>
                     <MenuItem value="Bike">Bike</MenuItem>
                   </TextField>

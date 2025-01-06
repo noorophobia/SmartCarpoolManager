@@ -8,7 +8,7 @@ import '../../styles/tables.css';
 
 const Drivers = () => {
   const [drivers, setDrivers] = useState([]); // State to hold the fetched drivers data
-  
+  const[vehicle,setVehicle]=useState(null);
   const navigate = useNavigate();
 
   // Fetch drivers data from the Express server when the component mounts
@@ -91,6 +91,15 @@ const Drivers = () => {
           },
         });
         if (response.ok) {
+            
+              const res_vehicle = await fetch(`http://localhost:5000/vehicles/driver/${id}`, {
+                method: 'DELETE',
+                headers: {
+                  'Authorization': `Bearer ${token}`,  // Add the token to the Authorization header
+                  'Content-Type': 'application/json',
+                },
+              });
+            
           setDrivers(drivers.filter(driver => driver.id !== id)); // Remove the deleted driver from state
         } else {
           alert('Failed to delete driver.');

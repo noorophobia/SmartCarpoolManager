@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { TextField, Button, MenuItem, Paper, Box, Typography, Alert, Grid, Card, CardContent, CardMedia, CardHeader } from '@mui/material';
-import '../styles/addDriver.css'
+import '../../styles/addDriver.css'
 const EditDriver = () => {
     const [name, setName] = useState('');
     const [gender, setGender] = useState('');
@@ -804,9 +804,10 @@ setVehicleRegistrationFront(vehicle.vehicleRegistrationFront);
                     helperText={errorMessages.vehicleType}
                   >
                     <MenuItem value="AC Car">AC Car</MenuItem>
-                    <MenuItem value="Mini Car">Mini Car</MenuItem>
-                    <MenuItem value="Rickshaw">Rickshaw</MenuItem>
-                    <MenuItem value="Bike">Bike</MenuItem>
+                                       <MenuItem value="Economy Car">Economy
+                                        Car</MenuItem>
+                                       <MenuItem value="Rickshaw">Rickshaw</MenuItem>
+                                       <MenuItem value="Bike">Bike</MenuItem>
                   </TextField>
                   <TextField
       label="Vehicle Production Year"

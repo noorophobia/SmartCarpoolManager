@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import "../styles/navbar.css";
 import { useNavigate, Link } from "react-router-dom";
-
+ 
 const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
@@ -12,7 +12,8 @@ const Navbar = () => {
   };
 
   const handleProfile = () => {
-    navigate("/profile"); // Redirect to the Profile page
+    navigate("/settings"
+      ); // Redirect to the Profile page
   };
 
   return (

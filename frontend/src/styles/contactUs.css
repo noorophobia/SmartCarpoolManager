@@ -1,0 +1,49 @@
+/* Basic styling for the dialog box */
+.MuiDialog-paper {
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    max-width: 600px;
+    margin: 10px;
+    background-color: #f9f9f9;
+  }
+  
+  /* Styling for the dialog title */
+  .MuiDialogTitle-root {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  /* Styling for the dialog content */
+  .MuiDialogContent-root {
+    padding: 20px;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #444;
+  }
+  
+  .MuiDialogContent-root p {
+    margin-bottom: 12px;
+  }
+  
+  .MuiDataGrid-row:hover {
+    background-color: #f4f4f4;
+  }
+  
+  /* Custom styling for the dialog scroll */
+  .MuiDialogContent-root::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .MuiDialogContent-root::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 10px;
+  }
+  
+  .MuiDialogContent-root::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
+  }
+  

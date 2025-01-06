@@ -26,7 +26,7 @@ router.get('/rate-settings/:vehicle', verifyToken,async (req, res) => {
     const rateSettings = await RateSettings.findOne({
       'vehicleTypes.type': vehicle // Querying the vehicleTypes array for the matching type
     });
-
+ 
     if (!rateSettings) {
       return res.status(404).json({ message: `Rate settings not found for ${vehicle}` });
     }

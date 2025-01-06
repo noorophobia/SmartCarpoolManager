@@ -1,5 +1,4 @@
-import './App.css';
-import {
+ import {
   createBrowserRouter,
   RouterProvider,
   Outlet,
@@ -10,7 +9,7 @@ import React, { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 
  import Passengers from './pages/admin/Passengers';
-import Drivers from './pages/admin/Drivers';
+import Drivers from './pages/driver/Drivers';
 import Settings from './pages/admin/Settings';
 import Rides from './pages/admin/Rides';
 import Default from './pages/Default';
@@ -20,24 +19,26 @@ import Footer from './components/Footer';
  import Home from './pages/Home'
 import Menu from './components/Menu'
 import Map from './pages/Map'
-import PendingApplications from './pages/admin/PendingApplications';
+import PendingApplications from './pages/driver/PendingApplications';
 import '../src/styles/global.css';  // Import the CSS file
  import RatingsAndReviews from './pages/admin/RatingsAndReviews';
 import Revenue from './pages/revenue/OverallRevenue';
  import YearlyRevenue from './pages/revenue/YearlyRevenue';
-import DriverDetails from './components/DriverDetails';
+import DriverDetails from './pages/driver/DriverDetails';
 import RateSetting from './pages/admin/RateSetting';
 import PassengerDetails from './components/PassengerDetails';
 import RideDetails from './components/RideDetails';
- import AddEditDriver from './components/AddPassenger';
-import AddDriver from './components/AddDriver';
-import EditDriver from './components/EditDriver';
+ import AddDriver from './pages/driver/AddDriver';
+import EditDriver from './pages/driver/EditDriver';
+import ContactUs from "./pages/admin/ContactUs";
 
-
-   
+    
 const Layout = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true); // State to track the loading state
+  const [theme, setTheme] = useState("light"); // State to track the loading state
+
+
 
   useEffect(() => {
     const token = localStorage.getItem("token"); // Check if token exists
@@ -49,7 +50,11 @@ const Layout = () => {
       setLoading(false);
     }
 
-    
+      // Theme handling logic
+      const savedTheme = localStorage.getItem("theme") || "light"; // Default to light theme if not set
+      setTheme(savedTheme);
+      document.body.setAttribute("data-theme", savedTheme); // Apply saved theme to <body>
+  
     const decoded = jwtDecode(token); // Decode the full JWT token (header + payload)
     console.log(decoded); // Log the full decoded token to check all claims
 
@@ -116,6 +121,10 @@ function App() {
         {
           path: "/rides",
           element: <Rides />,
+        },
+        {
+          path: "/contact-us",
+          element: <ContactUs/>,
         },
         {
           path: "/revenue",

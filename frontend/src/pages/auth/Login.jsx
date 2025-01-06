@@ -1,28 +1,26 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import "../../styles/login.css"; // Ensure the path is correct
+import "../../styles/login.css";  
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-
+  
   const handleSubmit = async (event) => {
     event.preventDefault();
-    alert(`Email: ${email} Password: ${password}`); // For debugging
-
+ 
     try {
       // Make the fetch request with POST method
       const res = await fetch("http://localhost:5000/api/admin/login", {
-        method: "POST", // HTTP method
+        method: "POST",  
         headers: {
           "Content-Type": "application/json", // Specify content type
         },
         body: JSON.stringify({ email, password }), // Send email and password as JSON
       });
 
-      // Check if the response is successful
-      if (!res.ok) {
+       if (!res.ok) {
         throw new Error("Failed to login");
       }
 
