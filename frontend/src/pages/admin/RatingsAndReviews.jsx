@@ -10,13 +10,12 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
 import Typography from "@mui/material/Typography";
- const RatingsAndReviews = () => {
-  // State for handling dialog open/close and selected row data
+import "../../styles/ratingAndReviews.css";
+
+const RatingsAndReviews = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedRide, setSelectedRide] = useState(null);
-
-  // Mock data for the rides
-  const rows = [
+  const [rows, setRows] = useState([
     {
       id: 1,
       rideID: "RIDE123",
@@ -28,27 +27,28 @@ import Typography from "@mui/material/Typography";
       driverName: "John Doe",
       driverRating: 4.8,
       driverReview: "Smooth ride, friendly driver!",
+      status: "new",
     },
     {
       id: 2,
       rideID: "RIDE124",
       passengerID: "124",
       passengerName: "Sara Ahmed",
-      passengerRating: 3.7,
+      passengerRating: 2.5,
       passengerReview: "Decent ride, could be better.",
       driverID: "457",
       driverName: "Emily Clark",
-      driverRating: 4.2,
-      driverReview: "Good passenger, but a bit late. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+      driverRating: 3.2,
+      driverReview: "Good passenger, but a bit late.",
+      status: "resolved",
     },
-  ];
+  ]);
 
   // Columns for the DataGrid
   const columns = [
     { field: "rideID", headerName: "Ride ID", width: 120 },
     { field: "passengerName", headerName: "Passenger Name", width: 180 },
     { field: "driverName", headerName: "Driver Name", width: 180 },
-   
     {
       field: "passengerReview",
       headerName: "Passenger Review",
@@ -60,9 +60,24 @@ import Typography from "@mui/material/Typography";
       width: 250,
     },
     {
-      field: "view",
+      field: "status",
+      headerName: "Status",
+      width: 120,
+      renderCell: (params) => (
+        <Typography
+          style={{
+            color: params.row.status === "new" ? "red" : "green",
+            fontWeight: "bold",
+          }}
+        >
+          {params.row.status === "new" ? "New" : "Resolved"}
+        </Typography>
+      ),
+    },
+    {
+      field: "action",
       headerName: "Action",
-      width: 90,
+      width: 150,
       renderCell: (params) => (
         <Button
           variant="contained"
@@ -79,11 +94,37 @@ import Typography from "@mui/material/Typography";
   const handleViewDetails = (row) => {
     setSelectedRide(row);
     setOpenDialog(true);
+
+    // Update row status to "in-progress" if it is "new"
+    const updatedRows = rows.map((r) =>
+      r.id === row.id && r.status === "new" ? { ...r, status: "in-progress" } : r
+    );
+    setRows(updatedRows);
   };
 
   // Handle closing the dialog
   const handleCloseDialog = () => {
     setOpenDialog(false);
+
+    // Update row status to "resolved"
+    const updatedRows = rows.map((r) =>
+      r.id === selectedRide.id && r.status === "in-progress"
+        ? { ...r, status: "resolved" }
+        : r
+    );
+    setRows(updatedRows);
+  };
+
+  // Handle blocking passenger
+  const handleBlockPassenger = (rideId) => {
+    alert(`Passenger for ride ${rideId} has been blocked`);
+    // Logic to block passenger
+  };
+
+  // Handle blocking driver
+  const handleBlockDriver = (rideId) => {
+    alert(`Driver for ride ${rideId} has been blocked`);
+    // Logic to block driver
   };
 
   // Center the columns
@@ -98,6 +139,9 @@ import Typography from "@mui/material/Typography";
       <div style={{ marginTop: "20px" }}>
         <Box sx={{ height: 500, width: "100%" }}>
           <DataGrid
+            getRowClassName={(params) =>
+              params.row.status === "new" ? "new-complaint-row" : ""
+            }
             className="dataGrid"
             rows={rows}
             columns={columns}
@@ -115,7 +159,7 @@ import Typography from "@mui/material/Typography";
                 },
               },
             }}
-            pageSizeOptions={[5, 10, 20]} // Allow users to choose 5, 10, or 20 records per page
+            pageSizeOptions={[5, 10, 20]}
             disableRowSelectionOnClick
             disableColumnFilter
             disableColumnSelector
@@ -126,19 +170,13 @@ import Typography from "@mui/material/Typography";
 
       {/* Dialog for displaying ratings and reviews */}
       <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="md" fullWidth>
-        <DialogTitle  
-        >Ratings and Reviews Details</DialogTitle>
-        <DialogContent sx={{ padding: "30px" ,marginTop:"30px"
-
-        }}>
+        <DialogTitle>Ratings and Reviews Details</DialogTitle>
+        <DialogContent sx={{ padding: "30px", marginTop: "30px" }}>
           {selectedRide && (
             <div style={{ display: "flex", justifyContent: "space-between" }}>
               {/* Passenger Info Card */}
-              <Card style={{ width: "48%" ,background:"#E0E0E0"
-
-               }}>
-                <CardHeader title="Passenger Review
-                " />
+              <Card style={{ width: "48%", background: "#E0E0E0" }}>
+                <CardHeader title="Passenger Review" />
                 <CardContent>
                   <Typography variant="body1">
                     <strong>Passenger Name:</strong> {selectedRide.passengerName}
@@ -149,15 +187,23 @@ import Typography from "@mui/material/Typography";
                   <Typography variant="body1">
                     <strong>Passenger Review:</strong> {selectedRide.passengerReview}
                   </Typography>
+                  {/* Block Button for Passenger */}
+                  {selectedRide.passengerRating < 3 && (
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      onClick={() => handleBlockPassenger(selectedRide.rideID)}
+                      style={{ marginTop: "10px" }}
+                    >
+                      Block Passenger
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
 
               {/* Driver Info Card */}
-              <Card style={{ width: "48%",background:"#E0E0E0"
-
-               }}>
-                <CardHeader title="Driver Review
-                " />
+              <Card style={{ width: "48%", background: "#E0E0E0" }}>
+                <CardHeader title="Driver Review" />
                 <CardContent>
                   <Typography variant="body1">
                     <strong>Driver Name:</strong> {selectedRide.driverName}
@@ -168,6 +214,17 @@ import Typography from "@mui/material/Typography";
                   <Typography variant="body1">
                     <strong>Driver Review:</strong> {selectedRide.driverReview}
                   </Typography>
+                  {/* Block Button for Driver */}
+                  {selectedRide.driverRating < 3 && (
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      onClick={() => handleBlockDriver(selectedRide.rideID)}
+                      style={{ marginTop: "10px" }}
+                    >
+                      Block Driver
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             </div>

@@ -2,24 +2,26 @@ import React, { useState, useEffect } from "react";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
-
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Rides = () => {
   const [driver, setDriver] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [selectedDriverId, setSelectedDriverId] = useState(null); // Track clicked driver ID
-  const navigate = useNavigate(); // Initialize navigate
+  const [selectedDriverId, setSelectedDriverId] = useState(null);
+  const navigate = useNavigate();
 
-  const token = localStorage.getItem("token"); // Assuming the token is stored in localStorage
+  const token = localStorage.getItem("token");
 
-  // Fetch driver details based on the selected driver ID
   useEffect(() => {
     const fetchDriver = async () => {
+      if (!selectedDriverId) return; // Skip if no driver ID is selected
+
       setLoading(true);
+      setError(null); // Reset error on each fetch
+      setDriver(null); // Clear previous driver data
+
       try {
         console.log(`Fetching driver for ID: ${selectedDriverId}`);
         const response = await axios.get(
@@ -31,28 +33,23 @@ const Rides = () => {
             },
           }
         );
-  // Handle response
-  if (response.status === 200) {
-    console.log('Driver updated successfully');
-      setDriver(response.data); // Set the fetched driver data
-        console.log("Fetched driver data: ", response.data); // Log the driver data
-        console.log("Driver ID: ", response.data._id);
-     // Use response.data._id directly instead of waiting for the state to update
-        navigate(`/drivers/${response.data._id}`);
-}
+
+        if (response.status === 200) {
+          setDriver(response.data);
+          console.log("Fetched driver data: ", response.data);
+          navigate(`/drivers/${response.data._id}`);
+        }
       } catch (err) {
-        setError(err.message); // Handle error
+        console.error("Error fetching driver data:", err);
+        setError(err.message);
       } finally {
-        setLoading(false); // Set loading state to false
+        setLoading(false);
       }
-    }
-  
-    
-      fetchDriver();
-    }
-  , [selectedDriverId, token]); // Re-run the effect when the selectedDriverId changes
- // Navigate when driver details are available
- 
+    };
+
+    fetchDriver();
+  }, [selectedDriverId, token, navigate]);
+
   const columns = [
     { field: "rideID", headerName: "Ride ID", width: 120 },
     { field: "pickUpLocation", headerName: "Pick-Up Location", width: 200 },
@@ -82,7 +79,7 @@ const Rides = () => {
           variant="text"
           color="primary"
           size="small"
-          onClick={() => setSelectedDriverId(params.value)} // Set selectedDriverId on click
+          onClick={() => setSelectedDriverId(params.value)}
         >
           {params.value}
         </Button>
@@ -111,7 +108,7 @@ const Rides = () => {
       rideMode: "Carpool",
       rideStatus: "Ongoing",
       passenger: "1",
-      driver: "DR-002", // Driver ID
+      driver: "DR-003",
     },
     {
       id: 2,
@@ -119,9 +116,9 @@ const Rides = () => {
       pickUpLocation: "DHA",
       dropOffLocation: "Gulberg",
       rideMode: "Single",
-      rideStatus: "Completed",
-      passenger: "124",
-      driver: "DR-003", // Another Driver ID
+      rideStatus: "Cancelled",
+      passenger: "2",
+      driver: "DR-003",
     },
   ];
 
@@ -144,30 +141,16 @@ const Rides = () => {
                 quickFilterProps: { debounceMs: 500 },
               },
             }}
-            pageSizeOptions={[5, 10, 20]} // Allow users to choose 5, 10, or 20 records per page
+            pageSizeOptions={[5, 10, 20]}
             disableRowSelectionOnClick
           />
         </Box>
       </div>
 
-      {/* Display the driver details below */}
+      {/* Display driver details */}
       {loading && <p>Loading driver details...</p>}
       {error && <p>Error: {error}</p>}
-      {driver && (
-        <div>
-          <h2>Driver Details</h2>
-          <p>
-            <strong>ID:</strong> {driver.id}
-          </p>
-          <p>
-            <strong>Name:</strong> {driver.name}
-          </p>
-          <p>
-            <strong>License:</strong> {driver.licenseNumber}
-          </p>
-          {/* You can display more driver details here */}
-        </div>
-      )}
+       
     </div>
   );
 };

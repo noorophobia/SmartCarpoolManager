@@ -45,14 +45,19 @@ const Menu = () => {
             <img src="/public/rate_setting.svg" alt="icon" className="icon" />
              <span className="listItemTitle">Vehicle Rates        </span>
           </Link>
+          <Link to="/contact-us" className="listItem" >
+  <img src="/public/complaint.svg" alt="icon" className="icon" />
+   <span className="listItemTitle">Complaints </span>
+</Link>
+ 
+<Link to="/packages" className="listItem" >
+  <img src="/public/package.svg" alt="icon" className="icon" />
+   <span className="listItemTitle">Packages </span>
+</Link>
+
          </div>
-         <Link to="/contact-us" className="listItem" style={{ marginBottom: '20px', marginTop:'10px'
-
-          }}>
-            <img src="/public/ratings_icon.svg" alt="icon" className="icon" />
-             <span className="listItemTitle">Complaints </span>
-          </Link>
-
+    
+           
          <div className="item">
  
           <div className="title">Revenue Report</div>
@@ -73,6 +78,11 @@ const Menu = () => {
             <img src="/public/settings.svg" alt="icon" className="icon" />
              <span className="listItemTitle">Settings </span>
           </Link>
+          <Link to="/push-notification" className="listItem" >
+  <img src="/public/notifications.svg" alt="icon" className="icon" />
+   <span className="listItemTitle">Push Notification </span>
+</Link>
+ 
 
          
          </div>

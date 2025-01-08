@@ -55,7 +55,9 @@ router.post(
         licenseNumber,
         driverId,
       } = req.body;
-
+      console.log('Request Body:', req.body);
+      console.log('Uploaded Files:', req.files);
+      
       if (!req.files.cnicFront || !req.files.cnicBack || !req.files.driverPhoto) {
         return res.status(400).json({ message: 'Required files are missing.' });
       }

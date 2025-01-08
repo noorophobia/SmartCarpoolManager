@@ -85,6 +85,8 @@ const currentYear = new Date().getFullYear();
  
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const formData = new FormData();
+
     setError(''); // Clear previous error
      // Reset errors before starting validation
      setErrorMessages({
@@ -213,31 +215,15 @@ const currentYear = new Date().getFullYear();
     const newDriver = { name, gender, email, phoneNumber, cnic, dateOfBirth, ratings };
    
        
-    const formData = new FormData();
-  
+   
 
-    // Append vehicle fields to formData
-  formData.append('brand', brand);
-  formData.append('vehicleName', vehicleName);
-  formData.append('vehicleColor', vehicleColor);
-   formData.append('vehicleType', vehicleType);
-  formData.append('vehicleProductionYear', vehicleProductionYear);
-  formData.append('licenseNumber', licenseNumber);
-  formData.append('vehicleRegistrationFront', vehicleRegistrationFront);
-  formData.append('vehicleRegistrationBack', vehicleRegistrationBack);
-  formData.append('cnicFront', cnicFront);
-  formData.append('driverPhoto', driverPhoto);
-  formData.append('cnicBack', cnicBack);
-  vehiclePhotos.forEach(photo => {
-    formData.append('vehiclePhotos', photo); // Append each file
-  });
+   
       console.log(vehiclePhotos)
  
       try {
         // Retrieve the token (example: from local storage)
         const token = localStorage.getItem('token'); // Adjust according to how you're storing the token
-      alert(newDriver);
-      alert(token)
+      
       const driverResponse = await axios.post(
         'http://localhost:5000/drivers',
         { ...newDriver }, // Data to be sent in the body
@@ -252,9 +238,23 @@ const currentYear = new Date().getFullYear();
       const driverResult = driverResponse.data;
     
       if (driverResponse.status === 201) {
+          // Append vehicle fields to formData
+  formData.append('brand', brand);
+  formData.append('vehicleName', vehicleName);
+  formData.append('vehicleColor', vehicleColor);
+   formData.append('vehicleType', vehicleType);
+  formData.append('vehicleProductionYear', vehicleProductionYear);
+  formData.append('licenseNumber', licenseNumber);
+  formData.append('vehicleRegistrationFront', vehicleRegistrationFront);
+  formData.append('vehicleRegistrationBack', vehicleRegistrationBack);
+  formData.append('cnicFront', cnicFront);
+  formData.append('driverPhoto', driverPhoto);
+  formData.append('cnicBack', cnicBack);
+  vehiclePhotos.forEach(photo => {
+    formData.append('vehiclePhotos', photo); // Append each file
+  });
           formData.append('driverId', driverResult._id);
-          console.log(formdata)
-      
+       
           const vehicleResponse = await axios.post('http://localhost:5000/vehicles', formData, {
             headers: {
               'Authorization': `Bearer ${token}`, // Add the token to headers

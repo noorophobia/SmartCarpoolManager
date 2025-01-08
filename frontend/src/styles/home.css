@@ -2,15 +2,15 @@
     display: grid;
     gap: 20px;
     grid-template-columns: repeat(4, 1fr); /* 4 equal columns */
-    grid-template-rows: auto auto auto; /* Adjust rows to auto for dynamic height */
+    grid-template-rows: auto auto auto; /*  rows  auto for dynamic height */
     padding: 20px;
     position: relative;
 }
-
+ 
 .heading {
-    grid-column: span 4; /* Make heading span across all columns */
+    grid-column: span 4;  
     font-size: 30px;
-    grid-row: 1; /* Explicitly place the heading in the first row */
+    grid-row: 1;  
 
     font-weight: bold;
     margin: 0;
@@ -18,17 +18,17 @@
 }
 
 .subheading {
-    grid-column: span 4; /* Make subheading span across all columns */
-    grid-row: 4;/* Explicitly place subheading in the second row */
+    grid-column: span 4;  
+    grid-row: 4; 
     font-size: 1.5em;
-    margin-left: 0; /* Remove margin */
+    margin-left: 0;  
     padding-bottom: 5px;
 }
 /* Box Layout */
 .box {
     display: grid;
-    grid-template-columns: 1fr auto; /* Text takes most of the space, icon takes minimal */
-    grid-template-rows: auto auto; /* Two rows: one for the heading, one for the number + icon */
+    grid-template-columns: 1fr auto;  
+    grid-template-rows: auto auto;  
     grid-template-areas:
         "heading heading"
         "number icon";
@@ -65,39 +65,36 @@
     grid-area: icon;
     width: 70px;
     height: 70px;
-      justify-self: end; /* Align the icon to the right */
+      justify-self: end;  
 }
 .recharts-legend {
-    margin-top: 20px;  /* Add margin to the entire legend */
+    margin-top: 20px;   
   }
   
 
-/* Position the first set of boxes */
-.box1, .box2, .box3, .box4 {
+ .box1, .box2, .box3, .box4 {
     grid-row: 2;
 }
 
-/* Position the second set of boxes */
-.box5, .box6, .box7, .box8 {
+ .box5, .box6, .box7, .box8 {
     grid-row: 3;
 }
 
-/* Last row for charts */
-.box9 {
-    grid-row: 5; /* Place the charts in the last row */
+ .box9 {
+    grid-row: 5; 
     grid-column: span 3;
-    min-height: 300px; /* Adjust height for proper spacing */
+    min-height: 300px; 
     padding: 0;
 }
 .box10 {
-    grid-row: 5; /* Adjust grid position */
-    grid-column: span 1;/* Span two columns */
-    min-height: 400px; /* Ensure enough height for the chart and legend */
+    grid-row: 5;  
+    grid-column: span 1;
+    min-height: 400px; 
     padding: 20px;
     display: flex;
     flex-direction: column;
-    align-items: center; /* Center content horizontally */
-    justify-content: space-between; /* Add spacing between chart and legend */
+    align-items: center;  
+    justify-content: space-between; 
   }
   
  .legend {

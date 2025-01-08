@@ -3,6 +3,7 @@ import '../styles/home.css';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { LineChart, Line, XAxis, YAxis, Tooltip as LineTooltip, Legend } from 'recharts';
 import { ToggleButton, ToggleButtonGroup } from '@mui/material'; // Import Material UI components
+import { useLocation } from "react-router-dom";
 
 // Line Chart Data and Setup
 const lineData = [
@@ -21,16 +22,17 @@ const dailyRevenueData = [
 ];
  // Pie Chart Data for Approved and Pending Requests
 const pieData = [
-  { name: 'Approved Requests', value: 80 },  // Example value for Approved Requests
-  { name: 'Pending Requests', value: 20 },   // Example value for Pending Requests
+  { name: 'Approved Requests', value: 80 },  
+  { name: 'Pending Requests', value: 20 },   
 ];
 
 // Colors for Pie chart segments
 const COLORS = ['#4CAF50', '#FFC107'];
 
 const Home = () => {
+    
   const [view, setView] = useState('monthly'); // State to track current view (daily or monthly)
-
+  
   // Toggle between daily and monthly views
   const handleViewToggle = () => {
     setView((prevView) => (prevView === 'daily' ? 'monthly' : 'daily'));
@@ -88,13 +90,13 @@ const Home = () => {
         <ResponsiveContainer width="100%" height="100%">
         <LineChart
   data={view === 'daily' ? dailyRevenueData : lineData}
-  margin={{ top: 10, right: 10, left: 10, bottom: 40 }} // Increase bottom margin
+  margin={{ top: 10, right: 10, left: 10, bottom: 40 }} 
 >
   {/* Adjust for daily or monthly data */}
 
             <XAxis dataKey="name"
-   angle={-45} // Rotate the labels to avoid overlapping
-   textAnchor="end" // Align the rotated text
+   angle={-45}  
+   textAnchor="end" 
    interval={0} 
             />
             <YAxis />
@@ -117,7 +119,7 @@ const Home = () => {
            value={view}
           orientation="vertical"
           sx={{
-              padding: '10px 20px', // Custom padding
+              padding: '10px 20px',  
             color:'black',
            }}
           exclusive

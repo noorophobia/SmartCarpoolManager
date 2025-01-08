@@ -190,7 +190,7 @@ const Drivers = () => {
             className="dataGrid"
             rows={drivers}
             columns={columns}
-            getRowId={(row) => row.compositeId} // Set the unique ID field
+            getRowId={(row) => row.compositeId || row._id}  // Fallback to _id if compositeId is missing
             slots={{ toolbar: GridToolbar }}
             pageSizeOptions={[5, 10, 20, 100]}
             checkboxSelection

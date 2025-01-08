@@ -152,8 +152,7 @@ const RateSetting = () => {
       });
       } catch (error) {
       console.error('Error updating rate settings:', error);
-      alert('Failed to update rate settings. Please try again later.');
-    }
+     }
   
     // Here we just log the data instead of sending it to a server
     console.log('Updated Rate Settings:', rateSettings);

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -6,23 +6,140 @@ import { useNavigate } from 'react-router-dom';
 
 const PendingApplications = () => {
   const navigate = useNavigate();
+  const [drivers,setDrivers]=useState(null);
+   useEffect(() => {
+      const fetchDrivers = async () => {
+        try {
+          // Get the token from localStorage (or sessionStorage)
+          const token = localStorage.getItem('token');  // Or sessionStorage.getItem('token')
+          
+          //   alert('You are not authenticated');
+            if (!token) {
+              // If no token is found, redirect to the login page
+              navigate('/login');
+              return;
+            }
+            
+            console.log('Token:', token);
+  
+          const response = await fetch('http://localhost:5000/drivers', {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`, // Add the token to the Authorization header
+              'Content-Type': 'application/json',
+            },
+          });
+          
+          const data = await response.json();
+          console.log(data);
+  
+          const mappedData = Array.isArray(data)
+          ? data.map(driver => ({
+              id: driver._id,
+              compositeId: driver.compositeId, // Add compositeId here
+              name: driver.name,
+              gender: driver.gender,
+              email: driver.email,
+              phoneNumber: driver.phoneNumber,
+              cnic: driver.cnic,
+              dateOfBirth: driver.dateOfBirth,
+            }))
+          : [];
+        
+  
+          setDrivers(mappedData); // Update state with the mapped data
+        } catch (error) {
+          console.error('Failed to fetch drivers:', error);
+        }
+      };
+    
+      fetchDrivers(); // Call the function to fetch data
+    }, []);
 
   const handleViewDetails = (id) => {
     navigate(`/drivers/${id}`);
   };
 
-  const handleEdit = (id) => {
-    alert(`Accept row with ID: ${id}`);
-    // Add your accept functionality here
-  };
+ 
+    const handleEdit = async (id) => {
+      alert(`Accept row with ID: ${id}`);
 
-  const handleDelete = (id) => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          alert('You are not authenticated');
+          navigate('/login');
+          return;
+        }
+    
+        const response = await fetch(`http://localhost:5000//drivers/application/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ isApproved: true }), // Update isApproved field to true
+        });
+    
+        if (response.ok) {
+          alert('Driver approved successfully!');
+          // Optionally, refetch drivers to update the UI
+          setDrivers((prev) =>
+            prev.map((driver) =>
+              driver.id === id ? { ...driver, isApproved: true } : driver
+            )
+          );
+        } else {
+          const data = await response.json();
+          alert(`Error: ${data.message}`);
+        }
+      } catch (error) {
+        console.error('Failed to approve driver:', error);
+        alert('Failed to approve driver. Please try again.');
+      }
+    };
+    
+  
+
+  const handleDelete =  async (id) => {
     alert(`Reject row with ID: ${id}`);
-    // Add your reject functionality here
-  };
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('You are not authenticated');
+        navigate('/login');
+        return;
+      }
+  
+      const response = await fetch(`http://localhost:5000/drivers/application/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ isApproved: false }), 
+      });
+  
+      if (response.ok) {
+        alert('Driver rejected !');
+        // Optionally, refetch drivers to update the UI
+        setDrivers((prev) =>
+          prev.map((driver) =>
+            driver.id === id ? { ...driver, isApproved: false } : driver
+          )
+        );
+      } else {
+        const data = await response.json();
+        alert(`Error: ${data.message}`);
+      }
+    } catch (error) {
+      console.error('Failed to approve driver:', error);
+      alert('Failed to approve driver. Please try again.');
+    }
+  };  
 
   const columns = [
-    { field: 'id', headerName: 'ID', width: 90 },
+    { field: 'compositeId', headerName: 'ID', width: 90 },
     { field: 'name', headerName: 'Name', width: 150 },
      { field: 'email', headerName: 'Email', width: 180 },
     { field: 'phoneNumber', headerName: 'Phone Number', width: 150 },
@@ -96,7 +213,7 @@ const PendingApplications = () => {
         <Box sx={{ height: 500, width: '100%' }}>
           <DataGrid
             className="dataGrid"
-            rows={rows}
+            rows={drivers}
             columns={columns}
             slots={{ toolbar: GridToolbar }}
             slotProps={{

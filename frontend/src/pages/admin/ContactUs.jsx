@@ -16,7 +16,7 @@ const ContactUs = () => {
   const rows = [
     {
       id: 1,
-      userID: "U001",
+      userID: "1",
       userName: "Ali Khan",
       email: "ali.khan@example.com",
       phone: "+92300XXXXXXX",
@@ -25,7 +25,7 @@ const ContactUs = () => {
     },
     {
       id: 2,
-      userID: "U002",
+      userID: "2",
       userName: "Sara Ahmed",
       email: "sara.ahmed@example.com",
       phone: "+92301YYYYYYY",
@@ -33,7 +33,7 @@ const ContactUs = () => {
     },
     {
       id: 3,
-      userID: "U003",
+      userID: "3",
       userName: "Mohammad Tariq",
       email: "mohammad.tariq@example.com",
       phone: "+92302ZZZZZZZ",

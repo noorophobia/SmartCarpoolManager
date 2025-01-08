@@ -1,63 +1,194 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "../../styles/login.css";  
+import { useLocation } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState(""); // Added state for confirm password
+  const [showForgotPassword, setShowForgotPassword] = useState(false); // State to toggle forgot password form
+  const [errorMessage, setErrorMessage] = useState(""); // Error message for invalid email
+  const [successMessage, setSuccessMessage] = useState(""); // Success message after request
+  const [loading, setLoading] = useState(false); // Loading state for forgot password
   const navigate = useNavigate();
-  
+  const location = useLocation();
+
+  useEffect(() => {
+    const checkAuthentication = () => {
+      try {
+        const token = localStorage.getItem("token"); 
+
+        if (token) {
+          navigate("/"); 
+        }
+      } catch (error) {
+        console.error("Error checking authentication:", error);
+      }
+    };
+
+    if (location.pathname === "/login") {
+      document.body.style.background = "linear-gradient(to right, #3D52A0, #1F4D75, #8697C4)";
+    } else {
+      document.body.className = ""; 
+      document.body.style.backgroundColor = ""; 
+    }
+
+    checkAuthentication();
+  }, [navigate, location.pathname]);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
- 
+  
     try {
-      // Make the fetch request with POST method
       const res = await fetch("http://localhost:5000/api/admin/login", {
         method: "POST",  
         headers: {
-          "Content-Type": "application/json", // Specify content type
+          "Content-Type": "application/json", 
         },
-        body: JSON.stringify({ email, password }), // Send email and password as JSON
+        body: JSON.stringify({ email, password }), 
       });
 
-       if (!res.ok) {
+      if (!res.ok) {
         throw new Error("Failed to login");
       }
 
-      // Parse JSON response
       const data = await res.json();
-      alert(data.message); // Show success message
-      localStorage.setItem("token", data.token); // Save token in localStorage
-      navigate("/"); // Navigate to home page after successful login
+      alert(data.message);  
+      localStorage.setItem("token", data.token);  
+
+      document.body.style.backgroundColor = "white";  
+
+      navigate("/");  
     } catch (err) {
       alert(err.message || "An error occurred");
+    }
+  };
+
+  const handleForgotPasswordSubmit = async (event) => {
+    event.preventDefault();
+
+    // Empty fields validation
+    if (!email.trim()) {
+      setErrorMessage("Please enter your email.");
+      setSuccessMessage("");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setErrorMessage("Passwords do not match.");
+      setSuccessMessage("");
+      return;
+    }
+
+    setErrorMessage("");
+    setLoading(true);
+
+    try {
+      // Send forgot password request to backend (this could trigger an email to the user)
+      const response = await fetch("http://localhost:5000/api/admin/forgot-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSuccessMessage("Password reset successful! You can now log in with your new password.");
+        setEmail(""); // Reset the email field
+        setPassword(""); // Reset the password field
+        setConfirmPassword(""); // Reset the confirm password field
+      } else {
+        setErrorMessage(data.error || "An error occurred. Please try again.");
+        setSuccessMessage("");
+      }
+    } catch (err) {
+      setErrorMessage("An error occurred. Please try again.");
+      setSuccessMessage("");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="login-page">
       <div className="login-container">
-        <h2>Login</h2>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="email"
-            placeholder="Enter Email"
-            className="form-control"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-          />
-          <input
-            type="password"
-            placeholder="Enter Password"
-            className="form-control"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-          />
-          <button type="submit" className="btn-primary">Login</button>
-        </form>
-        <Link to="/" className="register-link">Don't have an account? Register</Link>
+        
+ 
+        {!showForgotPassword ? (
+          // Login Form
+ 
+          <form onSubmit={handleSubmit}>
+                      <h2>Login</h2>
+
+            <input
+              type="email"
+              placeholder="Enter Email"
+              className="form-control"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              required
+            />
+            <input
+              type="password"
+              placeholder="Enter Password"
+              className="form-control"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+            />
+            <button type="submit" className="btn-primary">Login</button>
+          </form>
+        ) : (
+          // Forgot Password Form
+          <form onSubmit={handleForgotPasswordSubmit}>
+            <h2>Forgot Password</h2>
+            <input
+              type="email"
+              placeholder="Enter your email"
+              className="form-control"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <input
+              type="password"
+              placeholder="New Password"
+              className="form-control"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <input
+              type="password"
+              placeholder="Confirm New Password"
+              className="form-control"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+            {errorMessage && <p className="error">{errorMessage}</p>}
+            {successMessage && <p className="success" style={{ color: "green" }}>{successMessage}</p>}
+            
+            <button type="submit" className="btn-primary" disabled={loading }>
+ 
+              {loading ? "Sending..." : "Reset Password"}
+            </button>
+            
+            <p   className="register-link" onClick={() => setShowForgotPassword(false)}>
+              Back to Login
+            </p>
+          </form>
+        )}
+
+        {!showForgotPassword && (
+          <div className="forgot-password-link">
+            <p onClick={() => setShowForgotPassword(true)} className="register-link">Forgot Password?</p>
+          </div>
+        )}
       </div>
     </div>
   );

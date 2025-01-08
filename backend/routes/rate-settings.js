@@ -10,6 +10,7 @@ router.get('/rate-settings',verifyToken, async (req, res) => {
     if (!rateSettings) {
       return res.status(404).json({ message: 'Rate settings not found' });
     }
+    console.log(rateSettings)
     res.status(200).json(rateSettings);
   } catch (error) {
     console.error('Error fetching rate settings:', error);

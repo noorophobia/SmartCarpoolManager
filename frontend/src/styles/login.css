@@ -1,8 +1,4 @@
- html, body {
-  height: 100%;
  
-  margin: 0;
-}
 .login-page {
   height: 100vh;
      display: flex;
@@ -65,4 +61,83 @@
     color: #0056b3;
     text-decoration: underline;
   }
-  
+  /* Forgot Password Form */
+.forgot-password .form-control {
+  margin-bottom: 1rem;
+}
+
+.forgot-password h3 {
+  margin-bottom: 1.5rem;
+  color: #007bff;
+  font-size: 1.5rem;
+}
+
+.forgot-password p {
+  color: #555;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.forgot-password .back-to-login {
+  text-align: center;
+  color: #3D52A0;
+  cursor: pointer;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.forgot-password .back-to-login:hover {
+  text-decoration: underline;
+}
+
+.forgot-password .error {
+  color: red;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.forgot-password .success {
+  color: green;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.forgot-password .btn-primary {
+  background-color: #007bff;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 4px;
+  width: 100%;
+  color: white;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.forgot-password .btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.forgot-password .btn-primary:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.forgot-password .form-group {
+  margin-bottom: 1rem;
+}
+
+/* Back to Login Link */
+.login-page .forgot-password-link {
+  text-align: center;
+}
+
+.login-page .forgot-password-link p {
+  color: #3D52A0;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.login-page .forgot-password-link p:hover {
+  text-decoration: underline;
+}
+ 

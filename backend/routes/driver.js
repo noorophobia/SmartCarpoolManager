@@ -42,47 +42,49 @@ const generateCompositeId = async () => {
 };
 
 // Add a new driver
- router.post('/drivers',verifyToken, async (req, res) => {
+router.post('/drivers', verifyToken, async (req, res) => {
   try {
-    console.log("body"+req.body);
     const { name, gender, email, phoneNumber, cnic, dateOfBirth, ratings } = req.body;
-     console.log(dateOfBirth);
-    // Ensure all required fields are present
-
+    
     if (!dateOfBirth) {
       return res.status(400).json({ message: 'Date of Birth required.' });
     }
-const isApproved=true;
-const createdAt=new Date();
-    const newDriver = new Driver({
-      name, gender, email, phoneNumber, cnic, dateOfBirth, ratings,
-      isApproved,// Explicitly set default if missing
-      createdAt, // Ensure createdAt is always set to the current time
-    });
-     // Save the driver first
-    await newDriver.save();
 
-    // Generate the composite ID after the driver has been saved
+    // Generate the composite ID before saving the driver
     const compositeId = await generateCompositeId();
 
-    // Update the driver with the generated composite ID
-    const updatedDriver = await Driver.findByIdAndUpdate(
-      newDriver._id,
-      { compositeId: compositeId },
-      { new: true }  // Return the updated driver
-    );
+    const isApproved = true;
+    const createdAt = new Date();
 
-    // Send back the updated driver with both compositeId and _id (id)
+    const newDriver = new Driver({
+      name,
+      gender,
+      email,
+      phoneNumber,
+      cnic,
+      dateOfBirth,
+      ratings,
+      compositeId,  // Include compositeId when creating the driver
+      isApproved,   // Explicitly set default if missing
+      createdAt,    // Ensure createdAt is always set to the current time
+    });
+
+    // Save the driver with compositeId
+    const savedDriver = await newDriver.save();
+
+    // Send back the newly created driver, including compositeId and _id
     res.status(201).json({
-      id: updatedDriver._id,        // MongoDB's _id
-      compositeId: updatedDriver.compositeId, // The custom composite ID
-      ...updatedDriver.toObject()  // Convert Mongoose document to plain object and spread the rest of the fields
+      id: savedDriver._id,         // MongoDB's _id
+      compositeId: savedDriver.compositeId, // The custom composite ID
+      ...savedDriver.toObject()    // Convert Mongoose document to plain object and spread the rest of the fields
     });
 
   } catch (error) {
+    console.error('Error saving driver:', error);
     res.status(500).json({ message: 'Error adding driver. Please try again.', error: error.message });
   }
 });
+
 
 // Update driver details
 router.put('/drivers/:id', verifyToken, async (req, res) => {
@@ -152,6 +154,35 @@ router.get('/drivers/composite/:compositeId', verifyToken, async (req, res) => {
     res.status(200).json(driver);  // Return the driver details as JSON
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch driver details', error: error.message });
+  }
+});
+
+// Update driver details (including isApproved)
+// Update driver's approval status (accept/reject)
+router.put('/drivers/application/:id', verifyToken, async (req, res) => {
+  const { id } = req.params;
+  const { isApproved } = req.body; // isApproved is either true or false
+
+  try {
+    // Ensure the isApproved field is provided and is a boolean
+    if (typeof isApproved !== 'boolean') {
+      return res.status(400).json({ message: 'Invalid approval status' });
+    }
+
+    // Find and update the driver by ID
+    const driver = await Driver.findByIdAndUpdate(
+      id,
+      { isApproved: isApproved },  // Update isApproved field
+      { new: true }  // Return the updated driver
+    );
+
+    if (!driver) {
+      return res.status(404).json({ message: 'Driver not found' });
+    }
+
+    res.status(200).json({ message: 'Driver updated successfully', driver });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to update driver', error: error.message });
   }
 });
 

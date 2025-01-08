@@ -52,12 +52,13 @@ const RideDetails = () => {
       pickUpLocation: "DHA",
       dropOffLocation: "Gulberg",
       rideMode: "Single",
-      rideStatus: "Completed",
+      rideStatus: "Cancelled",
+      cancellationReason: "Driver unavailable",
       noOfPassengers: 1,
       paymentID: "PAY5679",
       amount: 500.0,
       paymentType: "Cash",
-      paymentStatus: "Completed",
+      paymentStatus: "Refunded",
       passengers: [
         {
           passengerID: "124",
@@ -66,7 +67,7 @@ const RideDetails = () => {
           pickUpLocation: "DHA",
           dropOffLocation: "Gulberg",
           paymentType: "Cash",
-          paymentStatus: "Completed",
+          paymentStatus: "Refunded",
         },
       ],
     },
@@ -106,6 +107,13 @@ const RideDetails = () => {
             <td className="bold">Ride Status</td>
             <td>{ride.rideStatus}</td>
           </tr>
+          {/* Show Cancellation Reason if the Ride is Cancelled */}
+          {ride.rideStatus === "Cancelled" && (
+            <tr>
+              <td className="bold">Cancellation Reason</td>
+              <td>{ride.cancellationReason}</td>
+            </tr>
+          )}
           <tr>
             <td className="bold">No of Passengers</td>
             <td>{ride.noOfPassengers}</td>
