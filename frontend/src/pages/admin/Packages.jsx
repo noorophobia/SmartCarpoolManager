@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Box,
   Typography,
@@ -21,42 +22,67 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 const Packages = () => {
-  const [packages, setPackages] = useState([
-    {
-      id: 1,
-      name: "Basic",
-      duration: "1 Week",
-      discount: "15%",
-      fee: 700,
-    },
-    {
-      id: 2,
-      name: "Premium",
-      duration: "1 Month",
-      discount: "25%",
-      fee: 2500,
-    },
-  ]);
-
+  const [packages, setPackages] = useState([]);
+  const [token, setToken] = useState(localStorage.getItem("token")); // Retrieve token from localStorage
   const [newPackage, setNewPackage] = useState({
     name: "",
     duration: "",
     discount: "",
     fee: "",
   });
-
   const [editingPackage, setEditingPackage] = useState(null);
   const [commission, setCommission] = useState(10); // Default commission rate
+
+  // Fetch packages from backend
+  useEffect(() => {
+    const fetchPackages = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/packages", {
+          headers: { Authorization: `Bearer ${token}` }, // Include token in header
+        });
+        setPackages(response.data);
+      } catch (error) {
+        console.error("Error fetching packages:", error);
+      }
+    };
+
+    const fetchCommission = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/rate-settings", {
+          headers: { Authorization: `Bearer ${token}` }, // Include token in header
+        });
+        setCommission(response.data.commission);
+      } catch (error) {
+        console.error("Error fetching commission:", error);
+      }
+    };
+
+    if (token) {
+      fetchPackages();
+      fetchCommission();
+    } else {
+      console.log("No token available");
+    }
+  }, [token]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewPackage({ ...newPackage, [name]: value });
   };
 
-  const handleAddPackage = () => {
+  const handleAddPackage = async () => {
     if (newPackage.name && newPackage.duration && newPackage.discount && newPackage.fee) {
-      setPackages([...packages, { id: Date.now(), ...newPackage }]);
-      setNewPackage({ name: "", duration: "", discount: "", fee: "" });
+      try {
+        const response = await axios.post(
+          "http://localhost:5000/packages",
+          newPackage,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setPackages([...packages, response.data]);
+        setNewPackage({ name: "", duration: "", discount: "", fee: "" });
+      } catch (error) {
+        console.error("Error adding package:", error);
+      }
     } else {
       alert("Please fill out all fields.");
     }
@@ -66,26 +92,57 @@ const Packages = () => {
     setEditingPackage(pkg);
   };
 
-  const handleDeletePackage = (id) => {
-    setPackages(packages.filter((pkg) => pkg.id !== id));
+  const handleDeletePackage = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/packages/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setPackages(packages.filter((pkg) => pkg.id !== id));
+    } catch (error) {
+      console.error("Error deleting package:", error);
+    }
   };
 
-  const handleUpdatePackage = () => {
-    setPackages(
-      packages.map((pkg) =>
-        pkg.id === editingPackage.id ? editingPackage : pkg
-      )
-    );
-    setEditingPackage(null);
+  const handleUpdatePackage = async () => {
+    try {
+      // Ensure you are updating by the correct _id
+      console.log(editingPackage._id);
+      const response = await axios.put(
+        `http://localhost:5000/packages/${editingPackage._id}`,
+        editingPackage,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+  
+      // Update the local state by matching on _id instead of id
+      setPackages(
+        packages.map((pkg) =>
+          pkg._id === editingPackage._id ? response.data : pkg
+        )
+      );
+      setEditingPackage(null);
+    } catch (error) {
+      console.error("Error updating package:", error);
+    }
   };
+  
 
   const handleEditInputChange = (e) => {
     const { name, value } = e.target;
     setEditingPackage({ ...editingPackage, [name]: value });
   };
 
-  const handleCommissionChange = (e) => {
+  const handleCommissionChange = async (e) => {
     setCommission(e.target.value);
+    try {
+      await axios.put(
+        "http://localhost:5000/api/rate-settings/commission",
+        { commission: e.target.value },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert(`Commission rate updated to ${e.target.value}%`);
+    } catch (error) {
+      console.error("Error updating commission:", error);
+    }
   };
 
   return (
@@ -153,29 +210,29 @@ const Packages = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {packages.map((pkg) => (
-                <TableRow key={pkg.id}>
-                  <TableCell>{pkg.id}</TableCell>
-                  <TableCell>{pkg.name}</TableCell>
-                  <TableCell>{pkg.duration}</TableCell>
-                  <TableCell>{pkg.discount}</TableCell>
-                  <TableCell>{pkg.fee}</TableCell>
-                  <TableCell>
-                    <IconButton
-                      color="primary"
-                      onClick={() => handleEditClick(pkg)}
-                    >
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton
-                      color="secondary"
-                      onClick={() => handleDeletePackage(pkg.id)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
+              {Array.isArray(packages) ? (
+                packages.map((pkg) => (
+                  <TableRow key={pkg.id}>
+                    <TableCell>{pkg.id}</TableCell>
+                    <TableCell>{pkg.name}</TableCell>
+                    <TableCell>{pkg.duration}</TableCell>
+                    <TableCell>{pkg.discount}</TableCell>
+                    <TableCell>{pkg.fee}</TableCell>
+                    <TableCell>
+                      <IconButton color="primary" onClick={() => handleEditClick(pkg)}>
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton color="secondary" onClick={() => handleDeletePackage(pkg.id)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={6}>No packages available</TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </TableContainer>
@@ -249,17 +306,10 @@ const Packages = () => {
             />
           </DialogContent>
           <DialogActions>
-            <Button
-              onClick={() => setEditingPackage(null)}
-              color="secondary"
-            >
+            <Button onClick={() => setEditingPackage(null)} color="secondary">
               Cancel
             </Button>
-            <Button
-              onClick={handleUpdatePackage}
-              color="primary"
-              variant="contained"
-            >
+            <Button onClick={handleUpdatePackage} color="primary" variant="contained">
               Update
             </Button>
           </DialogActions>

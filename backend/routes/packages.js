@@ -1,9 +1,10 @@
 const express = require("express");
-const Package = require("../models/Package");
+const Package = require("../models/Packages");
 const router = express.Router();
+const verifyToken= require('../middleware/auth');
 
 // Create a new package
-router.post("/packages", async (req, res) => {
+router.post("/packages",verifyToken, async (req, res) => {
   const { name, duration, discount, fee } = req.body;
 
   if (!name || !duration || !discount || !fee) {
@@ -27,7 +28,7 @@ router.post("/packages", async (req, res) => {
 });
 
 // Get all packages
-router.get("/packages", async (req, res) => {
+router.get("/packages",verifyToken, async (req, res) => {
   try {
     const packages = await Package.find();
     res.status(200).json(packages);
@@ -38,7 +39,7 @@ router.get("/packages", async (req, res) => {
 });
 
 // Get package by ID
-router.get("/packages/:id", async (req, res) => {
+router.get("/packages/:id", verifyToken,async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -54,7 +55,7 @@ router.get("/packages/:id", async (req, res) => {
 });
 
 // Update package
-router.put("/packages/:id", async (req, res) => {
+router.put("/packages/:id",verifyToken, async (req, res) => {
   const { id } = req.params;
   const { name, duration, discount, fee } = req.body;
 
@@ -83,7 +84,7 @@ router.put("/packages/:id", async (req, res) => {
 });
 
 // Delete package
-router.delete("/packages/:id", async (req, res) => {
+router.delete("/packages/:id",verifyToken, async (req, res) => {
   const { id } = req.params;
 
   try {

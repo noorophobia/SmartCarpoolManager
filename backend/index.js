@@ -12,7 +12,7 @@ const bcrypt = require('bcryptjs');
 const driversRoutes = require('./routes/driver');  
 const vehiclesRoutes=require('./routes/vehicle')
 const adminRoutes = require('./routes/admin');  // Import the admin routes
- 
+ const packagesRoutes=require('./routes/packages');
 const { insertAdmin } = require('./routes/insertAdmin');  // Import the insertAdmin function
 
 const app = express();
@@ -49,6 +49,7 @@ app.use('/uploads', express.static('uploads'));
 app.use(express.json()); // Parse JSON request bodies
 // Use the drivers route
 app.use(driversRoutes);
+app.use(packagesRoutes);
 app.use('/api', rateSettingsRoute);
 app.use(vehiclesRoutes);
 app.use("/api/admin", adminRoutes);
