@@ -18,6 +18,13 @@ const rateSettingsSchema = new mongoose.Schema({
       discounts: { type: Number, required: true },
     }
   ],
+  commission: {
+    type: Number,
+    required: true,
+    default: 10, // commission rate as 10%
+    min: 0,
+    max: 100,  
+  },
   createdAt: {
     type: Date,
     default: Date.now

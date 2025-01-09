@@ -73,4 +73,49 @@ router.put('/rate-settings', verifyToken,async (req, res) => {
   }
 });
 
+router.get("/rate-settings/commission", verifyToken, async (req, res) => {
+  try {
+    const rateSettings = await RateSettings.findOne();
+    if (!rateSettings) {
+      return res.status(404).json({ message: "Rate settings not found" });
+    }
+    res.status(200).json({ commission: rateSettings.commission });
+  } catch (error) {
+    console.error("Error fetching commission:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.put("/rate-settings/commission", verifyToken, async (req, res) => {
+  const { commission } = req.body;
+
+  if (commission < 0 || commission > 100) {
+    return res.status(400).json({
+      message: "Commission rate must be a percentage between 0 and 100.",
+    });
+  }
+
+  try {
+    let rateSettings = await RateSettings.findOne();
+
+    if (!rateSettings) {
+      return res
+        .status(404)
+        .json({ message: "Rate settings not found to update commission." });
+    }
+
+    rateSettings.commission = commission;
+    rateSettings.updatedAt = Date.now();
+
+    const updatedRateSettings = await rateSettings.save();
+    res.status(200).json({
+      message: "Commission updated successfully.",
+      commission: updatedRateSettings.commission,
+    });
+  } catch (error) {
+    console.error("Error updating commission:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 module.exports = router;
