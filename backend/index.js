@@ -3,7 +3,13 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
+ const bodyParser = require("body-parser");
+ const dotenv = require("dotenv");
 
+// Import routes
+const notificationRoutes = require("./routes/notification");
+
+dotenv.config();
 const helmet = require('helmet');
 const bcrypt = require('bcryptjs');
    require('dotenv').config();
@@ -50,6 +56,7 @@ app.use(express.json()); // Parse JSON request bodies
 // Use the drivers route
 app.use(driversRoutes);
 app.use(packagesRoutes);
+app.use(notificationRoutes);
 app.use('/api', rateSettingsRoute);
 app.use(vehiclesRoutes);
 app.use("/api/admin", adminRoutes);

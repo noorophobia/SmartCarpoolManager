@@ -6,7 +6,7 @@ const rateSettingsSchema = new mongoose.Schema({
       type: { 
         type: String, 
         required: true, 
-        enum: ['AC Car', 'Economy Car', 'Rickshaw', 'Bike'], // New vehicle types
+        enum: ['AC Car', 'Economy Car', 'Rickshaw', 'Bike'],  
       },
       distanceRatePerKm: { type: Number, required: true },
       timeRatePerMinute: { type: Number, required: true },

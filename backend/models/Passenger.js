@@ -5,8 +5,9 @@ const passengerSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true, maxlength: 50 },
   password: { type: String, required: true, maxlength: 50 },
   gender: { type: String, enum: ['Male', 'Female'], required: true },
+  Photo: { type: String }, 
 
-  phoneNumber: { type: String, required: true }, // Adjust field  for phone number if required
+  phoneNumber: { type: String, required: true }, 
 
 });
 
