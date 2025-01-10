@@ -8,8 +8,11 @@ const passengerSchema = new mongoose.Schema({
   Photo: { type: String }, 
 
   phoneNumber: { type: String, required: true }, 
+  resetToken: { type: String },
+  resetCode: { type: Number },
+  tokenExpiry: { type: Date },
+}, { timestamps: true });
 
-});
 
 const Passenger = mongoose.model('Passenger', passengerSchema);
 module.exports = Passenger;
