@@ -6,6 +6,7 @@ const passengerSchema = new mongoose.Schema({
   password: { type: String, required: true, maxlength: 50 },
   gender: { type: String, enum: ['Male', 'Female'], required: true },
   Photo: { type: String }, 
+  compositeId: { type: String, required: false }, // Add compositeId field
 
   phoneNumber: { type: String, required: true }, 
   resetToken: { type: String },

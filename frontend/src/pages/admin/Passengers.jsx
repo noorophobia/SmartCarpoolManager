@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -17,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 const Passengers = () => {
   const navigate = useNavigate();
   const [openDialog, setOpenDialog] = useState(false);
+  const [passengers,setPassengers]=useState(null);
   const [isEditing, setIsEditing] = useState(false); // Track whether we are editing or adding
   const [formData, setFormData] = useState({
     firstName: '',
@@ -32,6 +33,55 @@ const Passengers = () => {
     phoneNumber: '',
     gender: '',
   });
+
+  // Fetch drivers data from the Express server when the component mounts
+    useEffect(() => {
+      const fetchPassengers = async () => {
+        try {
+          // Get the token from localStorage (or sessionStorage)
+          const token = localStorage.getItem('token');  // Or sessionStorage.getItem('token')
+          
+          //   alert('You are not authenticated');
+            if (!token) {
+              // If no token is found, redirect to the login page
+              navigate('/login');
+              return;
+            }
+            
+            console.log('Token:', token);
+  
+          const response = await fetch('http://localhost:5000/passengers', {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`, // Add the token to the Authorization header
+              'Content-Type': 'application/json',
+            },
+          });
+          
+          const data = await response.json();
+          console.log(data);
+  
+          const mappedData = Array.isArray(data)
+          ? data.map(passenger => ({
+               id: passenger._id,
+              compositeId: passenger.compositeId, // Add compositeId here
+              name: passenger.name,
+              gender: passenger.gender,
+              email: passenger.email,
+              phone: passenger.phone,
+             }))
+          : [];
+
+         
+  
+          setPassengers(mappedData); // Update state with the mapped data
+        } catch (error) {
+          console.error('Failed to fetch drivers:', error);
+        }
+      };
+    
+      fetchPassengers(); // Call the function to fetch data
+    }, []);
 
   const handleViewDetails = (id) => {
     navigate(`/passenger-details/${id}`);
@@ -115,27 +165,25 @@ const Passengers = () => {
   };
 
   const columns = [
-    { field: 'id', headerName: 'ID', width: 90 },
+    { field: 'compositeId', headerName: 'ID', width: 90 },
     {
       field: 'email',
       headerName: 'Email',
-      width: 200,
+      width: 250,
       editable: false, // Make it editable if required
     },
-    { field: 'phoneNumber', headerName: 'Phone Number', width: 150 },
+    { field: 'phone', headerName: 'Phone Number', width: 150 },
     {
       field: 'gender',
       headerName: 'Gender',
       width: 120,
     },
     {
-      field: 'fullName',
-      headerName: 'Full name',
-      description: 'This column has a value getter and is not sortable.',
-      sortable: false,
-      width: 160,
-      valueGetter: (value, row) => `${row.firstName || ''} ${row.lastName || ''}`,
-    },
+      field: 'name',
+      headerName: 'Name',
+       sortable: true,
+      width: 200,
+     },
     {
       field: 'viewDetails',
       headerName: 'View Details',
@@ -206,35 +254,10 @@ const Passengers = () => {
     },
   ];
 
-  columns.forEach((column) => (column.align = 'center'));
-  columns.forEach((column) => (column.headerAlign = 'center'));
+  columns.forEach((column) => (column.align = 'left'));
+  columns.forEach((column) => (column.headerAlign = 'left'));
 
-  const rows = [
-    {
-      id: 1,
-      lastName: 'Snow',
-      firstName: 'Jon',
-      email: 'someone@gmail.com',
-      totalRides: 2,
-      completedRides: 2,
-      cancelledRides: 0,
-      phoneNumber: '+1234567890',
-      ratings: 3.5,
-      gender: 'Female',
-    },
-    {
-      id: 2,
-      lastName: 'Lannister',
-      firstName: 'Cersei',
-      email: 'someone2@gmail.com',
-      totalRides: 2,
-      completedRides: 1,
-      cancelledRides: 1,
-      phoneNumber: '+1234364890',
-      ratings: 5,
-      gender: 'Male',
-    },
-  ];
+   
 
   return (
     <div className="main-content">
@@ -246,7 +269,7 @@ const Passengers = () => {
         <Box sx={{ height: 500, width: '100%' }}>
           <DataGrid
             className="dataGrid"
-            rows={rows}
+            rows={passengers}
             columns={columns}
             slots={{ toolbar: GridToolbar }}
             slotProps={{
@@ -271,73 +294,7 @@ const Passengers = () => {
           />
         </Box>
         
-        {/* Add/Edit Passenger Dialog */}
-        <Dialog open={openDialog} onClose={handleCloseDialog}>
-          <DialogTitle>{isEditing ? 'Edit Passenger' : 'Add New Passenger'}</DialogTitle>
-          <DialogContent>
-            <TextField
-              label="First Name"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleInputChange}
-              fullWidth
-              margin="normal"
-              required
-              error={!!formErrors.firstName}
-              helperText={formErrors.firstName}
-            />
-            <TextField
-              label="Last Name"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleInputChange}
-              fullWidth
-              margin="normal"
-              required
-              error={!!formErrors.lastName}
-              helperText={formErrors.lastName}
-            />
-            <TextField
-              label="Email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              fullWidth
-              margin="normal"
-              required
-              error={!!formErrors.email}
-              helperText={formErrors.email}
-            />
-            <TextField
-              label="Phone Number"
-              name="phoneNumber"
-              value={formData.phoneNumber}
-              onChange={handleInputChange}
-              fullWidth
-              margin="normal"
-              required
-              error={!!formErrors.phoneNumber}
-              helperText={formErrors.phoneNumber}
-            />
-            <FormControl fullWidth margin="normal" required>
-              <InputLabel>Gender</InputLabel>
-              <Select
-                name="gender"
-                value={formData.gender}
-                onChange={handleInputChange}
-                error={!!formErrors.gender}
-              >
-                <MenuItem value="Male">Male</MenuItem>
-                <MenuItem value="Female">Female</MenuItem>
-              </Select>
-              {formErrors.gender && <div style={{ color: 'red', fontSize: '12px' }}>{formErrors.gender}</div>}
-            </FormControl>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog} color="secondary">Cancel</Button>
-            <Button onClick={handleSubmit} color="primary">{isEditing ? 'Save Changes' : 'Add Passenger'}</Button>
-          </DialogActions>
-        </Dialog>
+      
       </div>
     </div>
   );

@@ -19,6 +19,8 @@ const driversRoutes = require('./routes/driver');
 const vehiclesRoutes=require('./routes/vehicle')
 const adminRoutes = require('./routes/admin');  // Import the admin routes
  const packagesRoutes=require('./routes/packages');
+ const passengerRoutes=require('./routes/passengers');
+
 const { insertAdmin } = require('./routes/insertAdmin');  // Import the insertAdmin function
 
 const app = express();
@@ -57,6 +59,7 @@ app.use(express.json()); // Parse JSON request bodies
 app.use(driversRoutes);
 app.use(packagesRoutes);
 app.use(notificationRoutes);
+app.use(passengerRoutes);
 app.use('/api', rateSettingsRoute);
 app.use(vehiclesRoutes);
 app.use("/api/admin", adminRoutes);
