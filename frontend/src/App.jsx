@@ -35,8 +35,7 @@ import ContactUs from "./pages/admin/ContactUs";
 import PushNotifications from "./pages/admin/PushNotification";
 import Packages from "./pages/admin/Packages";
 import ForgotPassword from "./pages/auth/ForgotPassword";
-
-    
+import Image from './pages/Image';  
 const Layout = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true); // State to track the loading state
@@ -134,6 +133,10 @@ function App() {
         {
           path: "/rides",
           element: <Rides />,
+        },
+        {
+          path: '/image',
+          element: <Image/>
         },
         {
           path: "/contact-us",
