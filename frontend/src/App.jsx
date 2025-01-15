@@ -36,6 +36,9 @@ import PushNotifications from "./pages/admin/PushNotification";
 import Packages from "./pages/admin/Packages";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import Image from './pages/Image';  
+import CircularProgress from "@mui/material/CircularProgress"; // For the loading spinner
+
+import EditPassenger from "./components/EditPassenger";
 const Layout = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true); // State to track the loading state
@@ -83,8 +86,11 @@ const Layout = () => {
    
   }, [navigate]); // Runs once when the component mounts
   if (loading) {
-     return null;  
-  }
+    return (
+      <div className="loading">
+        <CircularProgress />
+      </div>
+    );}
 
   return (
     <div className="main">
@@ -121,6 +127,10 @@ function App() {
         {
           path: "/drivers",
           element: <Drivers />,
+        },
+        {
+          path: "/edit-passenger/:id", 
+          element: <EditPassenger />,  
         },
         {
           path: "/add-driver/", 

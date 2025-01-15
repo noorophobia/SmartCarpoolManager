@@ -5,7 +5,7 @@ const Image = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [imageDetails, setImageDetails] = useState(null);
   const [loading, setLoading] = useState(false);
-  const API_KEY = "YourAPIKEY"; // Replace with your ImgBB API key
+  const API_KEY = "068837d15525cd65b1c49b07e618821b"; // Replace with your ImgBB API key
 
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);

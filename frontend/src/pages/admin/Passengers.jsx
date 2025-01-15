@@ -84,19 +84,13 @@ const Passengers = () => {
     }, []);
 
   const handleViewDetails = (id) => {
-    navigate(`/passenger-details/${id}`);
+     navigate(`/passenger-details/${id}`);
   };
 
-  const handleEdit = (passenger) => {
-    setIsEditing(true);
-    setFormData({
-      firstName: passenger.firstName,
-      lastName: passenger.lastName,
-      email: passenger.email,
-      phoneNumber: passenger.phoneNumber,
-      gender: passenger.gender,
-    });
-    setOpenDialog(true);
+  const handleEdit = (id) => {
+    
+    navigate(`/edit-passenger/${id}`);
+
   };
 
   const handleInputChange = (e) => {

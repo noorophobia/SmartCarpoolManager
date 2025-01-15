@@ -14,6 +14,10 @@ const rideSchema = new mongoose.Schema({
   vehicleId: { type: mongoose.Schema.Types.ObjectId, ref: 'Vehicle' }, // Relationship to Vehicle
   driverId: { type: mongoose.Schema.Types.ObjectId, ref: 'Driver', required: true }, // Driver ID
   passengerIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Passenger' }], // Array of Passenger IDs
+  passengerRating:{ type: String, required: true },
+  passengerReview:{ type: String, required: true },
+  driverRating:{ type: String, required: true },
+  driverReview:{ type: String, required: true },
 });
 
 const Ride = mongoose.model('Ride', rideSchema);

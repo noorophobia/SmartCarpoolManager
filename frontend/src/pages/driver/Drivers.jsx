@@ -8,8 +8,7 @@ import '../../styles/tables.css';
 
 const Drivers = () => {
   const [drivers, setDrivers] = useState([]); // State to hold the fetched drivers data
-  const[vehicle,setVehicle]=useState(null);
-  const navigate = useNavigate();
+   const navigate = useNavigate();
 
   // Fetch drivers data from the Express server when the component mounts
   useEffect(() => {
