@@ -24,6 +24,7 @@ const PushNotification = () => {
   const [recipientType, setRecipientType] = useState("allPassengers");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [subject, setSubject] = useState("");
   const [images, setImages] = useState([]);
   const [openDialog, setOpenDialog] = useState(false); 
   const handleImageUpload = async (file) => {
@@ -95,6 +96,7 @@ const PushNotification = () => {
       recipientType,
       email: recipientType === "specificEmail" ? email : null,
       message: updatedMessage,
+      subject:subject,
     };
 
     try {
@@ -229,7 +231,15 @@ const PushNotification = () => {
             />
           )}
         </Box>
-
+        <TextField
+              label="Enter SubjectLine"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              sx={{ marginBottom: "20px" }}
+            />
        
         {/* Open Dialog Button */}
         <Button

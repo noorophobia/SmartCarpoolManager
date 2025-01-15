@@ -26,7 +26,7 @@ const Drivers = () => {
           
           console.log('Token:', token);
 
-        const response = await fetch('http://localhost:5000/drivers', {
+        const response = await fetch('http://localhost:5000/drivers/approved', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`, // Add the token to the Authorization header

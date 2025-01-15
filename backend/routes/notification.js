@@ -19,7 +19,7 @@ const transporter = nodemailer.createTransport({
 
 // Route to handle sending notifications
 router.post("/send-notification", async (req, res) => {
-  const { recipientType, email, message } = req.body;
+  const { recipientType, email, message ,subject } = req.body;
 
   if (!message.trim()) {
     return res.status(400).json({ error: "Message is required" });
@@ -48,7 +48,7 @@ router.post("/send-notification", async (req, res) => {
     const mailOptions = {
       from: "smartcarpool1@gmail.com",  // Sender's email address
       to: recipients,  // Recipients
-      subject: "Important Notification",  // Subject line
+      subject: subject,  // Subject line
       html: message,
       //'<html> <body> <h1>Test Notification</h1> <p>This is a test notification with an image.</p><img src="https://images.pexels.com/photos/326055/pexels-photo-326055.jpeg" alt="Test Image" /></body>  </html>',  // Send the message as HTML
     };

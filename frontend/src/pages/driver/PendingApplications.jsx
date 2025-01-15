@@ -22,7 +22,7 @@ const PendingApplications = () => {
             
             console.log('Token:', token);
   
-          const response = await fetch('http://localhost:5000/drivers', {
+          const response = await fetch('http://localhost:5000/drivers/not-approved', {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${token}`, // Add the token to the Authorization header
@@ -72,7 +72,7 @@ const PendingApplications = () => {
           return;
         }
     
-        const response = await fetch(`http://localhost:5000//drivers/application/${id}`, {
+        const response = await fetch(`http://localhost:5000/drivers/application/${id}`, {
           method: 'PUT',
           headers: {
             'Authorization': `Bearer ${token}`,

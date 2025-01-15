@@ -8,6 +8,7 @@
 import React, { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
  import { useLocation } from "react-router-dom";
+ import CircularProgress from '@mui/material/CircularProgress';
 
  import Passengers from './pages/admin/Passengers';
 import Drivers from './pages/driver/Drivers';
@@ -36,7 +37,6 @@ import PushNotifications from "./pages/admin/PushNotification";
 import Packages from "./pages/admin/Packages";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import Image from './pages/Image';  
-import CircularProgress from "@mui/material/CircularProgress"; // For the loading spinner
 
 import EditPassenger from "./components/EditPassenger";
 const Layout = () => {
@@ -129,7 +129,7 @@ function App() {
           element: <Drivers />,
         },
         {
-          path: "/edit-passenger/:id", 
+          path: "/edit-passenger", 
           element: <EditPassenger />,  
         },
         {
@@ -194,7 +194,7 @@ function App() {
 
         },
         {
-          path: "/passenger-details/:id",
+          path: "/passenger-details",
           element:<PassengerDetails/>,
          },
          {

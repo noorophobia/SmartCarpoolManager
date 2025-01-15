@@ -18,7 +18,9 @@ const Passengers = () => {
   const navigate = useNavigate();
   const [openDialog, setOpenDialog] = useState(false);
   const [passengers,setPassengers]=useState(null);
-  const [isEditing, setIsEditing] = useState(false); // Track whether we are editing or adding
+  const [isEditing, setIsEditing] = useState(false); 
+  const token = localStorage.getItem('token');  // Or sessionStorage.getItem('token')
+  // Track whether we are editing or adding
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -36,75 +38,91 @@ const Passengers = () => {
 
   // Fetch drivers data from the Express server when the component mounts
     useEffect(() => {
-      const fetchPassengers = async () => {
-        try {
-          // Get the token from localStorage (or sessionStorage)
-          const token = localStorage.getItem('token');  // Or sessionStorage.getItem('token')
-          
-          //   alert('You are not authenticated');
-            if (!token) {
-              // If no token is found, redirect to the login page
-              navigate('/login');
-              return;
-            }
-            
-            console.log('Token:', token);
-  
-          const response = await fetch('http://localhost:5000/passengers', {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${token}`, // Add the token to the Authorization header
-              'Content-Type': 'application/json',
-            },
-          });
-          
-          const data = await response.json();
-          console.log(data);
-  
-          const mappedData = Array.isArray(data)
-          ? data.map(passenger => ({
-               id: passenger._id,
-              compositeId: passenger.compositeId, // Add compositeId here
-              name: passenger.name,
-              gender: passenger.gender,
-              email: passenger.email,
-              phone: passenger.phone,
-             }))
-          : [];
-
-         
-  
-          setPassengers(mappedData); // Update state with the mapped data
-        } catch (error) {
-          console.error('Failed to fetch drivers:', error);
-        }
-      };
-    
+     
       fetchPassengers(); // Call the function to fetch data
     }, []);
+    const fetchPassengers = async () => {
+      try {
+        // Get the token from localStorage (or sessionStorage)
+         
+        //   alert('You are not authenticated');
+          if (!token) {
+            // If no token is found, redirect to the login page
+            navigate('/login');
+            return;
+          }
+          
+          console.log('Token:', token);
 
+        const response = await fetch('http://localhost:5000/passengers', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`, // Add the token to the Authorization header
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        const data = await response.json();
+        console.log(data);
+
+        const mappedData = Array.isArray(data)
+        ? data.map(passenger => ({
+             id: passenger._id,
+            compositeId: passenger.compositeId, // Add compositeId here
+            name: passenger.name,
+            gender: passenger.gender,
+            email: passenger.email,
+            phone: passenger.phone,
+           }))
+        : [];
+
+       
+
+        setPassengers(mappedData); // Update state with the mapped data
+      } catch (error) {
+        console.error('Failed to fetch drivers:', error);
+      }
+    };
+  
   const handleViewDetails = (id) => {
-     navigate(`/passenger-details/${id}`);
+    localStorage.setItem('id', id);
+
+     navigate(`/passenger-details`);
   };
 
   const handleEdit = (id) => {
-    
-    navigate(`/edit-passenger/${id}`);
+    localStorage.setItem('id', id);
+
+    navigate(`/edit-passenger`);
 
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+  const handleDelete = async (id) => {
+    if (window.confirm(`Are you sure you want to delete the passenger with ID: ${id}?`)) {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:5000/passengers/${id}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+        if (!response.ok) {
+          throw new Error('Failed to delete passenger');
+        }
+  
+        // Optionally, refresh the page or update the state to reflect the deletion
+        alert('Passenger deleted successfully');
+        fetchPassengers();
+        // Reload or remove the deleted passenger from the UI, depending on your state structure
+      } catch (error) {
+        console.error(error);
+        alert('Failed to delete passenger');
+      }
+    }
   };
-
-  const handleDelete = (id) => {
-    alert(`Delete row with ID: ${id}`);
-    // Add your delete functionality here
-  };
+  
 
   const handleAddNew = () => {
     setIsEditing(false);

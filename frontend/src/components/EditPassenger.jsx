@@ -7,8 +7,9 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
 const EditPassenger = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
+  const id = localStorage.getItem('id');
+
+   const navigate = useNavigate();
   const [passenger, setPassenger] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,14 +17,12 @@ const EditPassenger = () => {
   const [imagePreview, setImagePreview] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const token = localStorage.getItem('token');
-
-  useEffect(() => {
+    useEffect(() => {
     if (!token) {
       navigate('/login');
       return;
     }
-
-    const fetchPassenger = async () => {
+     const fetchPassenger = async () => {
       try {
         const response = await fetch(`http://localhost:5000/passengers/${id}`, {
           headers: {
@@ -64,17 +63,19 @@ const EditPassenger = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
-
+ 
     const formData = new FormData();
     formData.append('name', passenger.name);
-    formData.append('lastName', passenger.lastName);
-    formData.append('email', passenger.email);
-    formData.append('phone', passenger.phone);
     formData.append('gender', passenger.gender);
+
+     formData.append('email', passenger.email);
+    formData.append('phoneNumber', passenger.phone);
+ 
     if (selectedFile) {
       formData.append('photo', selectedFile); // Append the selected file
     }
 
+    console.log(passenger.name);
     try {
       const response = await fetch(`http://localhost:5000/passengers/${id}`, {
         method: 'PUT',
@@ -87,8 +88,7 @@ const EditPassenger = () => {
       if (!response.ok) {
         throw new Error('Failed to update passenger details');
       }
-
-      navigate(`/passenger/${id}`); // Redirect to Passenger Details page
+       navigate(`/passenger-details/${id}`); // Redirect to Passenger Details page
     } catch (err) {
       setError(err.message);
     } finally {
@@ -129,13 +129,7 @@ const EditPassenger = () => {
           onChange={handleChange}
           fullWidth
         />
-        <TextField
-          label="Last Name"
-          name="lastName"
-          value={passenger.lastName || ''}
-          onChange={handleChange}
-          fullWidth
-        />
+        
         <TextField
           label="Email"
           name="email"

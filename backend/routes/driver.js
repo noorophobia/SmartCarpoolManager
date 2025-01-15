@@ -15,6 +15,25 @@ router.get('/drivers',verifyToken, async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch drivers' });
   }
 });
+// Fetch approved drivers
+router.get('/drivers/approved', verifyToken, async (req, res) => {
+  try {
+    const drivers = await Driver.find({ isApproved: true });
+    res.status(200).json(drivers);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch approved drivers' });
+  }
+});
+
+// Fetch not approved drivers
+router.get('/drivers/not-approved', verifyToken, async (req, res) => {
+  try {
+    const drivers = await Driver.find({ isApproved: false });
+    res.status(200).json(drivers);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch not approved drivers' });
+  }
+});
 // Fetch a single driver by ID
 router.get('/drivers/:id', verifyToken,async (req, res) => {
   const { id } = req.params;
@@ -53,7 +72,7 @@ router.post('/drivers', verifyToken, async (req, res) => {
     // Generate the composite ID before saving the driver
     const compositeId = await generateCompositeId();
 
-    const isApproved = true;
+    const isApproved = false;
     const createdAt = new Date();
 
     const newDriver = new Driver({

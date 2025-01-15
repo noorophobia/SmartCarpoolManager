@@ -4,8 +4,9 @@ const Passenger = require('../models/Passenger'); // Import the Passenger model
 const verifyToken = require('../middleware/auth');
 const router = express.Router();
 const Counter = require('./counter');  // Import Counter model
-
-// Function to generate composite ID
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' }); // Configure where to store the file
+  // Function to generate composite ID
 const generateCompositeId = async () => {
   try {
     // Find or create a Counter document for 'passengerId'
@@ -107,31 +108,29 @@ router.post('/passengers', verifyToken, async (req, res) => {
   }
 });
 
-// Update passenger details
-router.put('/passengers/:id', verifyToken, async (req, res) => {
+// Define the route for updating the passenger
+router.put('/passengers/:id', verifyToken, upload.single('photo'), async (req, res) => {
   const { id } = req.params;
-  const { name, gender, email, phoneNumber, photo } = req.body;
-
-  try {
+  const { name, lastName, email, phone, gender } = req.body; // req.body will contain non-file fields
+  const photo = req.file; // req.file will contain the uploaded file
+   try {
     const updateFields = {
       ...(name && { name }),
-      ...(gender && { gender }),
+      ...(lastName && { lastName }),
       ...(email && { email }),
-      ...(phoneNumber && { phoneNumber }),
-      ...(photo && { photo }),
+      ...(phone && { phone }),
+      ...(gender && { gender }),
     };
 
-    // Ensure compositeId is not overwritten
+    if (photo) {
+      updateFields.photo = photo.path; // Save the path of the uploaded file
+    }
+
+    // Update passenger document
     const passenger = await Passenger.findByIdAndUpdate(id, updateFields, { new: true });
 
     if (!passenger) {
       return res.status(404).json({ message: 'Passenger not found' });
-    }
-
-    // Only add compositeId if it's not already set
-    if (!passenger.compositeId) {
-      passenger.compositeId = await generateCompositeId();
-      await passenger.save(); // Save the updated passenger with compositeId
     }
 
     res.status(200).json(passenger);
@@ -139,7 +138,6 @@ router.put('/passengers/:id', verifyToken, async (req, res) => {
     res.status(500).json({ message: 'Failed to update passenger', error: error.message });
   }
 });
-
 // Delete a passenger
 router.delete('/passengers/:id', verifyToken, async (req, res) => {
   const { id } = req.params;

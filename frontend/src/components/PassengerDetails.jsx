@@ -7,7 +7,8 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
 const PassengerDetails = () => {
-  const { id } = useParams();
+  const id = localStorage.getItem('id');
+ 
   const navigate = useNavigate();
   const [passenger, setPassenger] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -77,7 +78,7 @@ const PassengerDetails = () => {
         }}
       >
         <div className="avatar-container">
-          {avatarLoading && <CircularProgress />}
+          {passenger.imageUrl && avatarLoading && <CircularProgress />}
           <Avatar
             alt={`${passenger.name}`}
             src={passenger.imageUrl || 'https://via.placeholder.com/150'}
@@ -86,14 +87,14 @@ const PassengerDetails = () => {
           />
         </div>
         <Box sx={{ flex: 1 }}>
-          <Typography variant="h5"><strong>Full Name:</strong> {passenger.name}</Typography>
-          <Typography variant="h5"><strong>Email:</strong> {passenger.email}</Typography>
-          <Typography variant="h5"><strong>Phone Number:</strong> {passenger.phone}</Typography>
-          <Typography variant="h5"><strong>Gender:</strong> {passenger.gender}</Typography>
-          <Typography variant="h5"><strong>Total Rides:</strong> {passenger.totalRides}</Typography>
-          <Typography variant="h5"><strong>Completed Rides:</strong> {passenger.completedRides}</Typography>
-          <Typography variant="h5"><strong>Cancelled Rides:</strong> {passenger.cancelledRides}</Typography>
-          <Typography variant="h5"><strong>Ratings:</strong> {passenger.ratings}</Typography>
+          <Typography variant="h6"><strong>Full Name:</strong> {passenger.name}</Typography>
+          <Typography variant="h6"><strong>Email:</strong> {passenger.email}</Typography>
+          <Typography variant="h6"><strong>Phone Number:</strong> {passenger.phone}</Typography>
+          <Typography variant="h6"><strong>Gender:</strong> {passenger.gender}</Typography>
+          <Typography variant="h6"><strong>Total Rides:</strong> {passenger.totalRides}</Typography>
+          <Typography variant="h6"><strong>Completed Rides:</strong> {passenger.completedRides}</Typography>
+          <Typography variant="h6"><strong>Cancelled Rides:</strong> {passenger.cancelledRides}</Typography>
+          <Typography variant="h6"><strong>Ratings:</strong> {passenger.ratings}</Typography>
         </Box>
       </Box>
     </div>
