@@ -100,12 +100,13 @@ const Login = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/admin/forgot-password", {
-        method: "POST",
+      // Send password update request to backend
+      const response = await fetch("http://localhost:5000/api/admin/update-password", {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, newPassword: password }),
       });
 
       const data = await response.json();

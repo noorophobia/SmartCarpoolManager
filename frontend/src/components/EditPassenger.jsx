@@ -5,6 +5,7 @@ import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import '../styles/passengerDetails.css';
 
 const EditPassenger = () => {
   const id = localStorage.getItem('id');
@@ -88,7 +89,9 @@ const EditPassenger = () => {
       if (!response.ok) {
         throw new Error('Failed to update passenger details');
       }
-       navigate(`/passenger-details/${id}`); // Redirect to Passenger Details page
+      localStorage.setItem('id', id);
+
+       navigate(`/passenger-details`); // Redirect to Passenger Details page
     } catch (err) {
       setError(err.message);
     } finally {
@@ -105,8 +108,8 @@ const EditPassenger = () => {
   }
 
   return (
-    <div className="edit-passenger-container">
-      <Typography variant="h4" gutterBottom>Edit Passenger</Typography>
+    <div className="passenger-details-container">
+      <h2 className="header">Edit Passenger Details</h2>
       <Box
         component="form"
         onSubmit={handleSubmit}
@@ -114,12 +117,14 @@ const EditPassenger = () => {
           display: 'flex',
           flexDirection: 'column',
           gap: 2,
-          maxWidth: 500,
+          maxWidth: 1200,
           margin: '0 auto',
           padding: 2,
           border: '1px solid #ccc',
           borderRadius: 2,
           boxShadow: 2,
+          backgroundColor: '#fff',
+          
         }}
       >
         <TextField
@@ -170,9 +175,9 @@ const EditPassenger = () => {
           <Button
             variant="contained"
             color="secondary"
-            onClick={() => navigate(`/passenger/${id}`)}
+            onClick={() => navigate(`/passengers`)}
           >
-            Cancel
+            Go Back
           </Button>
           <Button
             variant="contained"
@@ -183,7 +188,10 @@ const EditPassenger = () => {
             {saving ? 'Saving...' : 'Save Changes'}
           </Button>
         </Box>
+        
       </Box>
+     
+      
     </div>
   );
 };

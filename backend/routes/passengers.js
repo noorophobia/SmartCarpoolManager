@@ -87,8 +87,9 @@ router.get('/passengers/:id', verifyToken, async (req, res) => {
 // Add a new passenger
 router.post('/passengers', verifyToken, async (req, res) => {
   try {
-    const { name, gender, email, phoneNumber, photo } = req.body;
-
+    const { name, email, phoneNumber ,gender,password} = req.body;
+    const photo = req.file; // req.file will contain the uploaded file
+console.log(req.body);
     // Generate compositeId before creating the new passenger
     const compositeId = await generateCompositeId();
 
@@ -97,13 +98,14 @@ router.post('/passengers', verifyToken, async (req, res) => {
       gender,
       email,
       phoneNumber,
-      photo,
-      compositeId, // Add the compositeId
+      password,
+       compositeId, // Add the compositeId
     });
 
     const savedPassenger = await newPassenger.save();
     res.status(201).json(savedPassenger);
   } catch (error) {
+    console.log(error.message)
     res.status(500).json({ message: 'Error adding passenger. Please try again.', error: error.message });
   }
 });
@@ -111,13 +113,12 @@ router.post('/passengers', verifyToken, async (req, res) => {
 // Define the route for updating the passenger
 router.put('/passengers/:id', verifyToken, upload.single('photo'), async (req, res) => {
   const { id } = req.params;
-  const { name, lastName, email, phone, gender } = req.body; // req.body will contain non-file fields
+  const { name, email, phone, gender } = req.body; // req.body will contain non-file fields
   const photo = req.file; // req.file will contain the uploaded file
    try {
     const updateFields = {
       ...(name && { name }),
-      ...(lastName && { lastName }),
-      ...(email && { email }),
+       ...(email && { email }),
       ...(phone && { phone }),
       ...(gender && { gender }),
     };

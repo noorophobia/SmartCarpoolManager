@@ -39,6 +39,7 @@ import ForgotPassword from "./pages/auth/ForgotPassword";
 import Image from './pages/Image';  
 
 import EditPassenger from "./components/EditPassenger";
+import AddPassenger from "./components/AddPassenger";
 const Layout = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true); // State to track the loading state
@@ -133,13 +134,16 @@ function App() {
           element: <EditPassenger />,  
         },
         {
-          path: "/add-driver/", 
+          path: "/add-driver", 
           element: <AddDriver />,  
         }, {
           path: "/edit-driver/:id", 
           element: <EditDriver />,  
         },
- 
+        {
+          path: "/add-passenger", 
+          element: <AddPassenger />,  
+        },
         {
           path: "/rides",
           element: <Rides />,

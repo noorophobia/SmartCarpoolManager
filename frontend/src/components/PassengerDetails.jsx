@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
 import CircularProgress from '@mui/material/CircularProgress';
 import '../styles/passengerDetails.css';
+import Button from '@mui/material/Button';
+
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
@@ -96,7 +98,22 @@ const PassengerDetails = () => {
           <Typography variant="h6"><strong>Cancelled Rides:</strong> {passenger.cancelledRides}</Typography>
           <Typography variant="h6"><strong>Ratings:</strong> {passenger.ratings}</Typography>
         </Box>
+        
       </Box>
+      <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => navigate(`/passengers`)}
+            sx={{
+             
+              padding: 2,
+             marginTop:4,
+            
+            
+            }}
+          >
+            Go Back
+          </Button>
     </div>
   );
 };

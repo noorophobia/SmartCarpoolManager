@@ -16,25 +16,9 @@ import { useNavigate } from 'react-router-dom';
 
 const Passengers = () => {
   const navigate = useNavigate();
-  const [openDialog, setOpenDialog] = useState(false);
-  const [passengers,setPassengers]=useState(null);
-  const [isEditing, setIsEditing] = useState(false); 
-  const token = localStorage.getItem('token');  // Or sessionStorage.getItem('token')
-  // Track whether we are editing or adding
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phoneNumber: '',
-    gender: 'Male',
-  });
-  const [formErrors, setFormErrors] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phoneNumber: '',
-    gender: '',
-  });
+   const [passengers,setPassengers]=useState(null);
+   const token = localStorage.getItem('token');  // Or sessionStorage.getItem('token')
+    
 
   // Fetch drivers data from the Express server when the component mounts
     useEffect(() => {
@@ -124,57 +108,14 @@ const Passengers = () => {
   };
   
 
-  const handleAddNew = () => {
-    setIsEditing(false);
-    setFormData({
-      firstName: '',
-      lastName: '',
-      email: '',
-      phoneNumber: '',
-      gender: 'Male',
-    });
-    setOpenDialog(true);
-  };
+  const handleAddPassenger= () => {
+    navigate(`/add-passenger`);
 
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-    setFormErrors({});  // Reset form errors
+   };
 
-  };
-
-  const handleSubmit = () => {
-    // Validate the form fields
-    const errors = {};
-    const emailRegex = /\S+@\S+\.\S+/;
-    const phoneRegex = /^[+]?[0-9]{10,13}$/;
-
-    if (!formData.firstName) errors.firstName = 'First name is required';
-    if (!formData.lastName) errors.lastName = 'Last name is required';
-    if (!formData.email) {
-      errors.email = 'Email is required';
-    } else if (!emailRegex.test(formData.email)) {
-      errors.email = 'Invalid email format';
-    }
-    if (!formData.phoneNumber) {
-      errors.phoneNumber = 'Phone number is required';
-    } else if (!phoneRegex.test(formData.phoneNumber)) {
-      errors.phoneNumber = 'Invalid phone number format';
-    }
-    if (!formData.gender) errors.gender = 'Gender is required';
-
-    setFormErrors(errors);
-
-    if (Object.keys(errors).length === 0) {
-      if (isEditing) {
-        // Edit logic
-        alert(`Updated Passenger: ${JSON.stringify(formData)}`);
-      } else {
-        // Add new passenger logic
-        alert(`Added New Passenger: ${JSON.stringify(formData)}`);
-      }
-      handleCloseDialog();
-    }
-  };
+   
+   
+    
 
   const columns = [
     { field: 'compositeId', headerName: 'ID', width: 90 },
@@ -275,7 +216,7 @@ const Passengers = () => {
     <div className="main-content">
       <div className="header">
         <h1>Welcome to Passengers</h1>
-        <button className="button" onClick={handleAddNew}>Add New Passenger</button>
+        <button className="button" onClick={handleAddPassenger}>Add New Passenger</button>
       </div>
       <div>
         <Box sx={{ height: 500, width: '100%' }}>
