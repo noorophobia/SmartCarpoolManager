@@ -44,9 +44,8 @@ const AddPassenger = () => {
     formData.append('phoneNumber', newPassenger.phone);
     formData.append('gender', newPassenger.gender);
     formData.append('password', newPassenger.gender);
-
-    if (selectedFile) {
-      formData.append('photo', selectedFile); // Append the selected file
+     if (selectedFile) {
+      formData.append('photo', selectedFile.URL); // Append the selected file
     }
 
     try {

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const contactUsSchema = new mongoose.Schema({
+const complaintsSchema = new mongoose.Schema({
   userId: {
     type: Number,
     required: true,
@@ -30,6 +30,10 @@ const contactUsSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  compositeId: {
+    type: String, 
+    unique: true, 
+  },
 });
 
-module.exports = mongoose.model('ContactUs', contactUsSchema);
+module.exports = mongoose.model('Complaints', complaintsSchema);

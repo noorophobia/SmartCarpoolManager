@@ -5,22 +5,19 @@ const cors = require('cors');
 const path = require('path');
  const bodyParser = require("body-parser");
  const dotenv = require("dotenv");
+ dotenv.config();
+ const helmet = require('helmet');
+ const bcrypt = require('bcryptjs');
+    require('dotenv').config();
 
-// Import routes
-const notificationRoutes = require("./routes/notification");
-
-dotenv.config();
-const helmet = require('helmet');
-const bcrypt = require('bcryptjs');
-   require('dotenv').config();
-
+ const notificationRoutes = require("./routes/notification");
  const rateSettingsRoute = require('./routes/rate-settings');  
 const driversRoutes = require('./routes/driver');  
 const vehiclesRoutes=require('./routes/vehicle')
 const adminRoutes = require('./routes/admin');  // Import the admin routes
  const packagesRoutes=require('./routes/packages');
  const passengerRoutes=require('./routes/passengers');
-
+const complaintRoutes=require('./routes/complaints');
 const { insertAdmin } = require('./routes/insertAdmin');  // Import the insertAdmin function
 
 const app = express();
@@ -60,6 +57,7 @@ app.use(driversRoutes);
 app.use(packagesRoutes);
 app.use(notificationRoutes);
 app.use(passengerRoutes);
+app.use('/api',complaintRoutes);
 app.use('/api', rateSettingsRoute);
 app.use(vehiclesRoutes);
 app.use("/api/admin", adminRoutes);
