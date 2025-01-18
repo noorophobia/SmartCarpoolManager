@@ -190,10 +190,16 @@ const Drivers = () => {
             rows={drivers}
             columns={columns}
             getRowId={(row) => row.compositeId || row._id}  // Fallback to _id if compositeId is missing
-            slots={{ toolbar: GridToolbar }}
+               slots={{ toolbar: GridToolbar }}
+                        slotProps={{
+                          toolbar: {
+                            showQuickFilter: true,
+                            quickFilterProps: { debounceMs: 500 },
+                          },
+                        }}
             pageSizeOptions={[5, 10, 20, 100]}
-            checkboxSelection
-            disableRowSelectionOnClick
+             disableRowSelectionOnClick
+             disableColumnSelector
           />
         </Box>
       </div>

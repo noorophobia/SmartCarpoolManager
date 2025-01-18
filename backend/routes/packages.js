@@ -88,13 +88,13 @@ router.delete("/packages/:id",verifyToken, async (req, res) => {
   const { id } = req.params;
 
   try {
-    const package = await Package.findById(id);
-    if (!package) {
+     
+    const deletedPackage = await Package.findByIdAndDelete(id); // Deletes the package by its ID
+
+    if (!deletedPackage) {
       return res.status(404).json({ message: "Package not found" });
     }
-
-    await package.remove();
-    res.status(200).json({ message: "Package deleted successfully" });
+     res.status(200).json({ message: "Package deleted successfully" });
   } catch (error) {
     console.error("Error deleting package:", error);
     res.status(500).json({ message: "Server error" });

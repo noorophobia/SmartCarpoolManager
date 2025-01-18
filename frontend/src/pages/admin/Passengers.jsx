@@ -239,12 +239,12 @@ const Passengers = () => {
               },
             }}
             pageSizeOptions={[5, 10, 20]}
-            checkboxSelection
+             
             disableRowSelectionOnClick
-            disableColumnFilter
-            disableColumnSelector
-            disableDensitySelector
-          />
+            
+            
+             disableColumnSelector
+           />
         </Box>
         
       

@@ -106,10 +106,8 @@ const ContactUs = () => {
               }}
               pageSizeOptions={[5, 10, 20]} // Allow users to choose 5, 10, or 20 records per page
               disableRowSelectionOnClick
-              disableColumnFilter
-              disableColumnSelector
-              disableDensitySelector
-              getRowId={(row) => row._id} // Use _id from MongoDB as the unique row ID
+               disableColumnSelector
+               getRowId={(row) => row._id} // Use _id from MongoDB as the unique row ID
             />
           )}
         </Box>
@@ -118,7 +116,7 @@ const ContactUs = () => {
       {/* Dialog for displaying complaint details */}
       <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogTitle>Complaint Details</DialogTitle>
-        <DialogContent>
+        <DialogContent   sx={{margin:"20px", background:"#E0E0E0"}}>
           {selectedComplaint && (
             <div>
               <p><strong>Complaint ID:</strong> {selectedComplaint.compositeId}</p>
