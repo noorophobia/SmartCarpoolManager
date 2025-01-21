@@ -10,7 +10,9 @@ const paymentSchema = new mongoose.Schema({
       type: String,
       enum: ['Completed', 'Pending', 'Failed'],
       required: true,
-    },
+    }, 
+     compositeId: { type: String, required: false }, // Add compositeId field
+
     rideId: { type: mongoose.Schema.Types.ObjectId, ref: 'Ride' }, // Relationship to Ride
   });
   

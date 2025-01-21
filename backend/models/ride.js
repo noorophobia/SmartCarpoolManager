@@ -10,6 +10,8 @@ const rideSchema = new mongoose.Schema({
     enum: ['Ongoing', 'Completed', 'Cancelled'],
     default: 'Ongoing',
   },
+  compositeId: { type: String, required: false }, // Add compositeId field
+
   paymentIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Payment' }],  
   vehicleId: { type: mongoose.Schema.Types.ObjectId, ref: 'Vehicle' }, // Relationship to Vehicle
   driverId: { type: mongoose.Schema.Types.ObjectId, ref: 'Driver', required: true }, // Driver ID

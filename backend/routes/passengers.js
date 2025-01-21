@@ -3,29 +3,14 @@ const mongoose = require('mongoose');
 const Passenger = require('../models/Passenger'); // Import the Passenger model
 const verifyToken = require('../middleware/auth');
 const router = express.Router();
-const Counter = require('./counter');  // Import Counter model
-const multer = require('multer');
+ const multer = require('multer');
 const upload = multer({ dest: 'uploads/' }); // Configure where to store the file
-  // Function to generate composite ID
+  // Function to generate composite ID// Function to generate a composite ID for Payment
 const generateCompositeId = async () => {
-  try {
-    // Find or create a Counter document for 'passengerId'
-    const counter = await Counter.findOneAndUpdate(
-      { _id: 'passengerId' },
-      { $inc: { seq: 1 } }, // Increment the seq field by 1
-      { new: true, upsert: true } // Create the document if it doesn't exist
-    );
-
-    // Format the compositeId with zero padding
-    const newCompositeId = `PR-${String(counter.seq).padStart(3, '0')}`;
-
-    console.log(`Generated compositeId: ${newCompositeId}`);
-    return newCompositeId;
-  } catch (error) {
-    console.error('Error generating compositeId:', error.message);
-    throw error; // Rethrow error to be handled by the route
-  }
+  const passengerCount = await Passenger.countDocuments();
+  return `PR-${String(passengerCount + 1).padStart(3, '0')}`; // Generates IDs like PAY-001, PAY-002, etc.
 };
+
 
 
 
