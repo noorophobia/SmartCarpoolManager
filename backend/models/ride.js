@@ -10,7 +10,7 @@ const rideSchema = new mongoose.Schema({
     enum: ['Ongoing', 'Completed', 'Cancelled'],
     default: 'Ongoing',
   },
-  paymentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Payment' }, // Relationship to Payment
+  paymentIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Payment' }],  
   vehicleId: { type: mongoose.Schema.Types.ObjectId, ref: 'Vehicle' }, // Relationship to Vehicle
   driverId: { type: mongoose.Schema.Types.ObjectId, ref: 'Driver', required: true }, // Driver ID
   passengerIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Passenger' }], // Array of Passenger IDs
