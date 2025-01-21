@@ -3,10 +3,10 @@ const router = express.Router();
 const Ride = require('../models/Ride'); // Import Ride model
 
 // Function to generate a composite ride ID
-const generateCompositeId = async (pickUpLocation, dropOffLocation, rideMode) => {
+const generateCompositeId = async () => {
     const rideCount = await Ride.countDocuments();
-    return `${pickUpLocation}_${dropOffLocation}_${rideMode}_${String(rideCount + 1).padStart(3, '0')}`;
-};
+    return `RIDE-${String(rideCount + 1).padStart(3, '0')}`; // Generates IDs like PAY-001, PAY-002, etc.
+  };
 
 // Create a new ride (POST)
 router.post('/', async (req, res) => {

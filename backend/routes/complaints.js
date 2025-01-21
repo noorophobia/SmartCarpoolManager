@@ -1,25 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const Complaints = require('../models/Complaints'); 
-
-const Counter = require('./counter');  // Import Counter model
- const generateCompositeId = async () => {
-  try {
-     const counter = await Counter.findOneAndUpdate(
-      { _id: 'complaintId' },
-      { $inc: { seq: 1 } }, // Increment the seq field by 1
-      { new: true, upsert: true } // Create the document if it doesn't exist
-    );
-
-    // Format the compositeId with zero padding
-    const newCompositeId = `CM-${String(counter.seq).padStart(3, '0')}`;
-
-    console.log(`Generated compositeId: ${newCompositeId}`);
-    return newCompositeId;
-  } catch (error) {
-    console.error('Error generating compositeId:', error.message);
-    throw error; // Rethrow error to be handled by the route
-  }
+ // Function to generate a composite ride ID
+const generateCompositeId = async (pickUpLocation, dropOffLocation, rideMode) => {
+  const complaintCount = await Complaints.countDocuments();
+  return `CM-${String(complaintCount + 1).padStart(3, '0')}`; // Generates IDs like PAY-001, PAY-002, etc.
 };
 
 
