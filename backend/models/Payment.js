@@ -1,3 +1,5 @@
+const mongoose = require('mongoose');
+
 const paymentSchema = new mongoose.Schema({
     paymentID: { type: String, required: true, unique: true },
     amount: { type: Number, required: true },
@@ -12,6 +14,7 @@ const paymentSchema = new mongoose.Schema({
       required: true,
     }, 
      compositeId: { type: String, required: false }, // Add compositeId field
+     passengerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Passenger' }, // Relationship to Ride
 
     rideId: { type: mongoose.Schema.Types.ObjectId, ref: 'Ride' }, // Relationship to Ride
   });

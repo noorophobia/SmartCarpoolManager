@@ -18,6 +18,9 @@ const adminRoutes = require('./routes/admin');  // Import the admin routes
  const packagesRoutes=require('./routes/packages');
  const passengerRoutes=require('./routes/passengers');
 const complaintRoutes=require('./routes/complaints');
+const rideRoutes = require("./routes/ride");
+const paymentRoutes = require("./routes/payment");
+
 const { insertAdmin } = require('./routes/insertAdmin');  // Import the insertAdmin function
 
 const app = express();
@@ -54,6 +57,8 @@ app.use('/uploads', express.static('uploads'));
 app.use(express.json()); // Parse JSON request bodies
 // Use the drivers route
 app.use(driversRoutes);
+
+
 app.use(packagesRoutes);
 app.use(notificationRoutes);
 app.use(passengerRoutes);
@@ -61,6 +66,8 @@ app.use('/api',complaintRoutes);
 app.use('/api', rateSettingsRoute);
 app.use(vehiclesRoutes);
 app.use("/api/admin", adminRoutes);
+app.use(rideRoutes);
+app.use(paymentRoutes);
 
 app.get('/uploads/:imageName', (req, res) => {
   const imageName = req.params.imageName;
@@ -84,3 +91,6 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+
+
+

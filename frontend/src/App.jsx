@@ -42,8 +42,8 @@ import EditPassenger from "./components/EditPassenger";
 import AddPassenger from "./components/AddPassenger";
 const Layout = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true); // State to track the loading state
-  const [theme, setTheme] = useState("light"); // State to track the loading state
+  const [loading, setLoading] = useState(true);  
+  const [theme, setTheme] = useState("light");  
   const location = useLocation();
   
 
@@ -61,6 +61,7 @@ const Layout = () => {
     const token = localStorage.getItem("token");  
     if (!token) {
        navigate("/login");
+       return;
     }else {
        setLoading(false);
     }

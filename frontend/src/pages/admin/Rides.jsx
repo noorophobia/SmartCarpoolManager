@@ -6,50 +6,88 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Rides = () => {
-  const [driver, setDriver] = useState(null);
+  const [rides, setRides] = useState([]); // Holds the rides data
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [selectedDriverId, setSelectedDriverId] = useState(null);
+  const [driversData, setDriversData] = useState({}); // Holds all drivers' data
+  const [passengerData, setPassengerData] = useState({}); // Holds passenger data
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
-
+/*
+  // Fetch rides data
   useEffect(() => {
-    const fetchDriver = async () => {
-      if (!selectedDriverId) return; // Skip if no driver ID is selected
-
+    const fetchRides = async () => {
       setLoading(true);
       setError(null); // Reset error on each fetch
-      setDriver(null); // Clear previous driver data
 
       try {
-        console.log(`Fetching driver for ID: ${selectedDriverId}`);
-        const response = await axios.get(
-          `http://localhost:5000/drivers/composite/${selectedDriverId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const response = await axios.get("http://localhost:5000/rides", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
 
         if (response.status === 200) {
-          setDriver(response.data);
-          console.log("Fetched driver data: ", response.data);
-          navigate(`/drivers/${response.data._id}`);
+          const ridesData = response.data;
+          setRides(ridesData); // Set the fetched rides data
+
+          // Extract driver IDs and fetch driver data for all drivers in one go
+          const driverIds = [...new Set(ridesData.map((ride) => ride.driverId))];
+          const driverPromises = driverIds.map((driverId) =>
+            axios.get(`http://localhost:5000/drivers/${driverId}`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            })
+          );
+
+          // Fetch driver data
+          const driverResponses = await Promise.all(driverPromises);
+          const driversMap = driverResponses.reduce((acc, driver) => {
+            if (driver.status === 200) {
+              acc[driver.data._id] = driver.data; // Map driver ID to driver data
+            }
+            return acc;
+          }, {});
+
+          setDriversData(driversMap); // Set the drivers data
+
+          // Now fetch passenger data
+          const passengerIds = ridesData.flatMap((ride) => ride.passengerIds);
+          const uniquePassengerIds = [...new Set(passengerIds)];
+          const passengerPromises = uniquePassengerIds.map((passengerId) =>
+            axios.get(`http://localhost:5000/passengers/${passengerId}`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            })
+          );
+
+          const passengerResponses = await Promise.all(passengerPromises);
+          const passengersMap = passengerResponses.reduce((acc, passenger) => {
+            if (passenger.status === 200) {
+              acc[passenger.data._id] = passenger.data;
+            }
+            return acc;
+          }, {});
+
+          setPassengerData(passengersMap); // Set passenger data
         }
       } catch (err) {
-        console.error("Error fetching driver data:", err);
+        console.error("Error fetching rides data:", err);
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchDriver();
-  }, [selectedDriverId, token, navigate]);
-
+     
+    fetchRides();
+  }, [token]);
+  
   const columns = [
     { field: "rideID", headerName: "Ride ID", width: 120 },
     { field: "pickUpLocation", headerName: "Pick-Up Location", width: 200 },
@@ -58,32 +96,38 @@ const Rides = () => {
     { field: "rideStatus", headerName: "Ride Status", width: 150 },
     {
       field: "passenger",
-      headerName: "Passenger (ID)",
+      headerName: "Passenger (Composite ID)",
       flex: 1,
       minWidth: 150,
-      renderCell: (params) => (
-        <Link to={`/passenger-details/${params.value}`}>
-          <Button variant="text" color="primary" size="small">
-            {params.value}
-          </Button>
-        </Link>
-      ),
+      renderCell: (params) => {
+        const passenger = passengerData[params.value];
+        return (
+          <Link to={`/passenger-details/${params.value}`}>
+            <Button variant="text" color="primary" size="small">
+              {passenger ? passenger.compositeId : "Loading..."}
+            </Button>
+          </Link>
+        );
+      },
     },
     {
       field: "driver",
-      headerName: "Driver (ID)",
+      headerName: "Driver (Composite ID)",
       flex: 1,
       minWidth: 100,
-      renderCell: (params) => (
-        <Button
-          variant="text"
-          color="primary"
-          size="small"
-          onClick={() => setSelectedDriverId(params.value)}
-        >
-          {params.value}
-        </Button>
-      ),
+      renderCell: (params) => {
+        const driver = driversData[params.value]; // Fetch driver data from state
+        return (
+          <Button
+            variant="text"
+            color="primary"
+            size="small"
+            onClick={() => navigate(`/drivers/${params.value}`)}
+          >
+            {driver ? driver.compositeId : "Loading..."}
+          </Button>
+        );
+      },
     },
     {
       field: "viewDetails",
@@ -97,43 +141,26 @@ const Rides = () => {
         </Link>
       ),
     },
-  ];
-
-  const rows = [
-    {
-      id: 1,
-      rideID: "RIDE123",
-      pickUpLocation: "Model Town",
-      dropOffLocation: "Liberty Market",
-      rideMode: "Carpool",
-      rideStatus: "Ongoing",
-      passenger: "1",
-      driver: "DR-003",
-    },
-    {
-      id: 2,
-      rideID: "RIDE124",
-      pickUpLocation: "DHA",
-      dropOffLocation: "Gulberg",
-      rideMode: "Single",
-      rideStatus: "Cancelled",
-      passenger: "2",
-      driver: "DR-003",
-    },
-  ];
+  ];*/
 
   return (
     <div className="main-content">
       <div className="header">
         <h1>Welcome to Rides</h1>
-        <button className="button">Add New Ride</button>
-      </div>
+       </div>
       <div style={{ marginTop: "20px" }}>
         <Box sx={{ height: 500, width: "100%" }}>
-          <DataGrid
+      {/*   <DataGrid
             className="dataGrid"
-            rows={rows}
+            rows={rides.map((ride) => ({
+              ...ride,
+              id: ride._id, 
+               driver: ride.driverId, 
+              passenger: ride.passengerIds[0], 
+            }))}
             columns={columns}
+            pageSize={5}
+            disableRowSelectionOnClick
             slots={{ toolbar: GridToolbar }}
             slotProps={{
               toolbar: {
@@ -141,16 +168,15 @@ const Rides = () => {
                 quickFilterProps: { debounceMs: 500 },
               },
             }}
-            pageSizeOptions={[5, 10, 20]}
-            disableRowSelectionOnClick
           />
+          **/}
+
         </Box>
       </div>
 
-      {/* Display driver details */}
-      {loading && <p>Loading driver details...</p>}
+      {/* Display loading or error messages */}
+      {loading && <p>Loading data...</p>}
       {error && <p>Error: {error}</p>}
-       
     </div>
   );
 };

@@ -16,7 +16,7 @@ const generateCompositeId = async () => {
 
  // Fetch all passengers
 router.get('/passengers', verifyToken, async (req, res) => {
-  try {
+   try {
     const passengers = await Passenger.find();
     console.log(`Found ${passengers.length} passengers`);
 
