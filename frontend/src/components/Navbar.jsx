@@ -15,12 +15,18 @@ const Navbar = () => {
     navigate("/settings"
       ); // Redirect to the Profile page
   };
+  const goToHome = () => {
+    navigate("/"
+      ); // Redirect to the Profile page
+  };
 
   return (
     <div className="navbar">
       {/* Logo */}
-      <img className="logo" src="/public/logo.png" alt="logo" />
-
+      
+       <img className="logo" src="/public/logo.png" alt="logo" 
+      onClick={goToHome}/>
+ 
       {/* Dropdown Trigger */}
       <div className="settings-dropdown" onClick={() => setDropdownOpen(!dropdownOpen)}>
         <img
