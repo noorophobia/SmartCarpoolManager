@@ -45,7 +45,7 @@ const driverSchema = new mongoose.Schema({
     type: Date, 
     required: [true, 'Date of Birth is required.'],
   },
-  ratings: { 
+  rating: { 
     type: Number, 
     default: 0, 
     min: 0, 
@@ -57,6 +57,7 @@ const driverSchema = new mongoose.Schema({
   },
   compositeId: { type: String, unique: true }, 
   isApproved: { type:Boolean, default:false},
+  isBlocked: { type:Boolean, default:false},
 
 });
 

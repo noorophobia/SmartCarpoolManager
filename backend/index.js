@@ -56,6 +56,8 @@ app.use('/uploads', express.static('uploads'));
 
 app.use(express.json()); // Parse JSON request bodies
 // Use the drivers route
+app.use(express.urlencoded({ extended: true }));
+
 app.use(driversRoutes);
 
 

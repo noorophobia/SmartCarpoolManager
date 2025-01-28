@@ -14,7 +14,7 @@ const Rides = () => {
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
-/*
+
   // Fetch rides data
   useEffect(() => {
     const fetchRides = async () => {
@@ -141,7 +141,7 @@ const Rides = () => {
         </Link>
       ),
     },
-  ];*/
+  ];
 
   return (
     <div className="main-content">
@@ -150,7 +150,7 @@ const Rides = () => {
        </div>
       <div style={{ marginTop: "20px" }}>
         <Box sx={{ height: 500, width: "100%" }}>
-      {/*   <DataGrid
+      {  <DataGrid
             className="dataGrid"
             rows={rides.map((ride) => ({
               ...ride,
@@ -169,7 +169,7 @@ const Rides = () => {
               },
             }}
           />
-          **/}
+          }
 
         </Box>
       </div>

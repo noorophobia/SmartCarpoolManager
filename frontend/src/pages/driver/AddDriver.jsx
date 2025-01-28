@@ -383,8 +383,16 @@ const currentYear = new Date().getFullYear();
                     type="tel"
                     fullWidth
                     value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    margin="normal"
+                    onChange={(e) => {
+                      const input = e.target.value;
+                      
+                      // Only modify if it's a valid number and doesn't start with +92
+                      if (!input.startsWith("+92") && input) {
+                        setPhoneNumber(`+92${input.replace(/^0/, "")}`); // Prepend +92 and remove leading 0 if present
+                      } else {
+                        setPhoneNumber(input); // Otherwise, just set the value as is
+                      }
+                    }}                    margin="normal"
                     error={!!errorMessages.phoneNumber}
                     helperText={errorMessages.phoneNumber}
                   />

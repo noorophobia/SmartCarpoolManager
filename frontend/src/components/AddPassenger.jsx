@@ -1,60 +1,130 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import { MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import '../styles/passengerDetails.css';
 
 const AddPassenger = () => {
   const navigate = useNavigate();
+  const [emails, setEmails] = useState([]);
+  const [phoneNumbers, setPhoneNumbers] = useState([]);
+  const [errorMessages, setErrorMessages] = useState({
+    name: "",
+    gender: "",
+    email: "",
+    phone: "",
+  });
+
+  // Fetch passengers data when the component mounts
+  useEffect(() => {
+    const fetchAllPassengers = async () => {
+      try {
+        const token = localStorage.getItem('token'); // Adjust according to how you're storing the token
+
+        const response = await fetch(`http://localhost:5000/passengers`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,  // Add the token to the Authorization header
+            'Content-Type': 'application/json',
+          },
+        });
+        const data = await response.json();
+        console.log(data);
+        if (Array.isArray(data)) {
+          setEmails(data.map(passenger => passenger.email));
+          setPhoneNumbers(data.map(passenger => passenger.phone));
+        }
+      } catch (error) {
+        console.error('Failed to fetch passengers:', error);
+      }
+    };
+
+    fetchAllPassengers(); // Call the function to fetch data
+  }, []);
+
   const [newPassenger, setNewPassenger] = useState({
     name: '',
     email: '',
     phone: '',
     gender: '',
+    password: '',
   });
   const [saving, setSaving] = useState(false);
-  const [imagePreview, setImagePreview] = useState('');
-  const [selectedFile, setSelectedFile] = useState(null);
   const [error, setError] = useState(null);
   const token = localStorage.getItem('token');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+  
+    // If the phone number is being updated, prepend +92 if it's not already there
+    if (name === "phone") {
+      if (!value.startsWith("+92")) {
+        setNewPassenger((prev) => ({ ...prev, [name]: `+92${value.replace(/^0/, "")}` })); // Ensure no leading zero
+        return; // Exit early if phone number is being modified
+      }
+    }
+  
+    // For other fields, update the state as usual
     setNewPassenger((prev) => ({ ...prev, [name]: value }));
   };
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-      setImagePreview(URL.createObjectURL(file)); // Create a temporary URL for preview
-    }
-  };
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
+    setErrorMessages({
+      name: "",
+      gender: "",
+      email: "",
+      phone: "",
+    });
 
-    const formData = new FormData();
-    formData.append('name', newPassenger.name);
-    formData.append('email', newPassenger.email);
-    formData.append('phoneNumber', newPassenger.phone);
-    formData.append('gender', newPassenger.gender);
-    formData.append('password', newPassenger.gender);
-     if (selectedFile) {
-      formData.append('photo', selectedFile.URL); // Append the selected file
+    const { name, email, phone, gender, password } = newPassenger;
+    let hasError = false;
+
+    // Check for existing email or phone
+    if (emails.includes(email)) {
+      setErrorMessages((prev) => ({ ...prev, email: "Email is already in use" }));
+      hasError = true;
     }
+    if (phoneNumbers.includes(phone)) {
+      setErrorMessages((prev) => ({ ...prev, phone: "Phone Number is already in use" }));
+      hasError = true;
+    }
+
+    // Validate required fields and format
+    if (!name.trim()) {
+      setErrorMessages((prev) => ({ ...prev, name: "Name is required" }));
+      hasError = true;
+    }
+    if (!['Male', 'Female'].includes(gender)) {
+      setErrorMessages((prev) => ({ ...prev, gender: "Gender must be Male or Female" }));
+      hasError = true;
+    }
+    if (!email.match(/^\S+@\S+\.\S+$/) || !email) {
+      setErrorMessages((prev) => ({ ...prev, email: "Please provide a valid email address" }));
+      hasError = true;
+    }
+    if (!phone.match(/^((\+92)|0)(3[0-9]{2})[0-9]{7}$/)) {
+      setErrorMessages((prev) => ({ ...prev, phone: "Phone number must be a valid Pakistani number" }));
+      hasError = true;
+    }
+
+    if (hasError) {
+      setSaving(false); 
+      return;}
 
     try {
       const response = await fetch('http://localhost:5000/passengers', {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // Include token if required
         },
-        body: formData,
+        body: JSON.stringify(newPassenger), // Send the form data
       });
 
       if (!response.ok) {
@@ -93,6 +163,8 @@ const AddPassenger = () => {
           name="name"
           value={newPassenger.name}
           onChange={handleChange}
+          error={!!errorMessages.name}
+          helperText={errorMessages.name}
           fullWidth
         />
         <TextField
@@ -100,33 +172,45 @@ const AddPassenger = () => {
           name="email"
           value={newPassenger.email}
           onChange={handleChange}
+          error={!!errorMessages.email}
+          helperText={errorMessages.email}
           fullWidth
         />
         <TextField
           label="Phone Number"
           name="phone"
+          type="tel"
+
           value={newPassenger.phone}
           onChange={handleChange}
+          error={!!errorMessages.phone}
+          helperText={errorMessages.phone}
           fullWidth
         />
+
+        <FormControl fullWidth>
+          <InputLabel>Gender</InputLabel>
+          <Select
+            label="Gender"
+            name="gender"
+            value={newPassenger.gender}
+            onChange={handleChange}
+            error={!!errorMessages.gender}
+          >
+            <MenuItem value="Male">Male</MenuItem>
+            <MenuItem value="Female">Female</MenuItem>
+          </Select>
+        </FormControl>
+
         <TextField
-          label="Gender"
-          name="gender"
-          value={newPassenger.gender}
+          label="Password"
+          name="password"
+          type="password"
+          value={newPassenger.password}
           onChange={handleChange}
           fullWidth
         />
-        <div>
-          <Typography variant="h6">Photo</Typography>
-          <input type="file" accept="image/*" onChange={handleFileChange} />
-          {imagePreview && (
-            <img
-              src={imagePreview}
-              alt="Preview"
-              style={{ width: '100%', marginTop: 10, borderRadius: 8 }}
-            />
-          )}
-        </div>
+
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Button variant="contained" color="secondary" onClick={() => navigate('/passengers')}>
             Cancel
@@ -136,6 +220,7 @@ const AddPassenger = () => {
           </Button>
         </Box>
       </Box>
+
       {error && <Typography color="error" sx={{ marginTop: 2 }}>{error}</Typography>}
     </div>
   );

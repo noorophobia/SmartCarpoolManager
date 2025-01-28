@@ -6,6 +6,8 @@ const router = express.Router();
  const multer = require('multer');
 const upload = multer({ dest: 'uploads/' }); // Configure where to store the file
   // Function to generate composite ID// Function to generate a composite ID for Payment
+  const bcrypt = require('bcrypt');
+const saltRounds = 10;
 const generateCompositeId = async () => {
   const passengerCount = await Passenger.countDocuments();
   return `PR-${String(passengerCount + 1).padStart(3, '0')}`; // Generates IDs like PAY-001, PAY-002, etc.
@@ -72,18 +74,26 @@ router.get('/passengers/:id', verifyToken, async (req, res) => {
 // Add a new passenger
 router.post('/passengers', verifyToken, async (req, res) => {
   try {
-    const { name, email, phoneNumber ,gender,password} = req.body;
+    const { name, email, phone ,gender,password} = req.body;
     const photo = req.file; // req.file will contain the uploaded file
 console.log(req.body);
     // Generate compositeId before creating the new passenger
     const compositeId = await generateCompositeId();
+ // Check for missing fields
+ if (!name || !email || !phone|| !gender || !password) {
+  return res.status(400).json({ message: 'All fields are required' });
+}
 
+// Hash the password
+const hashedPassword = await bcrypt.hash(password, saltRounds);
     const newPassenger = new Passenger({
       name,
+       email,
+      phone
+      ,
       gender,
-      email,
-      phoneNumber,
-      password,
+
+      password: hashedPassword, // Store the hashed password
        compositeId, // Add the compositeId
     });
 
