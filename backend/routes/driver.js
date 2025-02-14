@@ -5,7 +5,8 @@ const mongoose = require('mongoose');
 const Driver = require('../models/Driver'); // Import the Driver model
 const verifyToken= require('../middleware/auth');
 const router = express.Router();
-
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 // Fetch all drivers
 router.get('/drivers',verifyToken, async (req, res) => {
   try {
@@ -63,7 +64,7 @@ const generateCompositeId = async () => {
 // Add a new driver
 router.post('/drivers', verifyToken, async (req, res) => {
   try {
-    const { name, gender, email, phoneNumber, cnic, dateOfBirth, ratings } = req.body;
+    const { name, gender, email, phoneNumber, cnic, dateOfBirth, ratings,password } = req.body;
     
     if (!dateOfBirth) {
       return res.status(400).json({ message: 'Date of Birth required.' });
@@ -74,11 +75,14 @@ router.post('/drivers', verifyToken, async (req, res) => {
 
     const isApproved = false;
     const createdAt = new Date();
+const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     const newDriver = new Driver({
       name,
       gender,
       email,
+      password: hashedPassword, // Store the hashed password
+
       phoneNumber,
       cnic,
       dateOfBirth,

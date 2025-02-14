@@ -7,8 +7,9 @@ const AddDriver = () => {
   const [name, setName] = useState('');
   const [gender, setGender] = useState('');
    const [email, setEmail] = useState('');
-  const [cnic, setCnic] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
+   const [cnic, setCnic] = useState('');
+   const [password, setPassword] = useState('');
+   const [phoneNumber, setPhoneNumber] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [ratings, setRatings] = useState(0);
   const [brand, setVehicleBrand] = useState('');
@@ -40,7 +41,7 @@ const AddDriver = () => {
     brand:"",
     vehicleColor:"",
     vehicleType:"",
-
+password:"",
     vehicleProductionYear: "",
     licenseNumber: "",
     vehiclePhotos : "",
@@ -107,6 +108,7 @@ const currentYear = new Date().getFullYear();
    vehicleRegistrationBack: "",
     cnicFront: "",
   cnicBack: "",
+  password:"",
     driverPhoto: "",
     });
     let hasError = false;
@@ -154,7 +156,10 @@ const currentYear = new Date().getFullYear();
       setErrorMessages((prev) => ({ ...prev, dateOfBirth: "Date of Birth is required" }));
       hasError = true;
     }
-
+    if(!password){
+      setErrorMessages((prev) => ({ ...prev, password: "Password is required" }));
+      hasError = true;
+    }
     // Validation logic for vehicle fields
     if (!vehicleName.trim()) {
       setErrorMessages((prev) => ({ ...prev, vehicleName: "Vehicle Name is required" }));
@@ -212,7 +217,7 @@ const currentYear = new Date().getFullYear();
       if (hasError) return;
 
 
-    const newDriver = { name, gender, email, phoneNumber, cnic, dateOfBirth, ratings };
+    const newDriver = { name, gender, email, phoneNumber, cnic, dateOfBirth, ratings,password };
    
        
    
@@ -396,6 +401,14 @@ const currentYear = new Date().getFullYear();
                     error={!!errorMessages.phoneNumber}
                     helperText={errorMessages.phoneNumber}
                   />
+                    <TextField
+                            label="Password"
+                            name="password"
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            fullWidth
+                          />
                   <TextField
                     label="CNIC"
                     variant="outlined"
