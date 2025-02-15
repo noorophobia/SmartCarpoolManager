@@ -244,26 +244,27 @@ const currentYear = new Date().getFullYear();
     
       if (driverResponse.status === 201) {
           // Append vehicle fields to formData
-  formData.append('brand', brand);
-  formData.append('vehicleName', vehicleName);
-  formData.append('vehicleColor', vehicleColor);
-   formData.append('vehicleType', vehicleType);
-  formData.append('vehicleProductionYear', vehicleProductionYear);
-  formData.append('licenseNumber', licenseNumber);
-  formData.append('vehicleRegistrationFront', vehicleRegistrationFront);
-  formData.append('vehicleRegistrationBack', vehicleRegistrationBack);
-  formData.append('cnicFront', cnicFront);
-  formData.append('driverPhoto', driverPhoto);
-  formData.append('cnicBack', cnicBack);
-  vehiclePhotos.forEach(photo => {
-    formData.append('vehiclePhotos', photo); // Append each file
-  });
-          formData.append('driverId', driverResult._id);
-       
-          const vehicleResponse = await axios.post('http://localhost:5000/vehicles', formData, {
+          const vehicleData = {
+            brand,
+            vehicleName,
+            vehicleColor,
+            vehicleType,
+            vehicleProductionYear,
+            licenseNumber,
+            driverPhoto, // Already a URL
+            cnicFront,
+            cnicBack,
+            vehicleRegistrationFront,
+            vehicleRegistrationBack,
+            vehiclePhotos, // Should be an array of URLs
+            driverId: driverResult._id, // Link vehicle to driver
+          };
+          console.log("Final Vehicle Data Before Sending:", vehicleData); // ✅ Debugging
+
+          const vehicleResponse = await axios.post('http://localhost:5000/vehicles', vehicleData, {
             headers: {
               'Authorization': `Bearer ${token}`, // Add the token to headers
-              'Content-Type': 'multipart/form-data', // Inform server about formData
+              'Content-Type': 'application/json', //  Content-Type for JSON
             },
           });
       
@@ -304,27 +305,79 @@ const currentYear = new Date().getFullYear();
   };
   
  
-  const handleDrop = (e, setFileCallback) => {
+  const uploadImageToImgbb = async (file) => {
+    const apiKey = "068837d15525cd65b1c49b07e618821b";
+    const formData = new FormData();
+    formData.append("image", file);
+  
+    try {
+      const response = await axios.post(`https://api.imgbb.com/1/upload?key=${apiKey}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+  
+      if (response.data && response.data.data && response.data.data.url) {
+         return response.data.data.url; // ✅ Return the uploaded image URL
+      } else {
+        console.error("Imgbb response is missing URL:", response.data);
+        return null;
+      }
+    } catch (error) {
+      console.error("Image upload to Imgbb failed:", error);
+      return null;
+    }
+  };
+  
+  
+  const handleFileChange = async (e, setState) => {
+    const file = e.target.files[0];
+    if (!file) return;
+  
+    console.log(`Uploading: ${file.name}`);
+    const uploadedUrl = await uploadImageToImgbb(file);
+    console.log("uploaded url "+uploadedUrl)
+    if (uploadedUrl) {
+      console.log(`Uploaded URL (${file.name}):`, uploadedUrl); // ✅ Debugging
+      setState(uploadedUrl); // ✅ Store URL instead of file object
+    } else {
+      console.error("Image upload failed for:", file.name);
+    }
+  };
+  
+  
+    
+  
+  
+  const handleVehiclePhotosChange = async (e) => {
+    const files = Array.from(e.target.files); // Get all selected files
+    const uploadedUrls = await Promise.all(files.map(file => uploadImageToImgbb(file)));
+  
+    setVehiclePhotos(prevPhotos => [...prevPhotos, ...uploadedUrls.filter(url => url)]); // Append new photos
+  };
+  
+  const handleDrop = async (e, setFileCallback) => {
     e.preventDefault();
     e.stopPropagation();
     setDragOver(false);
   
     const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) {
-      setFileCallback(file);
+    if (file && file.type.startsWith("image/")) {
+      await handleImageUpload(file, setFileCallback);
     } else {
-      console.warn('Invalid file type.');
+      console.warn("Invalid file type.");
     }
   };
   
+  const handleImageUpload = async (file, setState) => {
+    if (!file) return;
   
-
-  const handleVehiclePhotosChange = (e) => {
-    const files = Array.from(e.target.files);
-    setVehiclePhotos(files);
-    console.log('Images selected:', files); // Log the files directly
-
+    const uploadedUrl = await uploadImageToImgbb(file);
+    if (uploadedUrl) {
+      setState(uploadedUrl); // ✅ Set the URL, not the file object
+    } else {
+      console.error("Image upload failed for:", file.name);
+    }
   };
+  
  
 
   return (
@@ -450,8 +503,8 @@ const currentYear = new Date().getFullYear();
           <input
             type="file"
             accept="image/*"
-              onChange={e => { setDriverPhoto(e.target.files[0]) }}
-              
+                onChange={(e) => handleFileChange(e, setDriverPhoto)}
+
             style={{ display: 'none' }}
             id="driver-photo-upload"
           />
@@ -462,8 +515,12 @@ const currentYear = new Date().getFullYear();
 
         {driverPhoto && (
              <Box sx={{ marginTop: 1 }}>
-              <img src={URL.createObjectURL(driverPhoto)} alt="Driver Photo  Preview" width="100%" />
-            </Box>
+              
+              <img 
+      src={typeof driverPhoto === "string" ? driverPhoto : URL.createObjectURL(driverPhoto)} 
+      alt="Driver Photo Preview" 
+      width="100%" 
+    />            </Box>
          
                )}
                {/* Displaying error if any */}
@@ -495,7 +552,8 @@ const currentYear = new Date().getFullYear();
           <input
             type="file"
             accept="image/*"
-              onChange={e => { setCnicFront(e.target.files[0]) }}
+               onChange={(e) => handleFileChange(e, setCnicFront)}
+
             style={{ display: 'none' }}
             id="cnicfront-photo-upload"
           />
@@ -506,8 +564,12 @@ const currentYear = new Date().getFullYear();
 
         {cnicFront && (
              <Box sx={{ marginTop: 1 }}>
-              <img src={URL.createObjectURL(cnicFront)} alt="Driver Photo  Preview" width="100%" />
-            </Box>
+               <img 
+      src={typeof cnicFront === "string" ? cnicFront : URL.createObjectURL(cnicFront)} 
+      alt="cnicFront Photo Preview" 
+      width="100%" 
+    />
+             </Box>
          
                )}
                  {errorMessages.cnicFront && (
@@ -536,7 +598,8 @@ const currentYear = new Date().getFullYear();
           <input
             type="file"
             accept="image/*"
-              onChange={e => { setCnicBack(e.target.files[0]) }}
+               onChange={(e) => handleFileChange(e, setCnicBack)}
+
             style={{ display: 'none' }}
             id="cnicback-photo-upload"
           />
@@ -547,8 +610,12 @@ const currentYear = new Date().getFullYear();
 
         {cnicBack && (
              <Box sx={{ marginTop: 1 }}>
-              <img src={URL.createObjectURL(cnicBack)} alt="Driver Photo  Preview" width="100%" />
-            </Box>
+                      <img 
+      src={typeof cnicBack === "string" ? cnicBack : URL.createObjectURL(cnicBack)} 
+      alt="cnicBack Photo Preview" 
+      width="100%" 
+    />
+             </Box>
          
                )}
                  {errorMessages.cnicBack && (
@@ -666,7 +733,8 @@ const currentYear = new Date().getFullYear();
           <input
             type="file"
             accept="image/*"
-              onChange={e => { setVehicleRegistrationFront(e.target.files[0]) }}
+               onChange={(e) => handleFileChange(e, setVehicleRegistrationFront)}
+
             style={{ display: 'none' }}
             id="registrationFront-photo-upload"
           />
@@ -677,8 +745,12 @@ const currentYear = new Date().getFullYear();
 
         {vehicleRegistrationFront && (
              <Box sx={{ marginTop: 1 }}>
-              <img src={URL.createObjectURL(vehicleRegistrationFront)} alt="Driver Photo  Preview" width="100%" />
-            </Box>
+                       <img 
+      src={typeof vehicleRegistrationFront === "string" ? vehicleRegistrationFront : URL.createObjectURL(vehicleRegistrationFront)} 
+      alt="vehicleRegistrationFront Photo Preview" 
+      width="100%" 
+    />
+             </Box>
          
                )}
                  {errorMessages.vehicleRegistrationFront && (
@@ -706,7 +778,8 @@ const currentYear = new Date().getFullYear();
           <input
             type="file"
             accept="image/*"
-              onChange={e => { setVehicleRegistrationBack(e.target.files[0]) }}
+               onChange={(e) => handleFileChange(e, setVehicleRegistrationBack)}
+
             style={{ display: 'none' }}
             id="registrationBack-photo-upload"
           />
@@ -717,8 +790,12 @@ const currentYear = new Date().getFullYear();
 
         {vehicleRegistrationBack && (
              <Box sx={{ marginTop: 1 }}>
-              <img src={URL.createObjectURL(vehicleRegistrationBack)} alt="Driver Photo  Preview" width="100%" />
-            </Box>
+                              <img 
+      src={typeof vehicleRegistrationBack === "string" ? vehicleRegistrationBack : URL.createObjectURL(vehicleRegistrationBack)} 
+      alt="vehicleRegistrationBack Photo Preview" 
+      width="100%" 
+    />
+             </Box>
          
                )}
                  {errorMessages.vehicleRegistrationBack && (
@@ -777,10 +854,10 @@ const currentYear = new Date().getFullYear();
           <ul style={{ display: 'flex', padding: 0, listStyleType: 'none', flexWrap: 'wrap' }}>
             {vehiclePhotos.map((photo, index) => (
               <li key={index} style={{ marginRight: 10, marginBottom: 10 }}>
-                <img
-                  src={URL.createObjectURL(photo)} // Show image preview
-                  alt={`Vehicle Photo ${index + 1}`}
-                  width="250px" // Adjust width as needed
+                <img 
+  src={typeof photo === "string" ? photo : URL.createObjectURL(photo)} 
+  alt={`Vehicle Photo ${index + 1}`} 
+  width="250px"
                   style={{ borderRadius: '8px', marginBottom: 10 }}
                 />
               </li>

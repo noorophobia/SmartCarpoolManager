@@ -61,7 +61,7 @@ const PendingApplications = () => {
   };
 
  
-    const handleEdit = async (id) => {
+    const handleEdit = async (id,email) => {
       alert(`Accept row with ID: ${id}`);
 
       try {
@@ -83,7 +83,26 @@ const PendingApplications = () => {
     
         if (response.ok) {
           alert('Driver approved successfully!');
-          // Optionally, refetch drivers to update the UI
+      const emailResponse = await fetch("http://localhost:5000/send-notification", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        recipientType: "specificEmail",
+        email,
+        subject: "Smart Carpool - Application Approved 🚀",
+        message: `<p>Dear Driver,</p>
+                  <p>Congratulations! Your application has been <strong>approved</strong>. You can now start using the Smart Carpool platform.</p>
+                  <p>Login to your account and start accepting rides.</p>
+                  <p>Best Regards,<br>Smart Carpool Team</p>`,
+      }),
+    });
+
+    if (!emailResponse.ok) {
+      console.error("Failed to send approval email");
+    }
+
           setDrivers((prev) =>
             prev.map((driver) =>
               driver.id === id ? { ...driver, isApproved: true } : driver
@@ -101,42 +120,73 @@ const PendingApplications = () => {
     
   
 
-  const handleDelete =  async (id) => {
-    alert(`Reject row with ID: ${id}`);
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        alert('You are not authenticated');
-        navigate('/login');
-        return;
+    const handleDelete = async (id,email) => {
+      alert(`Reject row with ID: ${id}`);
+    
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          alert('You are not authenticated');
+          navigate('/login');
+          return;
+        }
+         // STEP 1: Update approval status
+        const response = await fetch(`http://localhost:5000/drivers/application/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ isApproved: false }),
+        });
+    
+        if (!response.ok) {
+          const data = await response.json();
+          alert(`Error updating approval status: ${data.message}`);
+          return;
+        }
+    
+        // STEP 2: Delete driver only if the status update was successful
+        const res = await fetch(`http://localhost:5000/drivers/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+    
+        if (res.ok) {
+          alert('Driver rejected and removed!');
+          const emailResponse = await fetch("http://localhost:5000/send-notification", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              recipientType: "specificEmail",
+              email,
+              subject: "Smart Carpool - Application Rejected ❌",
+              message: `<p>Dear Driver,</p>
+                        <p>We regret to inform you that your application has been <strong>rejected</strong>. If you believe this was a mistake, please contact support.</p>
+                        <p>Thank you for your interest in Smart Carpool.</p>
+                        <p>Best Regards,<br>Smart Carpool Team</p>`,
+            }),
+          });
+      
+          if (!emailResponse.ok) {
+            console.error("Failed to send rejection email");
+          }
+          setDrivers((prev) => prev.filter(driver => driver.id !== id)); 
+        } else {
+          const data = await res.json();
+          alert(`Error deleting driver: ${data.message}`);
+        }
+      } catch (error) {
+        console.error('Failed to reject driver:', error);
+        alert('Failed to reject driver. Please try again.');
       }
-  
-      const response = await fetch(`http://localhost:5000/drivers/application/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ isApproved: false }), 
-      });
-  
-      if (response.ok) {
-        alert('Driver rejected !');
-        // Optionally, refetch drivers to update the UI
-        setDrivers((prev) =>
-          prev.map((driver) =>
-            driver.id === id ? { ...driver, isApproved: false } : driver
-          )
-        );
-      } else {
-        const data = await response.json();
-        alert(`Error: ${data.message}`);
-      }
-    } catch (error) {
-      console.error('Failed to approve driver:', error);
-      alert('Failed to approve driver. Please try again.');
-    }
-  };  
+    };
+     
 
   const columns = [
     { field: 'compositeId', headerName: 'ID', width: 90 },
@@ -170,7 +220,7 @@ const PendingApplications = () => {
             variant="contained"
             color="success"
             size="small"
-            onClick={() => handleEdit(params.row.id)}
+            onClick={() => handleEdit(params.row.id, params.row.email)}  
             style={{ marginRight: 8 }}
           >
             Accept
@@ -179,8 +229,8 @@ const PendingApplications = () => {
             variant="contained"
             color="error"
             size="small"
-            onClick={() => handleDelete(params.row.id)}
-          >
+            onClick={() => handleDelete(params.row.id, params.row.email)}
+            >
             Reject
           </Button>
         </Box>
@@ -191,18 +241,7 @@ const PendingApplications = () => {
   columns.forEach((column) => (column.align = 'center')); // Set all columns to 'center' alignment
   columns.forEach((column) => (column.headerAlign = 'center')); // Set all headers to 'center' alignment
 
-  const rows = [
-    {
-      id: 1,
-      name: 'John Doe',
-      gender: 'Male',
-      email: 'john.doe@example.com',
-      phoneNumber: '+1234567890',
-      cnic: '12345-1234567-1',
-      dateOfBirth: '1990-05-15',
-    },
-    // Add more rows as needed
-  ];
+   
 
   return (
     <div className="main-content">

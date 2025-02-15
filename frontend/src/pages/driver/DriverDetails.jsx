@@ -154,10 +154,10 @@ const handleCloseCarDialog = () => {
   const handleCategoryChange = (category) => {
     if (category === 'CNIC') {
  
-      setCarouselImages([ `http://localhost:5000/uploads/${vehicle.cnicFront}` , `http://localhost:5000/uploads/${vehicle.cnicBack}`]);
+      setCarouselImages([ `${vehicle.cnicFront}` , `${vehicle.cnicBack}`]);
       setSelectedCategory('CNIC');
     } else if (category === 'Vehicle Registration') {
-      setCarouselImages([ `http://localhost:5000/uploads/${vehicle.vehicleRegistrationFront}` , `http://localhost:5000/uploads/${vehicle.vehicleRegistrationBack}`]);
+      setCarouselImages([ `${vehicle.vehicleRegistrationFront}` , `${vehicle.vehicleRegistrationBack}`]);
 
        setSelectedCategory('Vehicle Registration');
     }
@@ -185,7 +185,7 @@ const handleCloseCarDialog = () => {
                   {driver1 && vehicle && (
                     <Avatar
                       alt={driver1.name}
-                      src={`http://localhost:5000/uploads/${vehicle.driverPhoto}`}
+                      src={`${vehicle.driverPhoto}`}
                       sx={{ width: 150, height: 150, marginLeft: 4 }}
                     />
                   )}
@@ -232,7 +232,7 @@ const handleCloseCarDialog = () => {
                     <CardMedia
                       component="img"
                       height="140"
-                      image={`http://localhost:5000/uploads/${vehicle.vehiclePhotos[0]}`}
+                      image={`${vehicle.vehiclePhotos[0]}`}
                       alt="Car Image"
                     />
                   )}
@@ -323,7 +323,7 @@ const handleCloseCarDialog = () => {
       {vehicle?.vehiclePhotos?.length === 1 ? (
         // Single image view
         <img
-           src={`http://localhost:5000/uploads/${vehicle.vehiclePhotos[0]}`}
+           src={`${vehicle.vehiclePhotos[0]}`}
           alt={`Vehicle Photo 1`}
           style={{ width: '100%', height: 'auto' }}
         />
@@ -334,7 +334,7 @@ const handleCloseCarDialog = () => {
             {vehicle.vehiclePhotos.map((photo, index) => (
               <div key={index}>
                 <img
-                  src={`http://localhost:5000/uploads/${photo}`}
+                  src={`${photo}`}
                   alt={`Vehicle Photo ${index + 1}`}
                   style={{ width: '50%', height: 'auto' }}
                 />

@@ -20,6 +20,7 @@ const carpoolRideSchema = new mongoose.Schema({
   driverReview: { type: String, required: false },
   date: { type: Date, default: Date.now },
   commission: { type: Number, required: true },
+  isResolved: { type:Boolean, default:false},
 
 
 

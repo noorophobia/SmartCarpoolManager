@@ -19,6 +19,7 @@ const singleRideSchema = new mongoose.Schema({
   driverRating: { type: String, required: false },
   driverReview: { type: String, required: false },
   date: { type: Date, default: Date.now },
+  isResolved: { type:Boolean, default:false},
 
   commission: { type: Number, required: true }
 
