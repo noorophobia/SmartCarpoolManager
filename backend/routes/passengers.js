@@ -145,5 +145,16 @@ router.delete('/passengers/:id', verifyToken, async (req, res) => {
     res.status(500).json({ message: 'Failed to delete passenger', error: error.message });
   }
 });
+router.get("/passengers/api/count", verifyToken, async (req, res) => {
+  try {
+    console.log("Fetching Passenger count...");
+    const count = await Passenger.countDocuments();
+    console.log("Total Passenger:", count);
+    res.status(200).json({ totalPassengers: count });
+  } catch (error) {
+    console.error("🚨 Error fetching Passenger count:", error);
+    res.status(500).json({ message: "Failed to get Passenger count", error: error.message });
+  }
+});
 
 module.exports = router;

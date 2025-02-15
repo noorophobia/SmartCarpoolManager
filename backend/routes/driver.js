@@ -209,5 +209,50 @@ router.put('/drivers/application/:id', verifyToken, async (req, res) => {
   }
 });
 
+ 
+router.get("/drivers/api/count", verifyToken, async (req, res) => {
+  try {
+    console.log("Fetching driver count...");
+    const count = await Driver.countDocuments();
+    console.log("Total drivers:", count);
+    res.status(200).json({ totalDrivers: count });
+  } catch (error) {
+    console.error("🚨 Error fetching driver count:", error);
+    res.status(500).json({ message: "Failed to get driver count", error: error.message });
+  }
+});
+router.get("/drivers/api/pending-count", verifyToken, async (req, res) => {
+  try {
+    console.log("Fetching pending applications count...");
+    
+    const count = await Driver.countDocuments({ isApproved: false }); // Count only pending applications
+
+    console.log("Total pending applications:", count);
+    
+    res.status(200).json({ pendingApplications: count });
+  } catch (error) {
+    console.error("🚨 Error fetching pending applications count:", error);
+    res.status(500).json({ message: "Failed to get pending applications count", error: error.message });
+  }
+});
+router.get("/drivers/api/approved-count", verifyToken, async (req, res) => {
+  try {
+    console.log("Fetching approved drivers count...");
+    
+    const approvedDrivers = await Driver.find({ isApproved: true }); // Fetch all approved drivers
+    console.log("Approved Drivers Found:", approvedDrivers); // ✅ Log fetched drivers
+
+    const count = approvedDrivers.length; // ✅ Get count
+
+    console.log("Total approved drivers:", count);
+    
+    res.status(200).json({ approvedApplications: count });
+  } catch (error) {
+    console.error("🚨 Error fetching approved drivers count:", error);
+    res.status(500).json({ message: "Failed to get approved drivers count", error: error.message });
+  }
+});
+
+
 
 module.exports = router;

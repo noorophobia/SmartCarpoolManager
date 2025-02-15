@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../styles/home.css';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { LineChart, Line, XAxis, YAxis, Tooltip as LineTooltip, Legend } from 'recharts';
 import { ToggleButton, ToggleButtonGroup } from '@mui/material'; // Import Material UI components
 import { useLocation } from "react-router-dom";
+import axios from 'axios';
 
 // Line Chart Data and Setup
 const lineData = [
@@ -20,11 +21,7 @@ const dailyRevenueData = [
   { name: 'Jan-6', revenue: 170 },
   { name: 'Jan-7', revenue: 140 },
 ];
- // Pie Chart Data for Approved and Pending Requests
-const pieData = [
-  { name: 'Approved Requests', value: 80 },  
-  { name: 'Pending Requests', value: 20 },   
-];
+ 
 
 // Colors for Pie chart segments
 const COLORS = ['#4CAF50', '#FFC107'];
@@ -32,28 +29,119 @@ const COLORS = ['#4CAF50', '#FFC107'];
 const Home = () => {
     
   const [view, setView] = useState('monthly'); // State to track current view (daily or monthly)
+  const[driverCount,setDriverCount]=useState(0);
+  const[passengerCount,setPassengerCount]=useState(0);
+  const[pendingCount,setPendingCount]=useState(0);
+  const[approvedCount,setApprovedCount]=useState(0);
+  useEffect(() => {
+    const fetchDriverCount = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get("http://localhost:5000/drivers/api/count", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+  
+        console.log("API Response:", response.data); 
+  
+        if (typeof response.data.totalDrivers === "number") {
+          setDriverCount(response.data.totalDrivers);
+        } else {
+          console.error("Unexpected response format:", response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching driver count:", error);
+        setDriverCount("Error fetching data"); // Prevent React from rendering an object
+      }
+    };
+    const fetchPassengerCount = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get("http://localhost:5000/passengers/api/count", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+  
+        console.log("API Response:", response.data); 
+  
+        if (typeof response.data.totalPassengers === "number") {
+          setPassengerCount(response.data.totalPassengers);
+        } else {
+          console.error("Unexpected response format:", response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching passenger count:", error);
+        setDriverCount("Error fetching data"); // Prevent React from rendering an object
+      }
+    };
+    const fetchPendingCount = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get("http://localhost:5000/drivers/api/pending-count", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+  
+        console.log("API Response:", response.data); 
+  
+        if (typeof response.data.pendingApplications === "number") {
+          setPendingCount(response.data.pendingApplications);
+        } else {
+          console.error("Unexpected response format:", response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching driver count:", error);
+        setDriverCount("Error fetching data"); // Prevent React from rendering an object
+      }
+    };
+    const fetchApprovedCount = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get("http://localhost:5000/drivers/api/approved-count", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+  
+        console.log("API Response:", response.data); 
+  
+        if (typeof response.data.approvedApplications === "number") {
+          setApprovedCount(response.data.approvedApplications);
+        } else {
+          console.error("Unexpected response format:", response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching driver count:", error);
+        setDriverCount("Error fetching data"); // Prevent React from rendering an object
+      }
+    };
+  
+    fetchDriverCount();
+    fetchPassengerCount();
+    fetchPendingCount();
+    fetchApprovedCount();
+  }, []);
   
   // Toggle between daily and monthly views
   const handleViewToggle = () => {
     setView((prevView) => (prevView === 'daily' ? 'monthly' : 'daily'));
   };
+  const pieData = [
+    { name: "Approved Requests", value: approvedCount },
+    { name: "Pending Requests", value: pendingCount },
+  ];
 
   return (
     <div className="home">
       <span className="heading">Analytics</span>
       <div className="box box1">
         <span className="box-heading">Total Drivers</span>
-        <span className="number">12</span>
+        <span className="number">{typeof driverCount === "number" ? driverCount : "Loading..."}</span>
         <img src="driver_black.svg" alt="Driver Icon" className="icon" />
       </div>
       <div className="box box2">
-        <span className="box-heading">Active Drivers</span>
-        <span className="number">12</span>
+        <span className="box-heading">Pending Applications</span>
+        <span className="number">{typeof pendingCount === "number" ? pendingCount : "Loading..."}</span>
         <img src="driver_black.svg" alt="Driver Icon" className="icon" />
       </div>
       <div className="box box3">
-        <span className="box-heading">Pending Applications</span>
-        <span className="number">12</span>
+        <span className="box-heading">Approved Applications</span>
+        <span className="number">{typeof approvedCount === "number" ? approvedCount : "Loading..."}</span>
         <img src="pending_black.svg" alt="Form Icon" className="icon" />
       </div>
       <div className="box box4">
@@ -78,7 +166,7 @@ const Home = () => {
       </div>
       <div className="box box8">
         <span className="box-heading">Total Passengers</span>
-        <span className="number">10</span>
+        <span className="number">{typeof passengerCount === "number" ? passengerCount : "Loading..."}</span>
         <img src="passenger_black.svg" alt="Passengers Icon" className="icon" />
       </div>
 
