@@ -9,9 +9,9 @@ const singleRideSchema = new mongoose.Schema({
     enum: ['Ongoing', 'Completed', 'Cancelled'],
     default: 'Ongoing',
   },
-  paymentIds: { type: mongoose.Schema.Types.ObjectId, ref: 'Payment' },
+  paymentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Payment' },
   vehicleId: { type: mongoose.Schema.Types.ObjectId, ref: 'Vehicle' },
-  compositeId: { type: String, required: false }, // Unique identifier for carpool
+  compositeId: { type: String, required: false },  
 
   driverId: { type: mongoose.Schema.Types.ObjectId, ref: 'Driver', required: true },
   passengerRating: { type: String, required: false },

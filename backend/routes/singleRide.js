@@ -1,58 +1,47 @@
 const express = require('express');
-const mongoose = require('mongoose');
-const SingleRide = require('../models/SingleRide'); // Import the SingleRide model
-const verifyToken = require('../middleware/auth');
-
 const router = express.Router();
+const SingleRide = require('../models/SingleRide'); // Import SingleRide model
 
-// Function to generate a unique composite ride ID
+// Function to generate a composite single ride ID
 const generateCompositeId = async () => {
-  const rideCount = await SingleRide.countDocuments();
-  return `SG-RIDE-${String(rideCount + 1).padStart(3, '0')}`; // Generates IDs like SG-RIDE-001, SG-RIDE-002, etc.
+    const rideCount = await SingleRide.countDocuments();
+    return `SINGLE-RIDE-${String(rideCount + 1).padStart(3, '0')}`;
 };
 
-// Fetch all rides and ensure compositeId is set
-router.get('/single-rides', verifyToken, async (req, res) => {
-  try {
-    // Find all rides that are missing a compositeId
-    const ridesWithoutCompositeId = await SingleRide.find({ compositeId: { $exists: false } });
-
-    // Update each ride with a new compositeId
-    for (const ride of ridesWithoutCompositeId) {
-      ride.compositeId = await generateCompositeId();
-      await ride.save();
+// Get all single rides (GET) with composite ID
+router.get('/single-rides', async (req, res) => {
+    try {
+        const singleRides = await SingleRide.find().populate('paymentId vehicleId driverId');
+        const ridesWithCompositeId = await Promise.all(
+            singleRides.map(async (ride) => {
+                if (!ride.compositeId) {
+                    ride.compositeId = await generateCompositeId();
+                    await ride.save();
+                }
+                return ride;
+            })
+        );
+        res.status(200).json(ridesWithCompositeId);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
-
-    // Fetch all rides after ensuring compositeId is set
-    const rides = await SingleRide.find()
-      .populate('driverId', 'name email phoneNumber') // Populate driver details
-      .populate('vehicleId', 'model plateNumber') // Populate vehicle details
-      .populate('paymentIds'); // Populate payment details (optional)
-
-    res.status(200).json(rides);
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch rides', error: error.message });
-  }
 });
 
-// Fetch a specific ride by ID
-router.get('/single-ride/:id', verifyToken, async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const ride = await SingleRide.findById(id)
-      .populate('driverId', 'name email phoneNumber')
-      .populate('vehicleId', 'model plateNumber')
-      .populate('paymentIds');
-
-    if (!ride) {
-      return res.status(404).json({ message: 'Ride not found' });
+// Get a single ride by ID (GET) with composite ID
+router.get('/single-rides/:id', async (req, res) => {
+    try {
+        const singleRide = await SingleRide.findById(req.params.id).populate('paymentId vehicleId driverId');
+        if (!singleRide) return res.status(404).json({ message: 'Single Ride not found' });
+        
+        if (!singleRide.compositeId) {
+            singleRide.compositeId = await generateCompositeId();
+            await singleRide.save();
+        }
+        
+        res.status(200).json(singleRide);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
-
-    res.status(200).json(ride);
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch ride details', error: error.message });
-  }
 });
 
 module.exports = router;

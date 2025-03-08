@@ -1,12 +1,12 @@
-// routes/drivers.js
 
 const express = require('express');
 const mongoose = require('mongoose');
-const Driver = require('../models/Driver'); // Import the Driver model
+const Driver = require('../models/Driver');  
 const verifyToken= require('../middleware/auth');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+
 // Fetch all drivers
 router.get('/drivers',verifyToken, async (req, res) => {
   try {
@@ -16,6 +16,7 @@ router.get('/drivers',verifyToken, async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch drivers' });
   }
 });
+
 // Fetch approved drivers
 router.get('/drivers/approved', verifyToken, async (req, res) => {
   try {
@@ -35,20 +36,19 @@ router.get('/drivers/not-approved', verifyToken, async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch not approved drivers' });
   }
 });
+
 // Fetch a single driver by ID
 router.get('/drivers/:id', verifyToken,async (req, res) => {
   const { id } = req.params;
 
   try {
-    // Find the driver by the compositeId or MongoDB _id
-    const driver = await Driver.findById(id);  // MongoDB's findById method
+     const driver = await Driver.findById(id);   
 
-    // If the driver is not found, return a 404 error
-    if (!driver) {
+     if (!driver) {
       return res.status(404).json({ message: 'Driver not found' });
     }
 
-    res.status(200).json(driver);  // Return the driver details as JSON
+    res.status(200).json(driver);  
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch driver details', error: error.message });
   }
@@ -58,7 +58,7 @@ router.get('/drivers/:id', verifyToken,async (req, res) => {
 // Function to generatappe composite ID
 const generateCompositeId = async () => {
   const driverCount = await Driver.countDocuments();
-  return `DR-${String(driverCount + 1).padStart(3, '0')}`; // Generate ID like DR-001, DR-002, etc.
+  return `DR-${String(driverCount + 1).padStart(3, '0')}`; 
 };
 
 // Add a new driver
@@ -70,8 +70,7 @@ router.post('/drivers', verifyToken, async (req, res) => {
       return res.status(400).json({ message: 'Date of Birth required.' });
     }
 
-    // Generate the composite ID before saving the driver
-    const compositeId = await generateCompositeId();
+     const compositeId = await generateCompositeId();
 
     const isApproved = false;
     const createdAt = new Date();
@@ -81,25 +80,23 @@ const hashedPassword = await bcrypt.hash(password, saltRounds);
       name,
       gender,
       email,
-      password: hashedPassword, // Store the hashed password
+      password: hashedPassword, 
 
       phoneNumber,
       cnic,
       dateOfBirth,
       ratings,
-      compositeId,  // Include compositeId when creating the driver
-      isApproved,   // Explicitly set default if missing
-      createdAt,    // Ensure createdAt is always set to the current time
+      compositeId,   
+      isApproved,  
+      createdAt,     
     });
 
-    // Save the driver with compositeId
-    const savedDriver = await newDriver.save();
+     const savedDriver = await newDriver.save();
 
-    // Send back the newly created driver, including compositeId and _id
-    res.status(201).json({
+     res.status(201).json({
       id: savedDriver._id,         // MongoDB's _id
-      compositeId: savedDriver.compositeId, // The custom composite ID
-      ...savedDriver.toObject()    // Convert Mongoose document to plain object and spread the rest of the fields
+      compositeId: savedDriver.compositeId,  
+      ...savedDriver.toObject()    
     });
 
   } catch (error) {
@@ -115,8 +112,7 @@ router.put('/drivers/:id', verifyToken, async (req, res) => {
   const { name, gender, email, phoneNumber, cnic, dateOfBirth, ratings } = req.body;
 
   try {
-    // Build the update object dynamically to avoid overwriting missing fields
-    const updateFields = {
+     const updateFields = {
       ...(name && { name }),
       ...(gender && { gender }),
       ...(email && { email }),
@@ -130,11 +126,10 @@ router.put('/drivers/:id', verifyToken, async (req, res) => {
     const driver = await Driver.findByIdAndUpdate(
       id,
       updateFields,
-      { new: true } // Return the updated driver
+      { new: true }  
     );
 
-    // If no driver is found, return an error
-    if (!driver) {
+     if (!driver) {
       return res.status(404).json({ message: 'Driver not found' });
     }
 
@@ -162,41 +157,36 @@ router.get('/drivers/composite/:compositeId', verifyToken, async (req, res) => {
  
   const { compositeId } = req.params;
 
-  console.log("Received compositeId:", compositeId); // This should log the compositeId value
+  console.log("Received compositeId:", compositeId);  
 
   try {
-    // Find the driver by compositeId
-    const driver = await Driver.findOne({ compositeId: compositeId });  // Find driver based on compositeId
+     const driver = await Driver.findOne({ compositeId: compositeId });   
 
  console.log(driver);
-    // If the driver is not found, return a 404 error
-    if (!driver) {
+     if (!driver) {
       return res.status(404).json({ message: 'Driver not found' });
     }
 
-    res.status(200).json(driver);  // Return the driver details as JSON
+    res.status(200).json(driver);   
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch driver details', error: error.message });
   }
 });
 
-// Update driver details (including isApproved)
-// Update driver's approval status (accept/reject)
-router.put('/drivers/application/:id', verifyToken, async (req, res) => {
+ router.put('/drivers/application/:id', verifyToken, async (req, res) => {
   const { id } = req.params;
-  const { isApproved } = req.body; // isApproved is either true or false
+  const { isApproved } = req.body;  
 
   try {
-    // Ensure the isApproved field is provided and is a boolean
-    if (typeof isApproved !== 'boolean') {
+     if (typeof isApproved !== 'boolean') {
       return res.status(400).json({ message: 'Invalid approval status' });
     }
 
     // Find and update the driver by ID
     const driver = await Driver.findByIdAndUpdate(
       id,
-      { isApproved: isApproved },  // Update isApproved field
-      { new: true }  // Return the updated driver
+      { isApproved: isApproved },   
+      { new: true }  
     );
 
     if (!driver) {
@@ -217,7 +207,7 @@ router.get("/drivers/api/count", verifyToken, async (req, res) => {
     console.log("Total drivers:", count);
     res.status(200).json({ totalDrivers: count });
   } catch (error) {
-    console.error("🚨 Error fetching driver count:", error);
+    console.error(" Error fetching driver count:", error);
     res.status(500).json({ message: "Failed to get driver count", error: error.message });
   }
 });
@@ -225,13 +215,13 @@ router.get("/drivers/api/pending-count", verifyToken, async (req, res) => {
   try {
     console.log("Fetching pending applications count...");
     
-    const count = await Driver.countDocuments({ isApproved: false }); // Count only pending applications
+    const count = await Driver.countDocuments({ isApproved: false }); 
 
     console.log("Total pending applications:", count);
     
     res.status(200).json({ pendingApplications: count });
   } catch (error) {
-    console.error("🚨 Error fetching pending applications count:", error);
+    console.error(" Error fetching pending applications count:", error);
     res.status(500).json({ message: "Failed to get pending applications count", error: error.message });
   }
 });
@@ -239,16 +229,16 @@ router.get("/drivers/api/approved-count", verifyToken, async (req, res) => {
   try {
     console.log("Fetching approved drivers count...");
     
-    const approvedDrivers = await Driver.find({ isApproved: true }); // Fetch all approved drivers
-    console.log("Approved Drivers Found:", approvedDrivers); // ✅ Log fetched drivers
+    const approvedDrivers = await Driver.find({ isApproved: true }); 
+    console.log("Approved Drivers Found:", approvedDrivers);  
 
-    const count = approvedDrivers.length; // ✅ Get count
+    const count = approvedDrivers.length; 
 
     console.log("Total approved drivers:", count);
     
     res.status(200).json({ approvedApplications: count });
   } catch (error) {
-    console.error("🚨 Error fetching approved drivers count:", error);
+    console.error(" Error fetching approved drivers count:", error);
     res.status(500).json({ message: "Failed to get approved drivers count", error: error.message });
   }
 });

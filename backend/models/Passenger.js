@@ -4,7 +4,7 @@ const passengerSchema = new mongoose.Schema({
   name: { type: String, required: true, maxlength: 50 },
   email: { type: String, required: true, unique: true, maxlength: 50 },
   password: { type: String, required: true },
-  gender: { type: String, enum: ['Male', 'Female'], required: true },
+  gender: { type: String, enum: ['male', 'female'], required: true },
   Photo: { type: String }, 
   compositeId: { type: String, required: false }, 
   rating: { 

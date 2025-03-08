@@ -100,8 +100,8 @@ const AddPassenger = () => {
       setErrorMessages((prev) => ({ ...prev, name: "Name is required" }));
       hasError = true;
     }
-    if (!['Male', 'Female'].includes(gender)) {
-      setErrorMessages((prev) => ({ ...prev, gender: "Gender must be Male or Female" }));
+    if (!['male', 'female'].includes(gender)) {
+      setErrorMessages((prev) => ({ ...prev, gender: "Gender must be male or female" }));
       hasError = true;
     }
     if (!email.match(/^\S+@\S+\.\S+$/) || !email) {
@@ -197,8 +197,8 @@ const AddPassenger = () => {
             onChange={handleChange}
             error={!!errorMessages.gender}
           >
-            <MenuItem value="Male">Male</MenuItem>
-            <MenuItem value="Female">Female</MenuItem>
+            <MenuItem value="male">male</MenuItem>
+            <MenuItem value="female">female</MenuItem>
           </Select>
         </FormControl>
 
