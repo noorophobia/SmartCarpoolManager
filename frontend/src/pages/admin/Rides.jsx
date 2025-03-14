@@ -1,134 +1,44 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { Link } from "react-router-dom"; // Import Link to navigate to the details page
 
 const Rides = () => {
-  const [rides, setRides] = useState([]); // Holds the rides data
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [driversData, setDriversData] = useState({}); // Holds all drivers' data
-  const [passengerData, setPassengerData] = useState({}); // Holds passenger data
-  const navigate = useNavigate();
-
-  const token = localStorage.getItem("token");
-
-  // Fetch rides data
-  useEffect(() => {
-    const fetchRides = async () => {
-      setLoading(true);
-      setError(null); // Reset error on each fetch
-
-      try {
-        const response = await axios.get("http://localhost:5000/rides", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (response.status === 200) {
-          const ridesData = response.data;
-          setRides(ridesData); // Set the fetched rides data
-
-          // Extract driver IDs and fetch driver data for all drivers in one go
-          const driverIds = [...new Set(ridesData.map((ride) => ride.driverId))];
-          const driverPromises = driverIds.map((driverId) =>
-            axios.get(`http://localhost:5000/drivers/${driverId}`, {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            })
-          );
-
-          // Fetch driver data
-          const driverResponses = await Promise.all(driverPromises);
-          const driversMap = driverResponses.reduce((acc, driver) => {
-            if (driver.status === 200) {
-              acc[driver.data._id] = driver.data; // Map driver ID to driver data
-            }
-            return acc;
-          }, {});
-
-          setDriversData(driversMap); // Set the drivers data
-
-          // Now fetch passenger data
-          const passengerIds = ridesData.flatMap((ride) => ride.passengerIds);
-          const uniquePassengerIds = [...new Set(passengerIds)];
-          const passengerPromises = uniquePassengerIds.map((passengerId) =>
-            axios.get(`http://localhost:5000/passengers/${passengerId}`, {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            })
-          );
-
-          const passengerResponses = await Promise.all(passengerPromises);
-          const passengersMap = passengerResponses.reduce((acc, passenger) => {
-            if (passenger.status === 200) {
-              acc[passenger.data._id] = passenger.data;
-            }
-            return acc;
-          }, {});
-
-          setPassengerData(passengersMap); // Set passenger data
-        }
-      } catch (err) {
-        console.error("Error fetching rides data:", err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-     
-    fetchRides();
-  }, [token]);
-  
   const columns = [
     { field: "rideID", headerName: "Ride ID", width: 120 },
     { field: "pickUpLocation", headerName: "Pick-Up Location", width: 200 },
     { field: "dropOffLocation", headerName: "Drop-Off Location", width: 200 },
     { field: "rideMode", headerName: "Ride Mode", width: 150 },
     { field: "rideStatus", headerName: "Ride Status", width: 150 },
+    
     {
       field: "passenger",
-      headerName: "Passenger (Composite ID)",
-      flex: 1,
-      minWidth: 150,
-      renderCell: (params) => {
-        const passenger = passengerData[params.value];
-        return (
-          <Link to={`/passenger-details/${params.value}`}>
-            <Button variant="text" color="primary" size="small">
-              {passenger ? passenger.compositeId : "Loading..."}
-            </Button>
-          </Link>
-        );
-      },
+      headerName: "Passenger (ID)",
+      flex: 1,  // Use flex instead of width for dynamic width
+      minWidth: 150,  // Minimum width to ensure the column is readable
+      renderCell: (params) => (
+        <Link to={`/passenger-details/${params.value}`}>
+          <Button variant="text" color="primary" size="small">
+            {params.value}
+          </Button>
+        </Link>
+      ),
     },
     {
       field: "driver",
-      headerName: "Driver (Composite ID)",
-      flex: 1,
-      minWidth: 100,
-      renderCell: (params) => {
-        const driver = driversData[params.value]; // Fetch driver data from state
-        return (
-          <Button
-            variant="text"
-            color="primary"
-            size="small"
-            onClick={() => navigate(`/drivers/${params.value}`)}
-          >
-            {driver ? driver.compositeId : "Loading..."}
+      headerName: "Driver (ID)",
+      flex: 1,  // Use flex for dynamic width
+      minWidth: 100,  // Minimum width to ensure the button is not too small
+      renderCell: (params) => (
+        <Link to={`/driver-details/${params.value}`}>
+          <Button variant="text" color="primary" size="small">
+            {params.value}
           </Button>
-        );
-      },
+        </Link>
+      ),
     },
+    
     {
       field: "viewDetails",
       headerName: "View Details",
@@ -143,6 +53,39 @@ const Rides = () => {
     },
   ];
 
+  const rows = [
+    {
+      id: 1,
+      rideID: "RIDE123",
+      pickUpLocation: "Model Town",
+      dropOffLocation: "Liberty Market",
+      rideMode: "Carpool",
+      rideStatus: "Ongoing",
+      noOfPassengers: 3,
+      paymentID: "PAY5678",
+      amount: 150.0,
+      paymentType: "Credit Card",
+      paymentStatus: "Completed",
+      passenger: "1",
+      driver: "2",
+    },
+    {
+      id: 2,
+      rideID: "RIDE124",
+      pickUpLocation: "DHA",
+      dropOffLocation: "Gulberg",
+      rideMode: "Single",
+      rideStatus: "Completed",
+      noOfPassengers: 1,
+      paymentID: "PAY5679",
+      amount: 500.0,
+      paymentType: "Cash",
+      paymentStatus: "Completed",
+      passenger: "124",
+      driver: "457",
+    },
+  ];
+
   return (
     <div className="main-content">
       <div className="header">
@@ -150,17 +93,10 @@ const Rides = () => {
        </div>
       <div style={{ marginTop: "20px" }}>
         <Box sx={{ height: 500, width: "100%" }}>
-      {  <DataGrid
+          <DataGrid
             className="dataGrid"
-            rows={rides.map((ride) => ({
-              ...ride,
-              id: ride._id, 
-               driver: ride.driverId, 
-              passenger: ride.passengerIds[0], 
-            }))}
+            rows={rows}
             columns={columns}
-            pageSize={5}
-            disableRowSelectionOnClick
             slots={{ toolbar: GridToolbar }}
             slotProps={{
               toolbar: {
@@ -168,15 +104,12 @@ const Rides = () => {
                 quickFilterProps: { debounceMs: 500 },
               },
             }}
+            pageSizeOptions={[5, 10, 20]} // Allow users to choose 5, 10, or 20 records per page
+            //checkboxSelection
+            disableRowSelectionOnClick
           />
-          }
-
         </Box>
       </div>
-
-      {/* Display loading or error messages */}
-      {loading && <p>Loading data...</p>}
-      {error && <p>Error: {error}</p>}
     </div>
   );
 };
