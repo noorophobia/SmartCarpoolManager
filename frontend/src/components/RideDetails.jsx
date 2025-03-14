@@ -5,7 +5,7 @@ import '../styles/rideDetails.css'; // Import the CSS file
 
 const RideDetails = () => {
   const { rideID } = useParams(); // Get ride ID from the URL
-
+ console.log(rideID);
   // Dummy data to simulate a fetch request
   const rideData = {
     RIDE123: {

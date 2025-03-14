@@ -1,16 +1,66 @@
-import React, { useState } from "react";
+ import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom'; 
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { Link } from "react-router-dom"; // Import Link to navigate to the details page
 
 const Rides = () => {
+  const [rides, setRides] = useState([]);  
+     const navigate = useNavigate();
+  
+     useEffect(() => {
+      const fetchRides = async () => {
+        try {
+           const token = localStorage.getItem('token');  
+           
+             if (!token) {
+               navigate('/login');
+              return;
+            }
+            
+            console.log('Token:', token);
+  
+          const response = await fetch('http://localhost:5000/single-rides', {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,  
+              'Content-Type': 'application/json',
+            },
+          });
+          
+          const data = await response.json();
+          console.log(data);
+  
+       /*   const mappedData = Array.isArray(data)
+          ? data.map(driver => ({
+              id: driver._id,
+              compositeId: driver.compositeId, // Add compositeId here
+              name: driver.name,
+              gender: driver.gender,
+              email: driver.email,
+              phoneNumber: driver.phoneNumber,
+              cnic: driver.cnic,
+              dateOfBirth: driver.dateOfBirth,
+            }))
+          : [];*/
+        
+  
+          setRides(data);  
+        } catch (error) {
+          console.error('Failed to fetch drivers:', error);
+        }
+      };
+    
+      fetchRides();  
+    }, []);
+  
   const columns = [
-    { field: "rideID", headerName: "Ride ID", width: 120 },
-    { field: "pickUpLocation", headerName: "Pick-Up Location", width: 200 },
-    { field: "dropOffLocation", headerName: "Drop-Off Location", width: 200 },
-    { field: "rideMode", headerName: "Ride Mode", width: 150 },
-    { field: "rideStatus", headerName: "Ride Status", width: 150 },
+    { field: "compositeId", headerName: "Ride ID", width: 180 },
+    { field: "requestOrigin", headerName: "Pick-Up Location", width: 220 },
+    { field: "requestDestination", headerName: "Drop-Off Location", width: 220 },
+    { field: "requestType", headerName: "Ride Mode", width: 150 },
+    { field: "status", headerName: "Ride Status", width: 150 },
     
     {
       field: "passenger",
@@ -44,7 +94,7 @@ const Rides = () => {
       headerName: "View Details",
       width: 200,
       renderCell: (params) => (
-        <Link to={`/ride-details/${params.row.rideID}`}>
+        <Link to={`/ride-details/${params.row._id}`}>
           <Button variant="contained" color="primary" size="small">
             View Details
           </Button>
@@ -95,15 +145,16 @@ const Rides = () => {
         <Box sx={{ height: 500, width: "100%" }}>
           <DataGrid
             className="dataGrid"
-            rows={rows}
+       rows={rides}
             columns={columns}
-            slots={{ toolbar: GridToolbar }}
-            slotProps={{
-              toolbar: {
-                showQuickFilter: true,
-                quickFilterProps: { debounceMs: 500 },
-              },
-            }}
+            getRowId={(row) => row.compositeId || row._id}  // Fallback to _id if compositeId is missing
+               slots={{ toolbar: GridToolbar }}
+                        slotProps={{
+                          toolbar: {
+                            showQuickFilter: true,
+                            quickFilterProps: { debounceMs: 500 },
+                          },
+                        }}            
             pageSizeOptions={[5, 10, 20]} // Allow users to choose 5, 10, or 20 records per page
             //checkboxSelection
             disableRowSelectionOnClick

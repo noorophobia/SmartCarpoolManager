@@ -3,25 +3,26 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
- const bodyParser = require("body-parser");
- const dotenv = require("dotenv");
+  const dotenv = require("dotenv");
  dotenv.config();
  const helmet = require('helmet');
- const bcrypt = require('bcryptjs');
-    require('dotenv').config();
+     require('dotenv').config();
 
+    // routes
  const notificationRoutes = require("./routes/notification");
  const rateSettingsRoute = require('./routes/rate-settings');  
 const driversRoutes = require('./routes/driver');  
 const vehiclesRoutes=require('./routes/vehicle')
-const adminRoutes = require('./routes/admin');  // Import the admin routes
+const adminRoutes = require('./routes/admin');   
  const packagesRoutes=require('./routes/packages');
  const passengerRoutes=require('./routes/passengers');
 const complaintRoutes=require('./routes/complaints');
 const rideRoutes = require("./routes/ride");
+const singlerideRoutes = require("./routes/single-rides");
+const carpoolrideRoutes = require("./routes/carpoolRide");
 const paymentRoutes = require("./routes/payment");
-
-const { insertAdmin } = require('./routes/insertAdmin');  // Import the insertAdmin function
+//  insertAdmin function
+const { insertAdmin } = require('./routes/insertAdmin');   
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -45,22 +46,19 @@ app.use(helmet({
 
 app.use(cors({
   origin: 'http://localhost:5173' , // Allow only frontend domain
-  methods: ['GET', 'POST', 'DELETE', 'PUT','OPTIONS'], // Allow DELETE method
-//y methods
+  methods: ['GET', 'POST', 'DELETE', 'PUT','OPTIONS'],  
   allowedHeaders: ['Content-Type', 'Authorization']
 
 }));
 
-// Then your static routes
-app.use('/uploads', express.static('uploads'));
-
+  
 app.use(express.json()); // Parse JSON request bodies
 // Use the drivers route
 app.use(express.urlencoded({ extended: true }));
 
 app.use(driversRoutes);
-
-
+app.use(singlerideRoutes);
+app.use(carpoolrideRoutes);
 app.use(packagesRoutes);
 app.use(notificationRoutes);
 app.use(passengerRoutes);
@@ -71,11 +69,7 @@ app.use("/api/admin", adminRoutes);
 app.use(rideRoutes);
 app.use(paymentRoutes);
 
-app.get('/uploads/:imageName', (req, res) => {
-  const imageName = req.params.imageName;
-  const imagePath = path.join(__dirname, 'uploads', imageName);
-  res.sendFile(imagePath);
-});
+ 
 // MongoDB connection
 console.log('MongoDB URI:', process.env.MONGO_URI);
 mongoose.connect(process.env.MONGO_URI)

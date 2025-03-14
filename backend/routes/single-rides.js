@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const SingleRide = require('../models/SingleRide'); // Import SingleRide model
+const SingleRide = require('../models/single-rides'); // Import SingleRide model
 
 // Function to generate a composite single ride ID
 const generateCompositeId = async () => {
@@ -11,18 +11,24 @@ const generateCompositeId = async () => {
 // Get all single rides (GET) with composite ID
 router.get('/single-rides', async (req, res) => {
     try {
-        const singleRides = await SingleRide.find().populate('paymentId vehicleId driverId');
-        const ridesWithCompositeId = await Promise.all(
-            singleRides.map(async (ride) => {
-                if (!ride.compositeId) {
-                    ride.compositeId = await generateCompositeId();
-                    await ride.save();
-                }
-                return ride;
-            })
-        );
-        res.status(200).json(ridesWithCompositeId);
+        console.log("Fetching all single rides");
+
+        const singleRides = await SingleRide.find();
+
+        console.log("Fetched Single Rides:", singleRides);
+
+        // Loop through rides and ensure they have compositeId
+        for (let ride of singleRides) {
+            if (!ride.compositeId) {
+                ride.compositeId = await generateCompositeId();
+                await SingleRide.updateOne({ _id: ride._id }, { $set: { compositeId: ride.compositeId } });
+                console.log(`Updated ride ${ride._id} with Composite ID: ${ride.compositeId}`);
+            }
+        }
+
+        res.status(200).json(singleRides);
     } catch (error) {
+        console.error("Error fetching rides:", error.message);
         res.status(500).json({ error: error.message });
     }
 });
