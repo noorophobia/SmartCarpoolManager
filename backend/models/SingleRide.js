@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 
 const singleRideSchema = new mongoose.Schema({
   rideID: { type: String, required: true, unique: true },
-  pickUpLocation: { type: String, required: true },
-  dropOffLocation: { type: String, required: true },
+  pickUp: { type: String, required: true },
+  dropOff: { type: String, required: true },
   rideStatus: {
     type: String,
     enum: ['Ongoing', 'Completed', 'Cancelled'],
