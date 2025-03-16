@@ -13,10 +13,11 @@ const singleRideSchema = new mongoose.Schema({
 
   paymentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Payment',default:null },
   vehicleId: { type: mongoose.Schema.Types.ObjectId, ref: 'Vehicle',default:null },
-  compositeId: { type: String, unique: true },
-  passengerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Passenger', default: null },
-  driverId: { type: mongoose.Schema.Types.ObjectId, ref: 'Driver', default: null },
-  passengerRating: { type: String, required: false },
+   
+  passengerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Passenger' },
+    driverID: { type: mongoose.Schema.Types.ObjectId, ref: 'Driver' },
+
+   passengerRating: { type: String, required: false },
   passengerReview: { type: String, required: false },
   driverRating: { type: String, required: false },
   driverReview: { type: String, required: false },

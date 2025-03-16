@@ -1,138 +1,189 @@
- import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import { Link } from "react-router-dom"; // Import Link to navigate to the details page
+import { Link } from "react-router-dom";
 
 const Rides = () => {
-  const [rides, setRides] = useState([]);  
-     const navigate = useNavigate();
-  
-     useEffect(() => {
-      const fetchRides = async () => {
-        try {
-           const token = localStorage.getItem('token');  
-           
-             if (!token) {
-               navigate('/login');
-              return;
-            }
-            
-            console.log('Token:', token);
-  
-          const response = await fetch('http://localhost:5000/single-rides', {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${token}`,  
-              'Content-Type': 'application/json',
-            },
-          });
-          
-          const data = await response.json();
-          console.log(data);
-  
-       /*   const mappedData = Array.isArray(data)
-          ? data.map(driver => ({
-              id: driver._id,
-              compositeId: driver.compositeId, // Add compositeId here
-              name: driver.name,
-              gender: driver.gender,
-              email: driver.email,
-              phoneNumber: driver.phoneNumber,
-              cnic: driver.cnic,
-              dateOfBirth: driver.dateOfBirth,
-            }))
-          : [];*/
-        
-  
-          setRides(data);  
-        } catch (error) {
-          console.error('Failed to fetch drivers:', error);
+  const [rides, setRides] = useState([]);
+  const navigate = useNavigate();
+  useEffect(() => {
+    const fetchRides = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/login");
+          return;
         }
-      };
-    
-      fetchRides();  
-    }, []);
   
+        console.log("Token:", token);
+  
+        // Fetch single rides
+        const ridesResponse = await fetch("http://localhost:5000/single-rides", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        let ridesData = await ridesResponse.json();
+        ridesData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  
+        // Fetch carpool rides
+        const carpoolRidesResponse = await fetch("http://localhost:5000/carpool-rides", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        let carpoolRidesData = await carpoolRidesResponse.json();
+   
+        // Extract unique passenger and driver IDs from single rides
+        const passengerIds = [...new Set(ridesData.map((ride) => ride.passengerId))];
+        const driverIds = [...new Set(ridesData.map((ride) => ride.driverID))];
+  
+        // Extract unique passenger and driver IDs from carpool rides
+        const carpoolPassengerIds = [
+          ...new Set(carpoolRidesData.flatMap((ride) => ride.passengerId))
+        ];
+        const carpoolDriverIds = [...new Set(carpoolRidesData.map((ride) => ride.driverID))];
+  
+        // Function to fetch composite IDs for passengers and drivers
+        const fetchCompositeIds = async (ids, type) => {
+          const idMap = {};
+          await Promise.all(
+            ids.map(async (id) => {
+              try {
+                const response = await fetch(`http://localhost:5000/${type}/${id}`, {
+                  method: "GET",
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                  },
+                });
+  
+                const data = await response.json();
+                if (data && data.compositeId) {
+                  idMap[id] = data.compositeId;
+                }
+              } catch (error) {
+                console.error(`Failed to fetch ${type} ${id}:`, error);
+              }
+            })
+          );
+          return idMap;
+        };
+  
+        // Fetch composite IDs for single ride passengers and drivers
+        const [passengerMap, driverMap] = await Promise.all([
+          fetchCompositeIds(passengerIds, "passengers"),
+          fetchCompositeIds(driverIds, "drivers"),
+        ]);
+  
+        // Fetch composite IDs for carpool passengers and drivers
+        const [carpoolPassengerMap, carpoolDriverMap] = await Promise.all([
+          fetchCompositeIds(carpoolPassengerIds, "passengers"),
+          fetchCompositeIds(carpoolDriverIds, "drivers"),
+        ]);
+  
+        // Add compositeId mapping for single rides
+        const updatedRides = ridesData.map((ride) => ({
+          ...ride,
+          mode: ride.requestType || "Unknown",
+          passengerCompositeId: passengerMap[ride.passengerId] || "N/A",
+          driverCompositeId: driverMap[ride.driverID] || "N/A",
+        }));
+  
+        // Add compositeId mapping for carpool rides (passengers array and driver)
+        const updatedCarpoolRides = carpoolRidesData.map((ride) => ({
+          ...ride,
+          passengerCompositeId: ride.passengerId.map((id) => carpoolPassengerMap[id] || "N/A"),
+          driverCompositeId: carpoolDriverMap[ride.driverID] || "N/A",
+        }));
+  
+        // Merge both arrays
+        const allRides = [...updatedRides, ...updatedCarpoolRides];
+        allRides.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        // Update state
+        setRides(allRides);
+  
+      } catch (error) {
+        console.error("Failed to fetch rides:", error);
+      }
+    };
+  
+    fetchRides();
+  }, []);
+  
+
   const columns = [
-    { field: "compositeId", headerName: "Ride ID", width: 180 },
-    { field: "requestOrigin", headerName: "Pick-Up Location", width: 220 },
-    { field: "requestDestination", headerName: "Drop-Off Location", width: 220 },
-    { field: "requestType", headerName: "Ride Mode", width: 150 },
+    { field: "requestOrigin", headerName: "Pick-Up Location", width: 300 },
+    { field: "requestDestination", headerName: "Drop-Off Location", width: 300 },
+    { field: "mode", headerName: "Ride Mode", width: 150 },
     { field: "status", headerName: "Ride Status", width: 150 },
-    
+
     {
-      field: "passenger",
-      headerName: "Passenger (ID)",
-      flex: 1,  // Use flex instead of width for dynamic width
-      minWidth: 150,  // Minimum width to ensure the column is readable
+      field: "passengerCompositeId",
+      headerName: "Passenger ID",
+      flex: 1,
+      minWidth: 180,
       renderCell: (params) => (
-        <Link to={`/passenger-details/${params.value}`}>
+        <Link
+          to={`/passenger-details`}
+          onClick={() => localStorage.setItem("id", params.row.passengerId)}
+        >
           <Button variant="text" color="primary" size="small">
             {params.value}
           </Button>
         </Link>
       ),
     },
+
     {
-      field: "driver",
-      headerName: "Driver (ID)",
-      flex: 1,  // Use flex for dynamic width
-      minWidth: 100,  // Minimum width to ensure the button is not too small
+      field: "driverCompositeId",
+      headerName: "Driver ID",
+      flex: 1,
+      minWidth: 180,
       renderCell: (params) => (
-        <Link to={`/driver-details/${params.value}`}>
+        <Link to={`/drivers/${params.row.driverID}`}>
           <Button variant="text" color="primary" size="small">
             {params.value}
           </Button>
         </Link>
       ),
     },
-    
+
     {
       field: "viewDetails",
       headerName: "View Details",
       width: 200,
-      renderCell: (params) => (
-        <Link to={`/ride-details/${params.row._id}`}>
-          <Button variant="contained" color="primary" size="small">
-            View Details
-          </Button>
-        </Link>
-      ),
-    },
-  ];
+      renderCell: (params) => {
+        const rideId = params.row._id;
+        const mode = params.row.mode;
 
-  const rows = [
-    {
-      id: 1,
-      rideID: "RIDE123",
-      pickUpLocation: "Model Town",
-      dropOffLocation: "Liberty Market",
-      rideMode: "Carpool",
-      rideStatus: "Ongoing",
-      noOfPassengers: 3,
-      paymentID: "PAY5678",
-      amount: 150.0,
-      paymentType: "Credit Card",
-      paymentStatus: "Completed",
-      passenger: "1",
-      driver: "2",
-    },
-    {
-      id: 2,
-      rideID: "RIDE124",
-      pickUpLocation: "DHA",
-      dropOffLocation: "Gulberg",
-      rideMode: "Single",
-      rideStatus: "Completed",
-      noOfPassengers: 1,
-      paymentID: "PAY5679",
-      amount: 500.0,
-      paymentType: "Cash",
-      paymentStatus: "Completed",
-      passenger: "124",
-      driver: "457",
+        const destination =
+          mode === "single"
+            ? `/ride-details`
+            : `/carpool-ride-details`;
+
+        return (
+          <Link
+            to={destination}
+            onClick={() => {
+              localStorage.setItem("id", rideId);
+              localStorage.setItem("passengerid", params.row.passengerCompositeId);
+              localStorage.setItem("driverid", params.row.driverCompositeId);
+            }}
+          >
+            <Button variant="contained" color="primary" size="small">
+              View Details
+            </Button>
+          </Link>
+        );
+      },
     },
   ];
 
@@ -140,23 +191,22 @@ const Rides = () => {
     <div className="main-content">
       <div className="header">
         <h1>Welcome to Rides</h1>
-       </div>
+      </div>
       <div style={{ marginTop: "20px" }}>
         <Box sx={{ height: 500, width: "100%" }}>
           <DataGrid
             className="dataGrid"
-       rows={rides}
+            rows={rides}
             columns={columns}
-            getRowId={(row) => row.compositeId || row._id}  // Fallback to _id if compositeId is missing
-               slots={{ toolbar: GridToolbar }}
-                        slotProps={{
-                          toolbar: {
-                            showQuickFilter: true,
-                            quickFilterProps: { debounceMs: 500 },
-                          },
-                        }}            
-            pageSizeOptions={[5, 10, 20]} // Allow users to choose 5, 10, or 20 records per page
-            //checkboxSelection
+            getRowId={(row) => row._id}
+            slots={{ toolbar: GridToolbar }}
+            slotProps={{
+              toolbar: {
+                showQuickFilter: true,
+                quickFilterProps: { debounceMs: 500 },
+              },
+            }}
+            pageSizeOptions={[5, 10, 20]}
             disableRowSelectionOnClick
           />
         </Box>

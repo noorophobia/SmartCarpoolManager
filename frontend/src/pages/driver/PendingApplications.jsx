@@ -37,12 +37,12 @@ const PendingApplications = () => {
           ? data.map(driver => ({
               id: driver._id,
               compositeId: driver.compositeId, // Add compositeId here
-              name: driver.name,
-              gender: driver.gender,
-              email: driver.email,
-              phoneNumber: driver.phoneNumber,
-              cnic: driver.cnic,
-              dateOfBirth: driver.dateOfBirth,
+              name: driver.driverFirstName +" "+ driver.driverLastName,
+              gender: driver.driverGender,
+              email: driver.driverEmail,
+              phoneNumber: driver.driverPhone,
+              cnic: driver.driverCnic,
+              dateOfBirth: driver.driverDOB,
             }))
           : [];
         

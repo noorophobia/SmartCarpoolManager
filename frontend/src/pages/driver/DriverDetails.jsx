@@ -10,14 +10,16 @@ import "react-responsive-carousel/lib/styles/carousel.min.css"; // import the ca
 const DriverDetails = () => {
   const { id } = useParams();
   const [driver1, setDriver1] = useState(null); // Store fetched driver data
-  const [vehicle, setVehicle] = useState(null); // Store fetched driver data
-  const [openCarDialog, setOpenCarDialog] = useState(false); // Dialog open state
+   const [openCarDialog, setOpenCarDialog] = useState(false); // Dialog open state
   const [carouselImages, setCarouselImages] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [rateSettings, setRateSettings] = useState(null); // Store rate settings
+  const [ridesData, setRidesData] = useState(null); // Store rate settings
+  const [totalRides, setTotalRides] = useState(0);
+  const [completedRides, setCompletedRides] = useState(0);
+  const [cancelledRides, setCancelledRides] = useState(0);
 
-  const [loading, setLoading] = useState(true); // Loading state
-  const [error, setError] = useState(null); // Error state
+  
     const navigate = useNavigate();
   
   console.log('Driver ID:', id);
@@ -28,87 +30,119 @@ const DriverDetails = () => {
     navigate('/login');
     return;
   }
-    const fetchDriver = async () => {
-      try {
-        const response = await fetch(`http://localhost:5000/drivers/${id}`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`, // Add the token to the Authorization header
-            'Content-Type': 'application/json',
-          },
-        });
-                if (!response.ok) {
-          throw new Error('Failed to fetch driver details');
-        }
-        const data = await response.json();
-        console.log(data);
-console.log(response);
-        setDriver1(data);
-       } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+    
+  const fetchDriver = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/drivers/${id}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      console.log('Driver API Response:', response); // Check status code
+  
+      if (!response.ok) {
+        throw new Error('Failed to fetch driver details');
       }
-    };
-    const fetchVehicle = async () => {
-      try {
-        const response = await fetch(`http://localhost:5000/vehicles/driver/${id}`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`, // Add the token to the Authorization header
-            'Content-Type': 'application/json',
-          },
-        });        const data = await response.json();
-        console.log('Fetched Vehicle Data:', data);
-        
-        // Access the first item in the array (if there is any data)
-        if (data && data.length > 0) {
-          setVehicle(data[0]); // Set vehicle state to the first object in the array
- 
-        } else {
-          setVehicle(null); // Handle case where no vehicle data is found
-        }
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+  
+      const data = await response.json();
+      console.log('Driver Data:', data); // Ensure data is correct
+  
+      setDriver1(data);
+    } catch (err) {
+      setError(err.message);
+      console.error('Error fetching driver:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+   
+   
     
     
 
     fetchDriver();
-    fetchVehicle();
- 
+  
   }, [id]);
   useEffect(() => {
-    if (vehicle) {
-      // Fetch rate settings once the vehicle is available
-      fetchRateSettings();
-    }
-  }, [vehicle]);  
-  const fetchRateSettings = async () => {
-    if (vehicle && vehicle.vehicleType) {
+    if (driver1) {
+      const fetchRateSettings = async () => {
+        try {
+            if (!driver1 || !driver1.carType) {
+                console.warn("Driver1 or carType is null, skipping API call.");
+                return;
+            }
+    
+            console.log("Driver vehicle type: " + driver1.carType);
+            const response = await axios.get(`http://localhost:5000/api/rate-settings/${driver1.carType}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+    
+            console.log('Fetched Rate Settings:', response.data);
+            setRateSettings(response.data);
+        } catch (error) {
+            console.error('Error fetching rate settings:', error);
+            setError('Error fetching rate settings');
+        }
+    };
+    const fetchRides = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/rate-settings/${vehicle.vehicleType}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-                console.log('Fetched Rate Settings:', response.data); // Debug log for fetched rate settings
-        setRateSettings(response.data);  // Set rate settings
+          
+  
+           const response = await axios.get(`http://localhost:5000/rides/driver/${id}`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+          });
+  
+          console.log('Fetched Rides:', response.data);
+          setRidesData(response.data);
       } catch (error) {
-        console.error('Error fetching rate settings:', error);
-        setError('Error fetching rate settings');
+          console.error('Error fetching rate settings:', error);
+          setError('Error fetching rate settings');
       }
-    }
   };
-  if(driver1){
-  console.log("driver 1 "+ driver1.name)
- }
- if(vehicle){
-console.log("vehicle"+vehicle.driverPhoto
-);
-console.log("brand"+vehicle.brand);
- }
+  
+          fetchRateSettings();
+          fetchRides();
+    }
+  }, [driver1]);  
+ 
+useEffect(() => {
+  if (ridesData) {
+    let total = 0;
+    let completed = 0;
+    let cancelled = 0;
+
+    // Count single rides
+    if (ridesData.singleRides && Array.isArray(ridesData.singleRides)) {
+      total += ridesData.singleRides.length;
+      completed += ridesData.singleRides.filter(ride => ride.completedAt).length;
+    }
+
+    // Count carpool rides
+    if (ridesData.carpoolRides && Array.isArray(ridesData.carpoolRides)) {
+      total += ridesData.carpoolRides.length;
+      completed += ridesData.carpoolRides.filter(ride => ride.completedAt).length;
+    }
+  
+    // Check single rides
+    if (ridesData.singleRides && Array.isArray(ridesData.singleRides)) {
+      cancelled += ridesData.singleRides.filter(ride =>ride.cancelledAt&& ride.cancelledAt !== null).length;
+    }
+  
+    // Check carpool rides
+    if (ridesData.carpoolRides && Array.isArray(ridesData.carpoolRides)) {
+      cancelled += ridesData.carpoolRides.filter(ride =>ride.cancelledAt&& ride.cancelledAt !== null).length;
+    }
+    // Update state
+    setTotalRides(total);
+    setCompletedRides(completed);
+    setCancelledRides(cancelled);
+  }
+}, [ridesData]);
+   
+   
  
  const handleOpenCarDialog = () => {
   setOpenCarDialog(true);
@@ -119,27 +153,7 @@ const handleCloseCarDialog = () => {
 };
   
   
-;  const driver = {
-    id: 1,
-     
-    totalSeatsCapacity: 5,
-    totalRides: 2,
-    completedRides: 2,
-    cancelledRides: 0,
-    distanceRatePerKm: 72,
-    timeRatePerMinute: 10,
-    fixedDriverFee: 50,
-    peakRateMultiplier: 1.2,
-    discounts: 5,
-    carImage: '/car.jpg',
-    driverImage: '/driver.jpg',
-    dateOfBirth: '1990-05-15',
-    documents: [
-      { id: 1, name: 'CNIC', url: 'https://example.com/cnic' },
-      { id: 2, name: 'Driver License', url: 'https://example.com/license' },
-      { id: 3, name: 'Vehicle Registration', url: 'https://example.com/registration' },
-    ],
-  };
+;  
 
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState(null);
@@ -154,10 +168,10 @@ const handleCloseCarDialog = () => {
   const handleCategoryChange = (category) => {
     if (category === 'CNIC') {
  
-      setCarouselImages([ `${vehicle.cnicFront}` , `${vehicle.cnicBack}`]);
+      setCarouselImages([ `${driver1.driverCnicFront}` , `${driver1.driverCnicBack}`]);
       setSelectedCategory('CNIC');
     } else if (category === 'Vehicle Registration') {
-      setCarouselImages([ `${vehicle.vehicleRegistrationFront}` , `${vehicle.vehicleRegistrationBack}`]);
+      setCarouselImages([ `${driver1.vehicleRegisterationFront}` , `${driver1.vehicleRegisterationBack}`]);
 
        setSelectedCategory('Vehicle Registration');
     }
@@ -182,10 +196,10 @@ const handleCloseCarDialog = () => {
               <Box display="flex" alignItems="center">
                 {/* Driver Image */}
                 <Box sx={{ width: '25%' }}>
-                  {driver1 && vehicle && (
+                  {driver1  && (
                     <Avatar
-                      alt={driver1.name}
-                      src={`${vehicle.driverPhoto}`}
+                      alt={driver1.driverFirstName}
+                      src={`${driver1.driverSelfie}`}
                       sx={{ width: 150, height: 150, marginLeft: 4 }}
                     />
                   )}
@@ -197,13 +211,13 @@ const handleCloseCarDialog = () => {
                       <Typography sx={{ fontSize: '1rem', marginBottom: 1, marginTop: 3 }}>
                         <strong>Driver ID:</strong> {driver1.compositeId}
                       </Typography>
-                      <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}><strong>Name:</strong> {driver1.name}</Typography>
-                      <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}><strong>Gender:</strong> {driver1.gender}</Typography>
-                      <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}><strong>Email:</strong> {driver1.email}</Typography>
-                      <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}><strong>Phone Number:</strong> {driver1.phoneNumber}</Typography>
-                      <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}><strong>CNIC:</strong> {driver1.cnic}</Typography>
-                      <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}><strong>Date of Birth:</strong> {driver1.dateOfBirth}</Typography>
-                      <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}><strong>Ratings:</strong> {driver1.ratings}</Typography>
+                      <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}><strong>Name:</strong> {driver1.driverFirstName+" "+driver1.driverLastName}</Typography>
+                      <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}><strong>Gender:</strong> {driver1.driverGender}</Typography>
+                      <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}><strong>Email:</strong> {driver1.driverEmail}</Typography>
+                      <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}><strong>Phone Number:</strong> {driver1.driverPhone}</Typography>
+                      <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}><strong>CNIC:</strong> {driver1.driverCnicNumber}</Typography>
+                      <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}><strong>Date of Birth:</strong> {driver1.driverDOB}</Typography>
+                      <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}><strong>Ratings:</strong> {driver1.rating}</Typography>
                     </div>
                   )}
                 </Box>
@@ -228,40 +242,40 @@ const handleCloseCarDialog = () => {
               <Box display="flex" alignItems="center">
                 {/* Car Image */}
                 <Box sx={{ width: '25%' }}>
-                  {vehicle && (
+                  {driver1 && (
                     <CardMedia
                       component="img"
                       height="140"
-                      image={`${vehicle.vehiclePhotos[0]}`}
+                      image={`${driver1.vehiclePhotos[0]}`}
                       alt="Car Image"
                     />
                   )}
                 </Box>
                 {/* Vehicle Details */}
                 <Box sx={{ width: '75%' ,marginLeft:4 }}>
-                  {vehicle &&
+                  {driver1 &&
                   <div style={{ marginLeft: 16 }}>
                     <Typography sx={{ fontSize: '1rem', marginBottom: 1, marginTop: 4 }}>
-                      <strong>Brand:</strong> {vehicle.brand}
+                      <strong>Brand:</strong> {driver1.brand}
                     </Typography>
                     <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}>
-                      <strong>Name:</strong> {vehicle.vehicleName}
+                      <strong>Name:</strong> {driver1.vehicleName}
                     </Typography>
                     <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}>
-                      <strong>Color:</strong> {vehicle.vehicleColor}
+                      <strong>Color:</strong> {driver1.vehicleColor}
                     </Typography>
                     
                     <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}>
-                      <strong>Type:</strong> {vehicle.vehicleType}
+                      <strong>Type:</strong> {driver1.carType}
                     </Typography>
                     <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}>
-                      <strong>Production Year:</strong> {vehicle.vehicleProductionYear}
+                      <strong>Production Year:</strong> {driver1.vehicleProductionYear}
                     </Typography>
                     <Typography sx={{ fontSize: '1rem', marginBottom: 1 }}>
-                      <strong>License Number:</strong> {vehicle.licenseNumber}
+                      <strong>License Number:</strong> {driver1.licenseNumber}
                     </Typography>
                     <Typography sx={{ fontSize: '1rem', marginBottom: 4 }}>
-                      <strong>Total Seats Capacity:</strong> {vehicle.vehicleType}
+                      <strong>Total Seats Capacity:</strong> {driver1.vehicleType}
                     </Typography>
                     <Box display="flex" justifyContent="flex-end">
                       <Button variant="contained" color="primary" onClick={handleOpenCarDialog}>
@@ -288,7 +302,7 @@ const handleCloseCarDialog = () => {
               <Divider />
               {rateSettings &&
                <div>
-                <Typography sx={{ fontSize: '1rem',marginTop:2, marginBottom: 1 ,marginLeft:4}}><strong>Vehicle Type :</strong> {vehicle.vehicleType}</Typography>
+                <Typography sx={{ fontSize: '1rem',marginTop:2, marginBottom: 1 ,marginLeft:4}}><strong>Vehicle Type :</strong> {driver1.vehicleType}</Typography>
 
           <Typography sx={{ fontSize: '1rem', marginBottom: 1 ,marginLeft:4}}><strong>Distance Rate per Km:</strong> {rateSettings.distanceRatePerKm}</Typography>
           <Typography sx={{ fontSize: '1rem', marginBottom: 1,marginLeft:4 }}><strong>Time Rate per Minute:</strong> {rateSettings.timeRatePerMinute}</Typography>
@@ -309,9 +323,9 @@ const handleCloseCarDialog = () => {
               </Box>
               <Divider />
               <div>
-              <Typography sx={{ fontSize: '1rem', marginBottom: 1, marginTop: 2,marginLeft:4}}><strong>Total Rides:</strong> {driver.totalRides}</Typography>
-                 <Typography sx={{ fontSize: '1rem', marginBottom: 1,marginTop: 2,marginLeft:4}}><strong>Completed Rides:</strong> {driver.completedRides}</Typography>
-                 <Typography sx={{ fontSize: '1rem',marginTop: 2,marginLeft:4,marginBottom:11}}><strong>Cancelled Rides:</strong> {driver.cancelledRides}</Typography>
+            <Typography sx={{ fontSize: '1rem', marginBottom: 1, marginTop: 2,marginLeft:4}}><strong>Total Rides:</strong> {totalRides}</Typography>
+                 <Typography sx={{ fontSize: '1rem', marginBottom: 1,marginTop: 2,marginLeft:4}}><strong>Completed Rides:</strong> {completedRides}</Typography>
+                 <Typography sx={{ fontSize: '1rem',marginTop: 2,marginLeft:4,marginBottom:11}}><strong>Cancelled Rides:</strong> {cancelledRides}</Typography>
               </div>
             </CardContent>
           </Card>
@@ -320,18 +334,18 @@ const handleCloseCarDialog = () => {
     <Dialog open={openCarDialog} onClose={handleCloseCarDialog} fullWidth maxWidth="md">
     <DialogTitle>Vehicle Photos</DialogTitle>
     <DialogContent>
-      {vehicle?.vehiclePhotos?.length === 1 ? (
+      {driver1?.vehiclePhotos?.length === 1 ? (
         // Single image view
         <img
-           src={`${vehicle.vehiclePhotos[0]}`}
+           src={`${driver1.vehiclePhotos[0]}`}
           alt={`Vehicle Photo 1`}
           style={{ width: '100%', height: 'auto' }}
         />
       ) : (
         // Multiple images carousel
-        vehicle?.vehiclePhotos?.length > 1 && (
+        driver1?.vehiclePhotos?.length > 1 && (
           <Carousel>
-            {vehicle.vehiclePhotos.map((photo, index) => (
+            {driver1.vehiclePhotos.map((photo, index) => (
               <div key={index}>
                 <img
                   src={`${photo}`}

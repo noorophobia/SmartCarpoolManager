@@ -22,29 +22,31 @@ router.get('/passengers', verifyToken, async (req, res) => {
     const passengers = await Passenger.find();
     console.log(`Found ${passengers.length} passengers`);
 
-    // Check for passengers missing compositeId and update them
-    const updatedPassengers = await Promise.all(
-      passengers.map(async (passenger) => {
-        if (!passenger.compositeId) {
-          const newCompositeId = await generateCompositeId();
-          passenger.compositeId = newCompositeId;
-          console.log(`Updating passenger ${passenger._id} with compositeId: ${newCompositeId}`);
-          
-          // Save the updated compositeId without triggering full validation
-          try {
-            await Passenger.updateOne(
-              { _id: passenger._id },
-              { $set: { compositeId: newCompositeId } }
-            );
-            console.log(`Passenger ${passenger._id} updated successfully`);
-          } catch (error) {
-            console.error(`Error saving passenger ${passenger._id}:`, error.message);
-            throw error;
-          }
-        }
-        return passenger;
-      })
-    );
+    // Count how many passengers already have a compositeId
+let counter = await Passenger.countDocuments({ compositeId: { $exists: true } });
+
+const updatedPassengers = await Promise.all(
+  passengers.map(async (passenger) => {
+    if (!passenger.compositeId) {
+      counter++; // increment for each new assignment
+      const newCompositeId = `PR-${String(counter).padStart(3, '0')}`;
+
+      console.log(`Assigning ${newCompositeId} to passenger ${passenger._id}`);
+      passenger.compositeId = newCompositeId;
+
+      try {
+        await Passenger.updateOne(
+          { _id: passenger._id },
+          { $set: { compositeId: newCompositeId } }
+        );
+      } catch (error) {
+        console.error(`Error updating passenger ${passenger._id}:`, error.message);
+      }
+    }
+    return passenger;
+  })
+);
+
 
     res.status(200).json(updatedPassengers);
   } catch (error) {

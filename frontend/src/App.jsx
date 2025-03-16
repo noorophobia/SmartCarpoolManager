@@ -40,6 +40,7 @@ import Image from './pages/Image';
 
 import EditPassenger from "./components/EditPassenger";
 import AddPassenger from "./components/AddPassenger";
+import CarpoolRides from "./components/CarpoolRideDetails";
 const Layout = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);  
@@ -150,6 +151,11 @@ function App() {
           element: <Rides />,
         },
         {
+          path: "/carpool-ride-details",
+          element: <CarpoolRides />,
+        },
+        
+        {
           path: '/image',
           element: <Image/>
         },
@@ -203,7 +209,7 @@ function App() {
           element:<PassengerDetails/>,
          },
          {
-          path: "/ride-details/:rideID",
+          path: "/ride-details",
           element:<RideDetails/>,
          },
         {

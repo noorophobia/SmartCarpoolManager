@@ -18,23 +18,23 @@ router.get('/rate-settings',verifyToken, async (req, res) => {
   }
 });
 // Route to get rate settings by vehicle type
-router.get('/rate-settings/:vehicle', verifyToken,async (req, res) => {
-  const vehicle = decodeURIComponent(req.params.vehicle); // Decode the URL-encoded vehicle type (like %20 for spaces)
-  console.log('Vehicle Type:', vehicle);  // Debugging: Log decoded vehicle type
-  
+router.get('/rate-settings/:vehicle', verifyToken, async (req, res) => {
+  const vehicle = decodeURIComponent(req.params.vehicle).toLowerCase().trim(); // Normalize input
+  console.log('Vehicle Type:', vehicle);
+
   try {
-    // Fetch rate settings from the database where vehicleTypes.type matches the vehicle type
+    // Fetch rate settings from the database where vehicleTypes.type matches the vehicle type (case-insensitive)
     const rateSettings = await RateSettings.findOne({
-      'vehicleTypes.type': vehicle // Querying the vehicleTypes array for the matching type
+      'vehicleTypes.type': { $regex: new RegExp(`^${vehicle}$`, 'i') } // Case-insensitive exact match
     });
- 
+
     if (!rateSettings) {
       return res.status(404).json({ message: `Rate settings not found for ${vehicle}` });
     }
     console.log('Fetched Rate Settings:', rateSettings);
 
     // Find the first matching vehicle type settings object
-    const vehicleRateSettings = rateSettings.vehicleTypes.find(v => v.type === vehicle);
+    const vehicleRateSettings = rateSettings.vehicleTypes.find(v => v.type.toLowerCase() === vehicle);
 
     if (!vehicleRateSettings) {
       return res.status(404).json({ message: `No rate settings found for vehicle type: ${vehicle}` });
@@ -47,6 +47,7 @@ router.get('/rate-settings/:vehicle', verifyToken,async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
 
 
 // Update rate settings

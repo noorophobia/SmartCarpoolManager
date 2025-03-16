@@ -1,15 +1,19 @@
-// models/Driver.js
-
 const mongoose = require('mongoose');
 
 const driverSchema = new mongoose.Schema({
-  name: { 
+  driverFirstName: { 
     type: String, 
-    required: [true, 'Name is required.'], 
-    maxlength: [50, 'Name cannot exceed 50 characters.'], 
+    required: [true, 'First name is required.'], 
+    maxlength: [50, 'First name cannot exceed 50 characters.'], 
     trim: true
   },
-  email: { 
+  driverLastName: { 
+    type: String, 
+    required: [true, 'Last name is required.'], 
+    maxlength: [50, 'Last name cannot exceed 50 characters.'], 
+    trim: true
+  },
+  driverEmail: { 
     type: String, 
     required: [true, 'Email is required.'], 
     unique: true, 
@@ -18,9 +22,9 @@ const driverSchema = new mongoose.Schema({
     lowercase: true,
     match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email address.']
   },
-  password: { type: String, required: true },
+  driverPassword: { type: String, required: true },
 
-  gender: { 
+  driverGender: { 
     type: String, 
     enum: {
       values: ['male', 'female'], 
@@ -28,14 +32,18 @@ const driverSchema = new mongoose.Schema({
     }, 
     required: [true, 'Gender is required.']
   },
-  cnic: { 
+  driverCnicNumber: { 
     type: String, 
-    maxlength: [15, 'CNIC cannot exceed 15 characters.'], 
-    required: [true, 'CNIC is required.'], 
     unique: true,
+    required: [true, 'CNIC is required.'],
+    maxlength: [15, 'CNIC cannot exceed 15 characters.'], 
     match: [/^\d{5}-\d{7}-\d{1}$/, 'CNIC must be in the format XXXXX-XXXXXXX-X.']
   },
-  phoneNumber: { 
+  driverCnicFront: { type: String, required: true },
+  driverCnicBack: { type: String, required: true },
+  driverSelfie: { type: String, required: true },
+
+  driverPhone: { 
     type: String, 
     required: [true, 'Phone number is required.'], 
     match: [
@@ -43,7 +51,7 @@ const driverSchema = new mongoose.Schema({
       'Phone number must be a valid Pakistani number in the format +92XXXXXXXXXX or 03XXXXXXXXX.'
     ]
   },
-  dateOfBirth: { 
+  driverDOB: { 
     type: Date, 
     required: [true, 'Date of Birth is required.'],
   },
@@ -58,8 +66,22 @@ const driverSchema = new mongoose.Schema({
     default: Date.now   
   },
   compositeId: { type: String, unique: true }, 
-  isApproved: { type:Boolean, default:false},
-  isBlocked: { type:Boolean, default:false},
+  isApproved: { type: Boolean, default: false },
+  isBlocked: { type: Boolean, default: false },
+
+  // 🚗 Vehicle Details
+  vehicleProductionYear: { type: String, required: true },
+  vehicleType: { type: String, enum: ["car", "bike"], required: true },
+  carType: { type: String, required: true },
+  vehicleName: { type: String, required: true },
+  vehicleColor: { type: String, required: true },
+  licenseNumber: { type: String, required: true },
+  brand: { type: String, required: true },
+  selectedDriver: { type: String, required: true },
+
+  vehicleRegisterationFront: { type: String, required: true },
+  vehicleRegisterationBack: { type: String, required: true },
+  vehiclePhotos: [{ type: String, required: true }]  // Array of images
 
 });
 

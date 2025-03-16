@@ -36,17 +36,17 @@ const Drivers = () => {
         
         const data = await response.json();
         console.log(data);
-
+ 
         const mappedData = Array.isArray(data)
         ? data.map(driver => ({
             id: driver._id,
             compositeId: driver.compositeId, // Add compositeId here
-            name: driver.name,
-            gender: driver.gender,
-            email: driver.email,
-            phoneNumber: driver.phoneNumber,
-            cnic: driver.cnic,
-            dateOfBirth: driver.dateOfBirth,
+            name: driver.driverFirstName +" "+ driver.driverLastName,
+            gender: driver.driverGender,
+            email: driver.driverEmail,
+            phoneNumber: driver.driverPhone,
+            cnic: driver.driverCnic,
+            dateOfBirth: driver.driverDOB,
           }))
         : [];
       
@@ -189,7 +189,7 @@ const Drivers = () => {
             className="dataGrid"
             rows={drivers}
             columns={columns}
-            getRowId={(row) => row.compositeId || row._id}  // Fallback to _id if compositeId is missing
+            getRowId={(row) => row.compositeId || row.id}  // Fallback to _id if compositeId is missing
                slots={{ toolbar: GridToolbar }}
                         slotProps={{
                           toolbar: {

@@ -6,6 +6,7 @@ const verifyToken= require('../middleware/auth');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+const Counter = require('../models/Counter');
 
 // Fetch all drivers
 router.get('/drivers',verifyToken, async (req, res) => {
@@ -17,9 +18,12 @@ router.get('/drivers',verifyToken, async (req, res) => {
   }
 });
 
-// Fetch approved drivers
+ 
+ 
 router.get('/drivers/approved', verifyToken, async (req, res) => {
   try {
+    await Driver.updateMany({ isApproved: { $exists: false } }, { $set: { isApproved: false } });
+
     const drivers = await Driver.find({ isApproved: true });
     res.status(200).json(drivers);
   } catch (error) {
@@ -28,22 +32,44 @@ router.get('/drivers/approved', verifyToken, async (req, res) => {
 });
 
 // Fetch not approved drivers
+
 router.get('/drivers/not-approved', verifyToken, async (req, res) => {
   try {
+    // Fetch drivers where isApproved is false
     const drivers = await Driver.find({ isApproved: false });
-    res.status(200).json(drivers);
+
+    // Filter drivers missing compositeId
+    const missingCompositeIdDrivers = drivers.filter(driver => !driver.compositeId);
+
+    if (missingCompositeIdDrivers.length > 0) {
+      const bulkUpdates = await Promise.all(
+        missingCompositeIdDrivers.map(async (driver) => ({
+          updateOne: {
+            filter: { _id: driver._id },
+            update: { $set: { compositeId: await generateCompositeId() } },
+          },
+        }))
+      );
+
+      // Perform bulk update in a single operation
+      await Driver.bulkWrite(bulkUpdates);
+    }
+
+    // Fetch updated drivers to include new compositeId values
+    const updatedDrivers = await Driver.find({ isApproved: false });
+
+    res.status(200).json(updatedDrivers);
   } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch not approved drivers' });
+    res.status(500).json({ message: 'Failed to fetch not approved drivers', error: error.message });
   }
 });
-
 // Fetch a single driver by ID
 router.get('/drivers/:id', verifyToken,async (req, res) => {
   const { id } = req.params;
 
   try {
      const driver = await Driver.findById(id);   
-
+console.log(driver)
      if (!driver) {
       return res.status(404).json({ message: 'Driver not found' });
     }
@@ -55,46 +81,96 @@ router.get('/drivers/:id', verifyToken,async (req, res) => {
 });
 
 
-// Function to generatappe composite ID
+ 
 const generateCompositeId = async () => {
-  const driverCount = await Driver.countDocuments();
-  return `DR-${String(driverCount + 1).padStart(3, '0')}`; 
-};
+  const counter = await Counter.findOneAndUpdate(
+    { name: "driverCounter" }, 
+    { $inc: { value: 1 } },  
+    { new: true, upsert: true }  
+  );
 
-// Add a new driver
+  // Convert counter value to 3-digit string (e.g., 1 -> "001")
+  return `DR-${String(counter.value).padStart(3, '0')}`;
+};
+ 
+// ✅ Add a new driver
 router.post('/drivers', verifyToken, async (req, res) => {
   try {
-    const { name, gender, email, phoneNumber, cnic, dateOfBirth, ratings,password } = req.body;
+    const { 
+      driverFirstName, 
+      driverLastName, 
+      driverGender, 
+      driverEmail, 
+      driverPhone, 
+      driverCnicNumber, 
+      driverDOB, 
+      rating, 
+      driverPassword,
+      driverCnicFront,
+      driverCnicBack,
+      driverSelfie,
+      vehicleProductionYear,
+      vehicleType,
+      carType,
+      vehicleName,
+      vehicleColor,
+      licenseNumber,
+      brand,
+      vehicleRegisterationFront,
+      vehicleRegisterationBack,
+      vehiclePhotos
+    } = req.body;
     
-    if (!dateOfBirth) {
-      return res.status(400).json({ message: 'Date of Birth required.' });
+    if (!driverDOB) {
+      return res.status(400).json({ message: 'Date of Birth is required.' });
     }
 
-     const compositeId = await generateCompositeId();
+    if (!driverPassword) {
+      return res.status(400).json({ message: 'Password is required.' });
+    }
 
+    // 🔹 Generate a unique composite ID
+    const compositeId = await generateCompositeId();
     const isApproved = false;
     const createdAt = new Date();
-const hashedPassword = await bcrypt.hash(password, saltRounds);
 
+    // 🔹 Hash the password
+    const hashedPassword = await bcrypt.hash(driverPassword, saltRounds);
+
+    // 🔹 Create a new driver object
     const newDriver = new Driver({
-      name,
-      gender,
-      email,
-      password: hashedPassword, 
-
-      phoneNumber,
-      cnic,
-      dateOfBirth,
-      ratings,
+      driverFirstName,
+      driverLastName,
+      driverGender,
+      driverEmail,
+      driverPhone,
+      driverCnicNumber,
+      driverDOB,
+      rating: rating || 0,  
+      driverPassword: hashedPassword, 
+      driverCnicFront,
+      driverCnicBack,
+      driverSelfie,
+      vehicleProductionYear,
+      vehicleType,
+      carType,
+      vehicleName,
+      vehicleColor,
+      licenseNumber,
+      brand,
+      vehicleRegisterationFront,
+      vehicleRegisterationBack,
+      vehiclePhotos,
       compositeId,   
       isApproved,  
       createdAt,     
     });
 
-     const savedDriver = await newDriver.save();
+    // 🔹 Save the new driver
+    const savedDriver = await newDriver.save();
 
-     res.status(201).json({
-      id: savedDriver._id,         // MongoDB's _id
+    res.status(201).json({
+      id: savedDriver._id,         
       compositeId: savedDriver.compositeId,  
       ...savedDriver.toObject()    
     });
@@ -105,36 +181,68 @@ const hashedPassword = await bcrypt.hash(password, saltRounds);
   }
 });
 
-
-// Update driver details
+// ✅ Update driver details
 router.put('/drivers/:id', verifyToken, async (req, res) => {
   const { id } = req.params;
-  const { name, gender, email, phoneNumber, cnic, dateOfBirth, ratings } = req.body;
+  const { 
+    driverFirstName,
+    driverLastName, 
+    driverGender, 
+    driverEmail, 
+    driverPhone, 
+    driverCnicNumber, 
+    driverDOB, 
+    rating,
+    driverCnicFront,
+    driverCnicBack,
+    driverSelfie,
+    vehicleProductionYear,
+    vehicleType,
+    carType,
+    vehicleName,
+    vehicleColor,
+    licenseNumber,
+    brand,
+    vehicleRegisterationFront,
+    vehicleRegisterationBack,
+    vehiclePhotos
+  } = req.body;
 
   try {
-     const updateFields = {
-      ...(name && { name }),
-      ...(gender && { gender }),
-      ...(email && { email }),
-      ...(phoneNumber && { phoneNumber }),
-      ...(cnic && { cnic }),
-      ...(dateOfBirth && { dateOfBirth }),
-      ...(ratings !== undefined && { ratings }),  
-     };
+    const updateFields = {
+      ...(driverFirstName && { driverFirstName }),
+      ...(driverLastName && { driverLastName }),
+      ...(driverGender && { driverGender }),
+      ...(driverEmail && { driverEmail }),
+      ...(driverPhone && { driverPhone }),
+      ...(driverCnicNumber && { driverCnicNumber }),
+      ...(driverDOB && { driverDOB }),
+      ...(rating !== undefined && { rating }),  
+      ...(driverCnicFront && { driverCnicFront }),
+      ...(driverCnicBack && { driverCnicBack }),
+      ...(driverSelfie && { driverSelfie }),
+      ...(vehicleProductionYear && { vehicleProductionYear }),
+      ...(vehicleType && { vehicleType }),
+      ...(carType && { carType }),
+      ...(vehicleName && { vehicleName }),
+      ...(vehicleColor && { vehicleColor }),
+      ...(licenseNumber && { licenseNumber }),
+      ...(brand && { brand }),
+      ...(vehicleRegisterationFront && { vehicleRegisterationFront }),
+      ...(vehicleRegisterationBack && { vehicleRegisterationBack }),
+      ...(vehiclePhotos && { vehiclePhotos }),
+    };
 
-    // Update the driver in the database
-    const driver = await Driver.findByIdAndUpdate(
-      id,
-      updateFields,
-      { new: true }  
-    );
+    // 🔹 Update the driver in the database
+    const driver = await Driver.findByIdAndUpdate(id, updateFields, { new: true });
 
-     if (!driver) {
+    if (!driver) {
       return res.status(404).json({ message: 'Driver not found' });
     }
 
     res.status(200).json(driver);
   } catch (error) {
+    console.error('Error updating driver:', error);
     res.status(500).json({ message: 'Failed to update driver', error: error.message });
   }
 });
