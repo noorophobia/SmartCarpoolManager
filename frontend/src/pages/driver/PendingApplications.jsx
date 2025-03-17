@@ -41,7 +41,7 @@ const PendingApplications = () => {
               gender: driver.driverGender,
               email: driver.driverEmail,
               phoneNumber: driver.driverPhone,
-              cnic: driver.driverCnic,
+              cnic: driver.driverCnicNumber,
               dateOfBirth: driver.driverDOB,
             }))
           : [];

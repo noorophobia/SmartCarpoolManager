@@ -71,13 +71,13 @@ const driverSchema = new mongoose.Schema({
 
   // 🚗 Vehicle Details
   vehicleProductionYear: { type: String, required: true },
-  vehicleType: { type: String, enum: ["car", "bike"], required: true },
+  vehicleType: { type: String, enum: ["car", "bike","Car","Bike"], required: true },
   carType: { type: String, required: true },
   vehicleName: { type: String, required: true },
   vehicleColor: { type: String, required: true },
   licenseNumber: { type: String, required: true },
   brand: { type: String, required: true },
-  selectedDriver: { type: String, required: true },
+  selectedDriver: { type: String, default:" "},
 
   vehicleRegisterationFront: { type: String, required: true },
   vehicleRegisterationBack: { type: String, required: true },

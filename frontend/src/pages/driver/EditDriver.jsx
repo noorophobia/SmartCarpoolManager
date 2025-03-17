@@ -10,35 +10,37 @@ import DialogTitle from '@mui/material/DialogTitle';
  
 
 const EditDriver = () => {
-    const [name, setName] = useState('');
-    const [gender, setGender] = useState('');
-     const [email, setEmail] = useState('');
-    const [cnic, setCnic] = useState('');
-    const [phoneNumber, setPhoneNumber] = useState('');
-    const[driverEmail,setDriverEmail]=useState('');
-    const[driverCnic,setDriverCnic]=useState('');
-    const[driverPhoneNumber,setDriverPhoneNumber]=useState('');
-    const [dialogOpen, setDialogOpen] = useState(false);
-const [dialogMessage, setDialogMessage] = useState('');
-const [dialogSeverity, setDialogSeverity] = useState('success');  // 'success' or 'error'
+    const [driverFirstName, setFirstName] = useState('');
+     const [driverLastName, setLastName] = useState('');
+     const [driverGender, setGender] = useState('');
+      const [driverEmail, setEmail] = useState('');
+      const [driverCnicNumber, setCnic] = useState('');
+      const [driverPassword, setPassword] = useState('');
+      const [driverPhone, setPhoneNumber] = useState('');
+     const [driverDOB, setDateOfBirth] = useState('');
+     const [rating, setRatings] = useState(0);
+     const [brand, setVehicleBrand] = useState('');
+     const [vehicleName, setVehicleName] = useState('');
+     const [vehicleColor, setVehicleColor] = useState('');
+     const [vehicleType, setVehicleType] = useState('');
+     const [carType, setCarType] = useState('');
+     const [vehicleProductionYear, setVehicleProductionYear] = useState('');
+     const [licenseNumber, setLicenseNumber] = useState('');
+     const [vehiclePhotos, setVehiclePhotos] = useState([]);
+     const [vehicleRegistrationFront, setVehicleRegistrationFront] = useState(null);
+     const [vehicleRegistrationBack, setVehicleRegistrationBack] = useState(null);
+     const [driverCnicFront, setCnicFront] = useState(null);
+     const [driverCnicBack, setCnicBack] = useState(null);
+     const [driverSelfie, setDriverPhoto] = useState(null);
+     const [oldEmail, setOldEmail] = useState(null);
+     const [oldCnic, setOldCnic] = useState(null);
+     const [oldPhone, setOldPhone] = useState(null);
+    
 
     
-    const [dateOfBirth, setDateOfBirth] = useState('');
-    const [ratings, setRatings] = useState(0);
-      const [vehicle, setVehicle] = useState(null); // Store fetched driver data
+    
       const currentYear = new Date().getFullYear();
- const [brand, setVehicleBrand] = useState('');
-  const [vehicleName, setVehicleName] = useState('');
-  const [vehicleColor, setVehicleColor] = useState('');
-   const [vehicleType, setVehicleType] = useState('');
-  const [vehicleProductionYear, setVehicleProductionYear] = useState('');
-  const [licenseNumber, setLicenseNumber] = useState('');
-  const [vehiclePhotos, setVehiclePhotos] = useState([]);
-  const [vehicleRegistrationFront, setVehicleRegistrationFront] = useState(null);
-  const [vehicleRegistrationBack, setVehicleRegistrationBack] = useState(null);
-  const [cnicFront, setCnicFront] = useState(null);
-  const [cnicBack, setCnicBack] = useState(null);
-  const [driverPhoto, setDriverPhoto] = useState(null);
+  
     const [error, setError] = useState('');
     const [dragOver, setDragOver] = useState(false);
     const [emails,setEmails]=useState("")
@@ -62,26 +64,29 @@ const updateState = (key, value) => {
     
     
      const [errorMessages, setErrorMessages] = useState({
-        name: "",
-        gender: "",
-        email: "",
-        phoneNumber: "",
-        cnic: "",
-        dateOfBirth: "",
-        vehicleName: "",
-        brand:"",
-        vehicleColor:"",
-        vehicleType:"",
-    
-        vehicleProductionYear: "",
-        licenseNumber: "",
-        vehiclePhotos : "",
-        vehicleRegistrationFront: "",
-       vehicleRegistrationBack: "",
-        cnicFront: "",
-      cnicBack: "",
-        driverPhoto: "",
-      });
+        
+      driverFirstName: "",
+      driverLastName: "",
+  
+      driverGender: "",
+      driverEmail: "",
+      driverPhone: "",
+      driverCnicNumber: "",
+      driverDOB: "",
+      vehicleName: "",
+      brand:"",
+      vehicleColor:"",
+      vehicleType:"",
+      carType:"",
+      driverPassword:"",
+      vehicleProductionYear: "",
+      licenseNumber: "",
+      vehiclePhotos : "",
+      vehicleRegistrationFront: "",
+     vehicleRegistrationBack: "",
+     driverCnicFront: "",
+     driverCnicBack: "",
+     driverSelfie: "",      });
   const { id } = useParams(); // Get the driver ID from URL params (if editing)
   const navigate = useNavigate();
  
@@ -107,16 +112,33 @@ const updateState = (key, value) => {
             },
           });
           const data = await response.json();
-          setName(data.name);
-          setEmail(data.email);
-          setPhoneNumber(data.phoneNumber);
-          setCnic(data.cnic);
-          setGender(data.gender);
-          setDateOfBirth(data.dateOfBirth.split('T')[0]);
-          setRatings(data.ratings || 0);
-        setDriverEmail(data.email);
-          setDriverCnic(data.cnic);
-         setDriverPhoneNumber(data.phoneNumber);
+          if (data) {
+            setFirstName(data.driverFirstName || '');
+            setLastName(data.driverLastName || '');
+            setGender(data.driverGender || '');
+            setEmail(data.driverEmail || '');
+            setCnic(data.driverCnicNumber || '');
+            setOldCnic(data.driverCnicNumber || '');
+            setOldEmail(data.driverEmail || '');
+            setOldPhone(data.driverPhone || '');
+         //   setPassword(data.); // Keeping password empty for security
+            setPhoneNumber(data.driverPhone || '');
+            setDateOfBirth(data.driverDOB ? data.driverDOB.split('T')[0] : '');
+            setRatings(data.rating || 0);
+            setVehicleBrand(data.brand || '');
+            setVehicleName(data.vehicleName || '');
+            setVehicleColor(data.vehicleColor || '');
+            setVehicleType(data.vehicleType || '');
+            setCarType(data.carType || '');
+            setVehicleProductionYear(data.vehicleProductionYear || '');
+            setLicenseNumber(data.licenseNumber || '');
+            setVehiclePhotos(data.vehiclePhotos || []);
+            setVehicleRegistrationFront(data.vehicleRegistrationFront || null);
+            setVehicleRegistrationBack(data.vehicleRegistrationBack || null);
+            setCnicFront(data.driverCnicFront || null);
+            setCnicBack(data.driverCnicBack || null);
+            setDriverPhoto(data.driverSelfie || null);}
+  
         } catch (error) {
           console.error('Failed to fetch driver:', error);
         }
@@ -141,132 +163,99 @@ const updateState = (key, value) => {
           console.error('Failed to fetch driver:', error);
         }
       };
-      const fetchVehicle = async () => {
-           const response = await fetch(`http://localhost:5000/vehicles/driver/${id}`, {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${token}`, // Add the token to the Authorization header
-              'Content-Type': 'application/json',
-            },
-          });        const data = await response.json();
-          console.log('Fetched Vehicle Data:', data);
-          
-          // Access the first item in the array (if there is any data)
-          if (data) {
-            console.log(data[0]);
-            setVehicle(data[0]); // Set vehicle state to the first object in the array
-          
-          } else {
-            setVehicle(null); // Handle case where no vehicle data is found
-          }
-         
-      };
+      
       
       
       fetchDriver();
       fetchAllDrivers();
-      fetchVehicle();
-      console.log("vehicle is"+vehicle)
-     
+      
 
     }
   }, [id]);
 
-   useEffect(()=>{
-    if(vehicle){
-    setVehicleBrand(vehicle.brand);
-    setVehicleColor(vehicle.vehicleColor);
-    setVehicleName(vehicle.vehicleName);
-
-    setVehicleType(vehicle.vehicleType);
-    setVehicleProductionYear(vehicle.vehicleProductionYear);
-    setLicenseNumber(vehicle.licenseNumber);
-    setCnicFront(vehicle.cnicFront);
-     setCnicBack(vehicle.cnicBack);
-setDriverPhoto(vehicle.driverPhoto);
-setVehicleRegistrationBack(vehicle.vehicleRegistrationBack);
-setVehicleRegistrationFront(vehicle.vehicleRegistrationFront);
- setVehiclePhotos(vehicle.vehiclePhotos);
     
- }
-   },vehicle)
-   
+    
    const handleSubmit = async (e) => {
     e.preventDefault();
     setError(''); // Clear previous error
      // Reset errors before starting validation
      setErrorMessages({
-      name: "",
-      gender: "",
-      email: "",
-      phoneNumber: "",
-      cnic: "",
-      dateOfBirth: "",
+      driverFirstName: "",
+      driverLastName: "",
+  
+      driverGender: "",
+      driverEmail: "",
+      driverPhone: "",
+      driverCnicNumber: "",
+      driverDOB: "",
       vehicleName: "",
       brand:"",
-    vehicleColor:"",
-    vehicleType:"",
+      vehicleColor:"",
+      vehicleType:"",
+      carType:"",
+    //  driverPassword:"",
       vehicleProductionYear: "",
       licenseNumber: "",
       vehiclePhotos : "",
-    vehicleRegistrationFront: "",
-   vehicleRegistrationBack: "",
-    cnicFront: "",
-  cnicBack: "",
-    driverPhoto: "",
+      vehicleRegistrationFront: "",
+     vehicleRegistrationBack: "",
+     driverCnicFront: "",
+     driverCnicBack: "",
+     driverSelfie: "",
     });
     let hasError = false;
+console.log("inside handel")
+if (driverEmail !== oldEmail && emails.includes(driverEmail)) {
+  setErrorMessages((prev) => ({ ...prev, driverEmail: "Email is already in use" }));
+  hasError = true;
+}
 
-    if(!email===driverEmail){
+if (driverPhone !== oldPhone && phoneNumbers.includes(driverPhone)) {
+  setErrorMessages((prev) => ({ ...prev, driverPhone: "Phone Number is already in use" }));
+  hasError = true;
+}
 
-    if (emails.includes(email)) {
-       
-         
-      setErrorMessages((prev) => ({ ...prev, email: "Email is already in use" }));
-      hasError = true;
-      
-    }}
-    if(!phoneNumber===driverPhoneNumber){
-    if (phoneNumbers.includes(phoneNumber)) {
-        
-      setErrorMessages((prev) => ({ ...prev, phoneNumber: "Phone Number is already in use" }));
-      hasError = true;
-    }
-  }
-  if(!cnic===driverCnic){
-    if (cnics.includes(cnic)) {
-      setErrorMessages((prev) => ({ ...prev, cnic: "CNIC is already in use" }));
-      hasError = true;
-    }
-  }
+if (driverCnicNumber !== oldCnic && cnics.includes(driverCnicNumber)) {
+  setErrorMessages((prev) => ({ ...prev, driverCnicNumber: "CNIC is already in use" }));
+  hasError = true;
+}
+
     // Validation logic for driver fields
-    if (!name.trim()) {
+    if (!driverFirstName.trim()) {
        
-      setErrorMessages((prev) => ({ ...prev, name: "Name is required" }));
+      setErrorMessages((prev) => ({ ...prev, driverFirstName: "First Name is required" }));
       hasError = true;
     }
-    if (!['Male', 'Female'].includes(gender)) {
-      setErrorMessages((prev) => ({ ...prev, gender: "Gender must be Male or Female" }));
+    if (!driverLastName.trim()) {
+       
+      setErrorMessages((prev) => ({ ...prev, driverLastName: "Last Name is required" }));
       hasError = true;
     }
-    if (!email.match(/^\S+@\S+\.\S+$/)|| (!email)) {
-      setErrorMessages((prev) => ({ ...prev, email: "Please provide a valid email address" }));
+    if (!['male', 'female'].includes(driverGender)) {
+      setErrorMessages((prev) => ({ ...prev, driverGender: "Gender must be Male or Female" }));
+      hasError = true;
+    }
+    if (!driverEmail.match(/^\S+@\S+\.\S+$/)|| (!driverEmail)) {
+      setErrorMessages((prev) => ({ ...prev, driverEmail: "Please provide a valid email address" }));
       hasError = true;
     }
     
-    if (!phoneNumber.match(/^((\+92)|0)(3[0-9]{2})[0-9]{7}$/)) {
-      setErrorMessages((prev) => ({ ...prev, phoneNumber: "Phone number must be a valid Pakistani number" }));
+    if (!driverPhone.match(/^((\+92)|0)(3[0-9]{2})[0-9]{7}$/)) {
+      setErrorMessages((prev) => ({ ...prev, driverPhone: "Phone number must be a valid Pakistani number" }));
       hasError = true;
     }
-    if (!cnic.match(/^\d{5}-\d{7}-\d{1}$/)) {
-      setErrorMessages((prev) => ({ ...prev, cnic: "CNIC must be in the format XXXXX-XXXXXXX-X" }));
+    if (!driverCnicNumber.match(/^\d{5}-\d{7}-\d{1}$/)) {
+      setErrorMessages((prev) => ({ ...prev, driverCnicNumber: "CNIC must be in the format XXXXX-XXXXXXX-X" }));
       hasError = true;
     }
-    if (!dateOfBirth) {
-      setErrorMessages((prev) => ({ ...prev, dateOfBirth: "Date of Birth is required" }));
+    if (!driverDOB) {
+      setErrorMessages((prev) => ({ ...prev, driverDOB: "Date of Birth is required" }));
       hasError = true;
     }
-
+    /*if(!driverPassword){
+      setErrorMessages((prev) => ({ ...prev, driverPassword: "Password is required" }));
+      hasError = true;
+    }*/
     // Validation logic for vehicle fields
     if (!vehicleName.trim()) {
       setErrorMessages((prev) => ({ ...prev, vehicleName: "Vehicle Name is required" }));
@@ -284,6 +273,10 @@ setVehicleRegistrationFront(vehicle.vehicleRegistrationFront);
       setErrorMessages((prev) => ({ ...prev, vehicleType: "Vehicle Type is required" }));
       hasError = true;
     }
+    if(!carType){
+      setErrorMessages((prev) => ({ ...prev, carType: "Car Type is required" }));
+      hasError = true;
+    }
     if (!licenseNumber.trim()) {
       setErrorMessages((prev) => ({ ...prev, licenseNumber: "License Number is required" }));
       hasError = true;
@@ -293,7 +286,7 @@ setVehicleRegistrationFront(vehicle.vehicleRegistrationFront);
       hasError = true;
      }
      
-     if (!vehiclePhotos) {
+     if (vehiclePhotos.length === 0) {
       setErrorMessages((prev) => ({
         ...prev,
         vehiclePhotos: 'Please upload at least one vehicle photo.',
@@ -308,40 +301,43 @@ setVehicleRegistrationFront(vehicle.vehicleRegistrationFront);
       setErrorMessages((prev) => ({ ...prev, vehicleRegistrationBack: "Please add Vehicle Registration Back Photo" }));
       hasError = true;
      }
-     if(!cnicFront){
-      setErrorMessages((prev) => ({ ...prev, cnicFront: "Please add CNIC Front Photo" }));
+     if(!driverCnicFront){
+      setErrorMessages((prev) => ({ ...prev, driverCnicFront: "Please add CNIC Front Photo" }));
       hasError = true;
      }
-     if(!cnicBack){
-      setErrorMessages((prev) => ({ ...prev, cnicBack: "Please add CNIC Back Photo" }));
+     if(!driverCnicBack){
+      setErrorMessages((prev) => ({ ...prev, driverCnicBack: "Please add CNIC Back Photo" }));
       hasError = true;
      }
-     if(!driverPhoto){
-      setErrorMessages((prev) => ({ ...prev, driverPhoto: "Please add Driver Photo" }));
+     if(!driverSelfie){
+      setErrorMessages((prev) => ({ ...prev, driverSelfie: "Please add Driver Photo" }));
       hasError = true;
      }
-      
+      console.log(hasError)
       if (hasError) return;
-
-
-    const newDriver = { name, gender, email, phoneNumber, cnic, dateOfBirth, ratings };
-   
     
-    const vehicleData = {
-      brand,
+
+    const newDriver = {  driverFirstName,
+      driverLastName, 
+      driverGender, 
+      driverEmail, 
+      driverPhone, 
+      driverCnicNumber, 
+      driverDOB, 
+      rating,
+      driverCnicFront,
+      driverCnicBack,
+      driverSelfie,
+      vehicleProductionYear,
+      vehicleType,
+      carType,
       vehicleName,
       vehicleColor,
-      vehicleType,
-      vehicleProductionYear,
       licenseNumber,
-      driverPhoto, // Already a URL
-      cnicFront,
-      cnicBack,
+      brand,
       vehicleRegistrationFront,
       vehicleRegistrationBack,
-      vehiclePhotos, // Should be an array of URLs
-      driverId: id, // Link vehicle to driver
-    };
+      vehiclePhotos};
 
        
     try {
@@ -364,49 +360,20 @@ setVehicleRegistrationFront(vehicle.vehicleRegistrationFront);
           }
         }
       );
-
+console.log("response came")
 
       // Handle response
       if (response.status === 200) {
         console.log('Driver updated successfully');
+        navigate('/drivers'); 
+
       }
     } catch (error) {
       console.error('Error saving data:', error);
       setError('Error saving data. Please try again.');
     }
 
-   try {
-      const token = localStorage.getItem('token');  // Or sessionStorage.getItem('token')
-        
-         if (!token) {
-          // If no token is found, redirect to the login page
-          navigate('/login');
-          return;
-        }
-     
-        const response = await axios.put(
-          `http://localhost:5000/vehicles/${vehicle._id}`, 
-          vehicleData,
-          {
-            headers: {
-              'Content-Type': 'application/json', // Important for FormData
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-      
-        if (response.status === 200) {
-          console.log('Vehicle updated successfully');
-          setDialogMessage('Driver updated successfully');
-          setDialogSeverity('success');
-          setDialogOpen(true);
-         
-        }
-      
-    } catch (error) {
-      console.error('Error saving data:', error);
-      setError('Error saving data. Please try again.');
-    }
+    
 
    };
    
@@ -530,540 +497,542 @@ setVehicleRegistrationFront(vehicle.vehicleRegistrationFront);
              {error && <Alert severity="error" sx={{ marginBottom: 2 }}>{error}</Alert>}
      
              <form onSubmit={handleSubmit}>
-               <Grid container spacing={3}>
-                 {/* Driver Details */}
-                 <Grid item xs={12} sm={6}>
-                   <Card sx={{ height: '100%' }}>
-                     <CardContent>
-                     <Typography variant="h6" component="div" align='center'  sx={{ fontWeight: 'bold' }}  // Makes the text bold
-      gutterBottom>
-           Driver Details
-         </Typography>
-                       <TextField
-                         label="Name"
-                         variant="outlined"
-                         fullWidth
-                         value={name}
-                         onChange={(e) => setName(e.target.value)}
-                         margin="normal"
-                         error={!!errorMessages.name}
-                         helperText={errorMessages.name}
-     
-                       />
-                       <TextField
-                         label="Gender"
-                         variant="outlined"
-                         fullWidth
-                         select
-                         value={gender}
-                         onChange={(e) => setGender(e.target.value)}
-                         margin="normal"
-                         error={!!errorMessages.gender}
-                         helperText={errorMessages.gender}
-                       >
-                         <MenuItem value="Male">Male</MenuItem>
-                         <MenuItem value="Female">Female</MenuItem>
-                       </TextField>
-                       <TextField
-                         label="Email"
-                         variant="outlined"
-                         type="email"
-                         fullWidth
-                         value={email}
-                         onChange={(e) => setEmail(e.target.value)}
-                         error={!!errorMessages.email}
-                         helperText={errorMessages.email}
-                         margin="normal"
-                       />
-                       <TextField
-                         label="Phone Number"
-                         variant="outlined"
-                         type="tel"
-                         fullWidth
-                         value={phoneNumber}
-                         onChange={(e) => {
-                           const input = e.target.value;
-                           
-                           // Only modify if it's a valid number and doesn't start with +92
-                           if (!input.startsWith("+92") && input) {
-                             setPhoneNumber(`+92${input.replace(/^0/, "")}`); // Prepend +92 and remove leading 0 if present
-                           } else {
-                             setPhoneNumber(input); // Otherwise, just set the value as is
-                           }
-                         }}                    margin="normal"
-                         error={!!errorMessages.phoneNumber}
-                         helperText={errorMessages.phoneNumber}
-                       />
-                         
-                       <TextField
-                         label="CNIC"
-                         variant="outlined"
-                         fullWidth
-                         value={cnic}
-                         onChange={handleCnicChange}
-                         margin="normal"
-                         error={!!errorMessages.cnic}
-                         helperText={errorMessages.cnic}
-                       />
-                       <TextField
-                         label="Date of Birth"
-                         variant="outlined"
-                         type="date"
-                         fullWidth
-                         value={dateOfBirth}
-                         onChange={(e) => setDateOfBirth(e.target.value)}
-                         margin="normal"
-                         error={!!errorMessages.dateOfBirth}
-                         helperText={errorMessages.dateOfBirth}
-                         InputLabelProps={{ shrink: true }}
-                       />
-                        {/* Image Uploads */}
-                        <Box sx={{ marginTop: 2 }}>
-                        <Typography variant="h6">Driver Photo </Typography>
-                        <div className="App">
-         <div id="FileUpload">
-           <div className="wrapper">
-             <div
-               className={`upload ${dragOver ? 'dragging' : ''}`}
-               onDragOver={handleDragOver}
-               onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, setDriverPhoto)} // Pass a different updater
-                
-             >
-               <p>
-                 Drag driver photo here or{' '}
-                </p>
-               <input
-                 type="file"
-                 accept="image/*"
-                     onChange={(e) => handleFileChange(e, setDriverPhoto)}
-     
-                 style={{ display: 'none' }}
-                 id="driver-photo-upload"
-               />
-               <label htmlFor="driver-photo-upload" className="upload__button">
-                 Browse
-               </label>
-             </div>
-     
-             {driverPhoto && (
-                  <Box sx={{ marginTop: 1 }}>
-                   
-                   <img 
-           src={typeof driverPhoto === "string" ? driverPhoto : URL.createObjectURL(driverPhoto)} 
-           alt="Driver Photo Preview" 
-           width="100%" 
-         />            </Box>
-              
-                    )}
-                    {/* Displaying error if any */}
-             {errorMessages.driverPhoto && (
-               <Typography variant="body2" color="error" sx={{ marginTop: 1 }}>
-                 {errorMessages.driverPhoto}
-               </Typography>
-             )}
-           </div>
-         </div>
-       </div>
-       </Box>
-     
-       <Box sx={{ marginTop: 2 }}>
-       <Typography variant="h6">Cnic Photos</Typography>
-       <div className="App">
-         <div id="FileUpload">
-           <div className="wrapper">
-             <div
-               className={`upload ${dragOver ? 'dragging' : ''}`}
-               onDragOver={handleDragOver}
-               onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, setCnicFront)} // Pass a different updater
-     
-             >
-               <p>
-                 Drag Cnic Front photo here or{' '}
-                </p>
-               <input
-                 type="file"
-                 accept="image/*"
-                    onChange={(e) => handleFileChange(e, setCnicFront)}
-     
-                 style={{ display: 'none' }}
-                 id="cnicfront-photo-upload"
-               />
-               <label htmlFor="cnicfront-photo-upload" className="upload__button">
-                 Browse
-               </label>
-             </div>
-     
-             {cnicFront && (
-                  <Box sx={{ marginTop: 1 }}>
-                    <img 
-           src={typeof cnicFront === "string" ? cnicFront : URL.createObjectURL(cnicFront)} 
-           alt="cnicFront Photo Preview" 
-           width="100%" 
-         />
-                  </Box>
-              
-                    )}
-                      {errorMessages.cnicFront && (
-               <Typography variant="body2" color="error" sx={{ marginTop: 1 }}>
-                 {errorMessages.cnicFront}
-               </Typography>
-             )}
-           </div>
-         </div>
-       </div>
-     
-     
-       <div className="App">
-         <div id="FileUpload">
-           <div className="wrapper">
-             <div
-               className={`upload ${dragOver ? 'dragging' : ''}`}
-               onDragOver={handleDragOver}
-               onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, setCnicBack)} // Pass a different updater
-     
-             >
-               <p>
-                 Drag Cnic Back photo here or
-                </p>
-               <input
-                 type="file"
-                 accept="image/*"
-                    onChange={(e) => handleFileChange(e, setCnicBack)}
-     
-                 style={{ display: 'none' }}
-                 id="cnicback-photo-upload"
-               />
-               <label htmlFor="cnicback-photo-upload" className="upload__button">
-                 Browse
-               </label>
-             </div>
-     
-             {cnicBack && (
-                  <Box sx={{ marginTop: 1 }}>
-                           <img 
-           src={typeof cnicBack === "string" ? cnicBack : URL.createObjectURL(cnicBack)} 
-           alt="cnicBack Photo Preview" 
-           width="100%" 
-         />
-                  </Box>
-              
-                    )}
-                      {errorMessages.cnicBack && (
-               <Typography variant="body2" color="error" sx={{ marginTop: 1 }}>
-                 {errorMessages.cnicBack}
-               </Typography>
-             )}
-           </div>
-         </div>
-       </div>
-       </Box>
-               
-                     </CardContent>
-                   </Card>
-                 </Grid>
-     
-                 {/* Vehicle Details */}
-                 <Grid item xs={12} sm={6}>
-                   <Card sx={{ height: '100%' }}>
-                     <CardContent>
-                     <Typography variant="h6" component="div" align='center'   sx={{ fontWeight: 'bold' }}  // Makes the text bold
-      gutterBottom>
-           Vehicle Details
-         </Typography>
-                       <TextField
-                         label="Vehicle Brand"
-                         variant="outlined"
-                         fullWidth
-                         value={brand}
-                         onChange={(e) => setVehicleBrand(e.target.value)}
-                         margin="normal"
-                         error={!!errorMessages.brand}
-                         helperText={errorMessages.brand}
-                       />
-                       <TextField
-                         label="Vehicle Name"
-                         variant="outlined"
-                         fullWidth
-                         value={vehicleName}
-                         onChange={(e) => setVehicleName(e.target.value)}
-                         margin="normal"
-                         error={!!errorMessages.vehicleName}
-                         helperText={errorMessages.vehicleName}
-                       />
-                       <TextField
-                         label="Vehicle Color"
-                         variant="outlined"
-                         fullWidth
-                         value={vehicleColor}
-                         onChange={(e) => setVehicleColor(e.target.value)}
-                         margin="normal"
-                         error={!!errorMessages.vehicleColor}
-                         helperText={errorMessages.vehicleColor}
-                       />
+                      <Grid container spacing={3}>
+                        {/* Driver Details */}
+                        <Grid item xs={12} sm={6}>
+                          <Card sx={{ height: '100%' }}>
+                            <CardContent>
+                            <Typography variant="h6" component="div" align='center'  sx={{ fontWeight: 'bold' }}  // Makes the text bold
+             gutterBottom>
+                  Driver Details
+                </Typography>
+                              <TextField
+                                label="First Name"
+                                variant="outlined"
+                                fullWidth
+                                value={driverFirstName}
+                                onChange={(e) => setFirstName(e.target.value)}
+                                margin="normal"
+                                error={!!errorMessages.driverFirstName}
+                                helperText={errorMessages.driverFirstName}
+            
+                              />
+                              <TextField
+                                label="Last Name"
+                                variant="outlined"
+                                fullWidth
+                                value={driverLastName}
+                                onChange={(e) => setLastName(e.target.value)}
+                                margin="normal"
+                                error={!!errorMessages.driverLastName}
+                                helperText={errorMessages.driverLastName}
+            
+                              />
+                              <TextField
+                                label="Gender"
+                                variant="outlined"
+                                fullWidth
+                                select
+                                value={driverGender}
+                                onChange={(e) => setGender(e.target.value)}
+                                margin="normal"
+                                error={!!errorMessages.driverGender}
+                                helperText={errorMessages.driverGender}
+                              >
+                                <MenuItem value="male">Male</MenuItem>
+                                <MenuItem value="female">Female</MenuItem>
+                              </TextField>
+                              <TextField
+                                label="Email"
+                                variant="outlined"
+                                type="email"
+                                fullWidth
+                                value={driverEmail}
+                                onChange={(e) => setEmail(e.target.value)}
+                                error={!!errorMessages.driverEmail}
+                                helperText={errorMessages.driverEmail}
+                                margin="normal"
+                              />
+                              <TextField
+                                label="Phone Number"
+                                variant="outlined"
+                                type="tel"
+                                fullWidth
+                                value={driverPhone}
+                                onChange={(e) => {
+                                  const input = e.target.value;
+                                  
+                                  // Only modify if it's a valid number and doesn't start with +92
+                                  if (!input.startsWith("+92") && input) {
+                                    setPhoneNumber(`+92${input.replace(/^0/, "")}`); // Prepend +92 and remove leading 0 if present
+                                  } else {
+                                    setPhoneNumber(input); // Otherwise, just set the value as is
+                                  }
+                                }}                    margin="normal"
+                                error={!!errorMessages.driverPhone}
+                                helperText={errorMessages.driverPhone}
+                              />
+                              {/* <TextField
+                                        label="Password"
+                                        name="password"
+                                        type="password"
+                                        value={driverPassword}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        fullWidth
+                                      />*/} 
+                              <TextField
+                                label="CNIC"
+                                variant="outlined"
+                                fullWidth
+                                value={driverCnicNumber}
+                                onChange={handleCnicChange}
+                                margin="normal"
+                                error={!!errorMessages.driverCnicNumber}
+                                helperText={errorMessages.driverCnicNumber}
+                              />
+                              <TextField
+                                label="Date of Birth"
+                                variant="outlined"
+                                type="date"
+                                fullWidth
+                                value={driverDOB}
+                                onChange={(e) => setDateOfBirth(e.target.value)}
+                                margin="normal"
+                                error={!!errorMessages.driverDOB}
+                                helperText={errorMessages.driverDOB}
+                                InputLabelProps={{ shrink: true }}
+                              />
+                               {/* Image Uploads */}
+                               <Box sx={{ marginTop: 2 }}>
+                               <Typography variant="h6">Driver Photo </Typography>
+                               <div className="App">
+                <div id="FileUpload">
+                  <div className="wrapper">
+                    <div
+                      className={`upload ${dragOver ? 'dragging' : ''}`}
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                       onDrop={(e) => handleDrop(e, setDriverPhoto)} // Pass a different updater
                        
-                       <TextField
-                         label="Vehicle Type"
-                         variant="outlined"
-                         fullWidth
-                         select
-                         value={vehicleType}
-                         onChange={(e) => setVehicleType(e.target.value)}
-                         margin="normal"
-                         error={!!errorMessages.vehicleType}
-                         helperText={errorMessages.vehicleType}
-                       >
-      
-                         <MenuItem value="AC Car">AC Car</MenuItem>
-                         <MenuItem value="Economy Car">Economy
-                          Car</MenuItem>
-                         <MenuItem value="Rickshaw">Rickshaw</MenuItem>
-                         <MenuItem value="Bike">Bike</MenuItem>
-                       </TextField>
-                       <TextField
-           label="Vehicle Production Year"
-           type="outlined"
-           fullWidth
-           value={vehicleProductionYear}
-           onChange={(e) => setVehicleProductionYear(e.target.value)}
-            
-     
-            margin="normal"
-           inputProps={{
-             min: 1900,
-             max: currentYear,
-           }}
-           helperText={`Year must be between 1900 and ${currentYear}`}
-           error={!!errorMessages.vehicleProductionYear}
-          />
-                       <TextField
-                         label="License Number"
-                         variant="outlined"
-                         fullWidth
-                         value={licenseNumber}
-                         onChange={(e) => setLicenseNumber(e.target.value)}
-                         margin="normal"
-                         error={!!errorMessages.licenseNumber}
-                         helperText={errorMessages.licenseNumber}
-                       />
-                        <Box sx={{ marginTop: 2 }}>
-                   <Typography variant="h6">Vehicle Registration Photos</Typography>
-                   <div className="App">
-         <div id="FileUpload">
-           <div className="wrapper">
-             <div
-               className={`upload ${dragOver ? 'dragging' : ''}`}
-               onDragOver={handleDragOver}
-               onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, setVehicleRegistrationFront)} // Pass a different updater
-     
-             >
-               <p>
-                 Drag Vehicle Registration Front photo here or
-                </p>
-               <input
-                 type="file"
-                 accept="image/*"
-                    onChange={(e) => handleFileChange(e, setVehicleRegistrationFront)}
-     
-                 style={{ display: 'none' }}
-                 id="registrationFront-photo-upload"
-               />
-               <label htmlFor="registrationFront-photo-upload" className="upload__button">
-                 Browse
-               </label>
-             </div>
-     
-             {vehicleRegistrationFront && (
-                  <Box sx={{ marginTop: 1 }}>
-                            <img 
-           src={typeof vehicleRegistrationFront === "string" ? vehicleRegistrationFront : URL.createObjectURL(vehicleRegistrationFront)} 
-           alt="vehicleRegistrationFront Photo Preview" 
-           width="100%" 
-         />
-                  </Box>
-              
-                    )}
-                      {errorMessages.vehicleRegistrationFront && (
-               <Typography variant="body2" color="error" sx={{ marginTop: 1 }}>
-                 {errorMessages.vehicleRegistrationFront}
-               </Typography>
-             )}
-           </div>
-         </div>
-       </div>
-      
-                   <div className="App">
-         <div id="FileUpload">
-           <div className="wrapper">
-             <div
-               className={`upload ${dragOver ? 'dragging' : ''}`}
-               onDragOver={handleDragOver}
-               onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, setVehicleRegistrationBack)} // Pass a different updater
-     
-             >
-               <p>
-                 Drag Vehicle Registration Back photo here or
-                </p>
-               <input
-                 type="file"
-                 accept="image/*"
-                    onChange={(e) => handleFileChange(e, setVehicleRegistrationBack)}
-     
-                 style={{ display: 'none' }}
-                 id="registrationBack-photo-upload"
-               />
-               <label htmlFor="registrationBack-photo-upload" className="upload__button">
-                 Browse
-               </label>
-             </div>
-     
-             {vehicleRegistrationBack && (
-                  <Box sx={{ marginTop: 1 }}>
-                                   <img 
-           src={typeof vehicleRegistrationBack === "string" ? vehicleRegistrationBack : URL.createObjectURL(vehicleRegistrationBack)} 
-           alt="vehicleRegistrationBack Photo Preview" 
-           width="100%" 
-         />
-                  </Box>
-              
-                    )}
-                      {errorMessages.vehicleRegistrationBack && (
-               <Typography variant="body2" color="error" sx={{ marginTop: 1 }}>
-                 {errorMessages.vehicleRegistrationBack}
-               </Typography>
-             )}
-           </div>
-         </div>
-       </div>
-       </Box>
-     
-                 
-                     </CardContent>
-                   </Card>
-                 </Grid>
-               </Grid>
-     
-                
-                     
-              
-     
-             {/* Vehicle Photos */}
-             <Card sx={{ marginBottom: 2 }}>
-               <CardContent>
-                 <Typography variant="h6">Vehicle Photos</Typography>
-               
-                 <div className="App">
-       <div id="FileUpload">
-         <div className="wrapper">
-           <div
-             className={`upload ${dragOver ? 'dragging' : ''}`}
-             onDragOver={handleDragOver}
-             onDragLeave={handleDragLeave}
-             onDrop={(e) => handleDrop(e, setVehiclePhotos)} // Handle drop for multiple photos
-           >
-             <p>Drag Vehicle Photos here or</p>
-             <input
-               type="file"
-               accept="image/*"
-               multiple
-               onChange={handleVehiclePhotosChange}
-     
-               style={{ display: 'none' }}
-               id="vehicle-photos-upload"
-             />
-             <label htmlFor="vehicle-photos-upload" className="upload__button">
-               Browse
-             </label>
-           </div>
-            
-     
-           {vehiclePhotos.length > 0 && (
-             <Box sx={{ marginTop: 1 }}>
-               <Typography variant="body2">Selected Photos:</Typography>
-               <ul style={{ display: 'flex', padding: 0, listStyleType: 'none', flexWrap: 'wrap' }}>
-                 {vehiclePhotos.map((photo, index) => (
-                   <li key={index} style={{ marginRight: 10, marginBottom: 10 }}>
-                     <img 
-       src={typeof photo === "string" ? photo : URL.createObjectURL(photo)} 
-       alt={`Vehicle Photo ${index + 1}`} 
-       width="250px"
-                       style={{ borderRadius: '8px', marginBottom: 10 }}
-                     />
-                     <button
-                      onClick={() => removePhoto(index)} // Remove photo on click
-                      style={{
-                        position: 'absolute',
-                        top: '5px',
-                        right: '5px',
-                        background: 'transparent',
-                        border: 'none',
-                        color: 'red',
-                        fontSize: '24px',
-                        cursor: 'pointer',
-                      }}
                     >
-                      ×
-                    </button>
-                   </li>
-                 ))}
-               </ul>
-             </Box>
-           )}
-                
-         </div>
-       </div>
-     </div>
-     {errorMessages.vehiclePhotos && (
-               <Typography variant="body2" color="error" sx={{ marginTop: 1 }}>
-                 {errorMessages.vehiclePhotos}
-               </Typography>
-             )}
-                 
-               </CardContent>
-             </Card>
-           
-
-<Box sx={{ display: 'flex', justifyContent: 'center' }}>
-  <Button
-    variant="contained"
-    color="primary"
-    type="submit"
-    sx={{
-      width: '250px', // Fixed width
-      padding: '10px 20px', // Add padding
-    }}
-  >
-    Update Driver
-  </Button>
-</Box>
-
-
-      </form>
-       {/* Dialog for success or error message */}
-       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
-        <DialogTitle>{dialogSeverity === 'success' ? 'Success' : 'Error'}</DialogTitle>
-        <DialogContent>
-          <Typography variant="body1">{dialogMessage}</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => {
-            setDialogOpen(false);
-            navigate("/drivers");
-
-          }} color="primary">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Paper>
-  </Box>
-);
-};
-
-
-export default EditDriver;
-  
+                      <p>
+                        Drag driver photo here or{' '}
+                       </p>
+                      <input
+                        type="file"
+                        accept="image/*"
+                            onChange={(e) => handleFileChange(e, setDriverPhoto)}
+            
+                        style={{ display: 'none' }}
+                        id="driver-photo-upload"
+                      />
+                      <label htmlFor="driver-photo-upload" className="upload__button">
+                        Browse
+                      </label>
+                    </div>
+            
+                    {driverSelfie && (
+                         <Box sx={{ marginTop: 1 }}>
+                          
+                          <img 
+                  src={typeof driverSelfie === "string" ? driverSelfie : URL.createObjectURL(driverSelfie)} 
+                  alt="Driver Photo Preview" 
+                  width="100%" 
+                />            </Box>
+                     
+                           )}
+                           {/* Displaying error if any */}
+                    {errorMessages.driverSelfie && (
+                      <Typography variant="body2" color="error" sx={{ marginTop: 1 }}>
+                        {errorMessages.driverSelfie}
+                      </Typography>
+                    )}
+                  </div>
+                </div>
+              </div>
+              </Box>
+            
+              <Box sx={{ marginTop: 2 }}>
+              <Typography variant="h6">Cnic Photos</Typography>
+              <div className="App">
+                <div id="FileUpload">
+                  <div className="wrapper">
+                    <div
+                      className={`upload ${dragOver ? 'dragging' : ''}`}
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                       onDrop={(e) => handleDrop(e, setCnicFront)} // Pass a different updater
+            
+                    >
+                      <p>
+                        Drag Cnic Front photo here or{' '}
+                       </p>
+                      <input
+                        type="file"
+                        accept="image/*"
+                           onChange={(e) => handleFileChange(e, setCnicFront)}
+            
+                        style={{ display: 'none' }}
+                        id="cnicfront-photo-upload"
+                      />
+                      <label htmlFor="cnicfront-photo-upload" className="upload__button">
+                        Browse
+                      </label>
+                    </div>
+            
+                    {driverCnicFront && (
+                         <Box sx={{ marginTop: 1 }}>
+                           <img 
+                  src={typeof driverCnicFront === "string" ? driverCnicFront : URL.createObjectURL(driverCnicFront)} 
+                  alt="cnicFront Photo Preview" 
+                  width="100%" 
+                />
+                         </Box>
+                     
+                           )}
+                             {errorMessages.driverCnicFront && (
+                      <Typography variant="body2" color="error" sx={{ marginTop: 1 }}>
+                        {errorMessages.driverCnicFront}
+                      </Typography>
+                    )}
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div className="App">
+                <div id="FileUpload">
+                  <div className="wrapper">
+                    <div
+                      className={`upload ${dragOver ? 'dragging' : ''}`}
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                       onDrop={(e) => handleDrop(e, setCnicBack)} // Pass a different updater
+            
+                    >
+                      <p>
+                        Drag Cnic Back photo here or
+                       </p>
+                      <input
+                        type="file"
+                        accept="image/*"
+                           onChange={(e) => handleFileChange(e, setCnicBack)}
+            
+                        style={{ display: 'none' }}
+                        id="cnicback-photo-upload"
+                      />
+                      <label htmlFor="cnicback-photo-upload" className="upload__button">
+                        Browse
+                      </label>
+                    </div>
+            
+                    {driverCnicBack && (
+                         <Box sx={{ marginTop: 1 }}>
+                                  <img 
+                  src={typeof driverCnicBack === "string" ? driverCnicBack : URL.createObjectURL(driverCnicBack)} 
+                  alt="cnicBack Photo Preview" 
+                  width="100%" 
+                />
+                         </Box>
+                     
+                           )}
+                             {errorMessages.driverCnicBack && (
+                      <Typography variant="body2" color="error" sx={{ marginTop: 1 }}>
+                        {errorMessages.driverCnicBack}
+                      </Typography>
+                    )}
+                  </div>
+                </div>
+              </div>
+              </Box>
+                      
+                            </CardContent>
+                          </Card>
+                        </Grid>
+            
+                        {/* Vehicle Details */}
+                        <Grid item xs={12} sm={6}>
+                          <Card sx={{ height: '100%' }}>
+                            <CardContent>
+                            <Typography variant="h6" component="div" align='center'   sx={{ fontWeight: 'bold' }}  // Makes the text bold
+             gutterBottom>
+                  Vehicle Details
+                </Typography>
+                              <TextField
+                                label="Vehicle Brand"
+                                variant="outlined"
+                                fullWidth
+                                value={brand}
+                                onChange={(e) => setVehicleBrand(e.target.value)}
+                                margin="normal"
+                                error={!!errorMessages.brand}
+                                helperText={errorMessages.brand}
+                              />
+                              <TextField
+                                label="Vehicle Name"
+                                variant="outlined"
+                                fullWidth
+                                value={vehicleName}
+                                onChange={(e) => setVehicleName(e.target.value)}
+                                margin="normal"
+                                error={!!errorMessages.vehicleName}
+                                helperText={errorMessages.vehicleName}
+                              />
+                              <TextField
+                                label="Vehicle Color"
+                                variant="outlined"
+                                fullWidth
+                                value={vehicleColor}
+                                onChange={(e) => setVehicleColor(e.target.value)}
+                                margin="normal"
+                                error={!!errorMessages.vehicleColor}
+                                helperText={errorMessages.vehicleColor}
+                              />
+                              
+                              <TextField
+                                label="Vehicle Type"
+                                variant="outlined"
+                                fullWidth
+                                select
+                                value={vehicleType}
+                                onChange={(e) => setVehicleType(e.target.value)}
+                                margin="normal"
+                                error={!!errorMessages.vehicleType}
+                                helperText={errorMessages.vehicleType}
+                              >
+             
+                                <MenuItem value="car">Car</MenuItem>
+                                <MenuItem value="bike">Bike</MenuItem>
+                                
+                              </TextField>
+                               <TextField
+                                label="Car Type"
+                                variant="outlined"
+                                fullWidth
+                                select
+                                value={carType}
+                                onChange={(e) => setCarType(e.target.value)}
+                                margin="normal"
+                                error={!!errorMessages.carType}
+                                helperText={errorMessages.carType}
+                              >
+             
+                                <MenuItem value="AC Car">AC Car</MenuItem>
+                                <MenuItem value="Economy Car">Economy
+                                 Car</MenuItem>
+                                <MenuItem value="Rickshaw">Rickshaw</MenuItem>
+                                <MenuItem value="Bike">Bike</MenuItem>
+                              </TextField>
+                              <TextField
+                  label="Vehicle Production Year"
+                  type="outlined"
+                  fullWidth
+                  value={vehicleProductionYear}
+                  onChange={(e) => setVehicleProductionYear(e.target.value)}
+                   
+            
+                   margin="normal"
+                  inputProps={{
+                    min: 1900,
+                    max: currentYear,
+                  }}
+                  helperText={`Year must be between 1900 and ${currentYear}`}
+                  error={!!errorMessages.vehicleProductionYear}
+                 />
+                              <TextField
+                                label="License Number"
+                                variant="outlined"
+                                fullWidth
+                                value={licenseNumber}
+                                onChange={(e) => setLicenseNumber(e.target.value)}
+                                margin="normal"
+                                error={!!errorMessages.licenseNumber}
+                                helperText={errorMessages.licenseNumber}
+                              />
+                               <Box sx={{ marginTop: 2 }}>
+                          <Typography variant="h6">Vehicle Registration Photos</Typography>
+                          <div className="App">
+                <div id="FileUpload">
+                  <div className="wrapper">
+                    <div
+                      className={`upload ${dragOver ? 'dragging' : ''}`}
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                       onDrop={(e) => handleDrop(e, setVehicleRegistrationFront)} // Pass a different updater
+            
+                    >
+                      <p>
+                        Drag Vehicle Registration Front photo here or
+                       </p>
+                      <input
+                        type="file"
+                        accept="image/*"
+                           onChange={(e) => handleFileChange(e, setVehicleRegistrationFront)}
+            
+                        style={{ display: 'none' }}
+                        id="registrationFront-photo-upload"
+                      />
+                      <label htmlFor="registrationFront-photo-upload" className="upload__button">
+                        Browse
+                      </label>
+                    </div>
+            
+                    {vehicleRegistrationFront && (
+                         <Box sx={{ marginTop: 1 }}>
+                                   <img 
+                  src={typeof vehicleRegistrationFront === "string" ? vehicleRegistrationFront : URL.createObjectURL(vehicleRegistrationFront)} 
+                  alt="vehicleRegistrationFront Photo Preview" 
+                  width="100%" 
+                />
+                         </Box>
+                     
+                           )}
+                             {errorMessages.vehicleRegistrationFront && (
+                      <Typography variant="body2" color="error" sx={{ marginTop: 1 }}>
+                        {errorMessages.vehicleRegistrationFront}
+                      </Typography>
+                    )}
+                  </div>
+                </div>
+              </div>
+             
+                          <div className="App">
+                <div id="FileUpload">
+                  <div className="wrapper">
+                    <div
+                      className={`upload ${dragOver ? 'dragging' : ''}`}
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                       onDrop={(e) => handleDrop(e, setVehicleRegistrationBack)} // Pass a different updater
+            
+                    >
+                      <p>
+                        Drag Vehicle Registration Back photo here or
+                       </p>
+                      <input
+                        type="file"
+                        accept="image/*"
+                           onChange={(e) => handleFileChange(e, setVehicleRegistrationBack)}
+            
+                        style={{ display: 'none' }}
+                        id="registrationBack-photo-upload"
+                      />
+                      <label htmlFor="registrationBack-photo-upload" className="upload__button">
+                        Browse
+                      </label>
+                    </div>
+            
+                    {vehicleRegistrationBack && (
+                         <Box sx={{ marginTop: 1 }}>
+                                          <img 
+                  src={typeof vehicleRegistrationBack === "string" ? vehicleRegistrationBack : URL.createObjectURL(vehicleRegistrationBack)} 
+                  alt="vehicleRegistrationBack Photo Preview" 
+                  width="100%" 
+                />
+                         </Box>
+                     
+                           )}
+                             {errorMessages.vehicleRegistrationBack && (
+                      <Typography variant="body2" color="error" sx={{ marginTop: 1 }}>
+                        {errorMessages.vehicleRegistrationBack}
+                      </Typography>
+                    )}
+                  </div>
+                </div>
+              </div>
+              </Box>
+            
+                        
+                            </CardContent>
+                          </Card>
+                        </Grid>
+                      </Grid>
+            
+                       
+                            
+                     
+            
+                    {/* Vehicle Photos */}
+                    <Card sx={{ marginBottom: 2 }}>
+                      <CardContent>
+                        <Typography variant="h6">Vehicle Photos</Typography>
+                      
+                        <div className="App">
+              <div id="FileUpload">
+                <div className="wrapper">
+                  <div
+                    className={`upload ${dragOver ? 'dragging' : ''}`}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={(e) => handleDrop(e, setVehiclePhotos)} // Handle drop for multiple photos
+                  >
+                    <p>Drag Vehicle Photos here or</p>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleVehiclePhotosChange}
+            
+                      style={{ display: 'none' }}
+                      id="vehicle-photos-upload"
+                    />
+                    <label htmlFor="vehicle-photos-upload" className="upload__button">
+                      Browse
+                    </label>
+                  </div>
+                   
+            
+                  {vehiclePhotos.length > 0 && (
+                    <Box sx={{ marginTop: 1 }}>
+                      <Typography variant="body2">Selected Photos:</Typography>
+                      <ul style={{ display: 'flex', padding: 0, listStyleType: 'none', flexWrap: 'wrap' }}>
+                        {vehiclePhotos.map((photo, index) => (
+                          <li key={index} style={{ marginRight: 10, marginBottom: 10 }}>
+                            <img 
+              src={typeof photo === "string" ? photo : URL.createObjectURL(photo)} 
+              alt={`Vehicle Photo ${index + 1}`} 
+              width="250px"
+                              style={{ borderRadius: '8px', marginBottom: 10 }}
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                    </Box>
+                  )}
+                       
+                </div>
+              </div>
+            </div>
+            {errorMessages.vehiclePhotos && (
+                      <Typography variant="body2" color="error" sx={{ marginTop: 1 }}>
+                        {errorMessages.vehiclePhotos}
+                      </Typography>
+                    )}
+                        
+                      </CardContent>
+                    </Card>
+                  
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+              <Button 
+                variant="contained" 
+                color="primary" 
+                type="submit"
+                sx={{ 
+                  width: '250px',  // Fixed width
+                  padding: '10px 20px',  // Add padding
+                }}
+              >
+                Update Driver
+              </Button>
+            </Box>
+            
+            
+                  </form>
+                </Paper>
+              </Box>
+            );
+            };
+            
+             
+            export default EditDriver;
+              

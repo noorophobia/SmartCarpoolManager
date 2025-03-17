@@ -120,7 +120,7 @@ router.post('/drivers', verifyToken, async (req, res) => {
       vehicleRegisterationBack,
       vehiclePhotos
     } = req.body;
-    
+    console.log(req.body)
     if (!driverDOB) {
       return res.status(400).json({ message: 'Date of Birth is required.' });
     }
@@ -232,7 +232,7 @@ router.put('/drivers/:id', verifyToken, async (req, res) => {
       ...(vehicleRegisterationBack && { vehicleRegisterationBack }),
       ...(vehiclePhotos && { vehiclePhotos }),
     };
-
+console.log("update "+req.body)
     // 🔹 Update the driver in the database
     const driver = await Driver.findByIdAndUpdate(id, updateFields, { new: true });
 

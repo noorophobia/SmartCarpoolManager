@@ -4,26 +4,28 @@ import { TextField, Button, MenuItem, Paper, Box, Typography, Alert, Grid, Card,
 import '../../styles/addDriver.css';
 import axios from 'axios';
 const AddDriver = () => {
-  const [name, setName] = useState('');
-  const [gender, setGender] = useState('');
-   const [email, setEmail] = useState('');
-   const [cnic, setCnic] = useState('');
-   const [password, setPassword] = useState('');
-   const [phoneNumber, setPhoneNumber] = useState('');
-  const [dateOfBirth, setDateOfBirth] = useState('');
-  const [ratings, setRatings] = useState(0);
+  const [driverFirstName, setFirstName] = useState('');
+  const [driverLastName, setLastName] = useState('');
+  const [driverGender, setGender] = useState('');
+   const [driverEmail, setEmail] = useState('');
+   const [driverCnicNumber, setCnic] = useState('');
+   const [driverPassword, setPassword] = useState('');
+   const [driverPhone, setPhoneNumber] = useState('');
+  const [driverDOB, setDateOfBirth] = useState('');
+  const [rating, setRatings] = useState(0);
   const [brand, setVehicleBrand] = useState('');
   const [vehicleName, setVehicleName] = useState('');
   const [vehicleColor, setVehicleColor] = useState('');
-   const [vehicleType, setVehicleType] = useState('');
+  const [vehicleType, setVehicleType] = useState('');
+  const [carType, setCarType] = useState('');
   const [vehicleProductionYear, setVehicleProductionYear] = useState('');
   const [licenseNumber, setLicenseNumber] = useState('');
   const [vehiclePhotos, setVehiclePhotos] = useState([]);
   const [vehicleRegistrationFront, setVehicleRegistrationFront] = useState(null);
   const [vehicleRegistrationBack, setVehicleRegistrationBack] = useState(null);
-  const [cnicFront, setCnicFront] = useState(null);
-  const [cnicBack, setCnicBack] = useState(null);
-  const [driverPhoto, setDriverPhoto] = useState(null);
+  const [driverCnicFront, setCnicFront] = useState(null);
+  const [driverCnicBack, setCnicBack] = useState(null);
+  const [driverSelfie, setDriverPhoto] = useState(null);
   const [error, setError] = useState('');
   const [dragOver, setDragOver] = useState(false);
   const [emails,setEmails]=useState("")
@@ -31,25 +33,28 @@ const AddDriver = () => {
   const [cnics,setCnics]=useState("")
   const navigate = useNavigate();
   const [errorMessages, setErrorMessages] = useState({
-    name: "",
-    gender: "",
-    email: "",
-    phoneNumber: "",
-    cnic: "",
-    dateOfBirth: "",
+    driverFirstName: "",
+    driverLastName: "",
+
+    driverGender: "",
+    driverEmail: "",
+    driverPhone: "",
+    driverCnicNumber: "",
+    driverDOB: "",
     vehicleName: "",
     brand:"",
     vehicleColor:"",
     vehicleType:"",
-password:"",
+    carType:"",
+    driverPassword:"",
     vehicleProductionYear: "",
     licenseNumber: "",
     vehiclePhotos : "",
     vehicleRegistrationFront: "",
    vehicleRegistrationBack: "",
-    cnicFront: "",
-  cnicBack: "",
-    driverPhoto: "",
+   driverCnicFront: "",
+   driverCnicBack: "",
+   driverSelfie: "",
   });
  // Fetch drivers data from the Express server when the component mounts
  useEffect(() => {
@@ -91,73 +96,82 @@ const currentYear = new Date().getFullYear();
     setError(''); // Clear previous error
      // Reset errors before starting validation
      setErrorMessages({
-      name: "",
-      gender: "",
-      email: "",
-      phoneNumber: "",
-      cnic: "",
-      dateOfBirth: "",
+     
+      driverFirstName: "",
+      driverLastName: "",
+  
+      driverGender: "",
+      driverEmail: "",
+      driverPhone: "",
+      driverCnicNumber: "",
+      driverDOB: "",
       vehicleName: "",
       brand:"",
-    vehicleColor:"",
-    vehicleType:"",
+      vehicleColor:"",
+      vehicleType:"",
+      carType:"",
+      driverPassword:"",
       vehicleProductionYear: "",
       licenseNumber: "",
       vehiclePhotos : "",
-    vehicleRegistrationFront: "",
-   vehicleRegistrationBack: "",
-    cnicFront: "",
-  cnicBack: "",
-  password:"",
-    driverPhoto: "",
+      vehicleRegistrationFront: "",
+     vehicleRegistrationBack: "",
+     driverCnicFront: "",
+     driverCnicBack: "",
+     driverSelfie: "",
     });
     let hasError = false;
 
-    if (emails.includes(email)) {
+    if (emails.includes(driverEmail)) {
        
          
-      setErrorMessages((prev) => ({ ...prev, email: "Email is already in use" }));
+      setErrorMessages((prev) => ({ ...prev, driverEmail: "Email is already in use" }));
       hasError = true;
       
     }
-    if (phoneNumbers.includes(phoneNumber)) {
+    if (phoneNumbers.includes(driverPhone)) {
         
-      setErrorMessages((prev) => ({ ...prev, phoneNumber: "Phone Number is already in use" }));
+      setErrorMessages((prev) => ({ ...prev, driverPhone: "Phone Number is already in use" }));
       hasError = true;
     }
-    if (cnics.includes(cnic)) {
-      setErrorMessages((prev) => ({ ...prev, cnic: "CNIC is already in use" }));
+    if (cnics.includes(driverCnicNumber)) {
+      setErrorMessages((prev) => ({ ...prev, driverCnicNumber: "CNIC is already in use" }));
       hasError = true;
     }
     // Validation logic for driver fields
-    if (!name.trim()) {
+    if (!driverFirstName.trim()) {
        
-      setErrorMessages((prev) => ({ ...prev, name: "Name is required" }));
+      setErrorMessages((prev) => ({ ...prev, driverFirstName: "First Name is required" }));
       hasError = true;
     }
-    if (!['Male', 'Female'].includes(gender)) {
-      setErrorMessages((prev) => ({ ...prev, gender: "Gender must be Male or Female" }));
+    if (!driverLastName.trim()) {
+       
+      setErrorMessages((prev) => ({ ...prev, driverLastName: "Last Name is required" }));
       hasError = true;
     }
-    if (!email.match(/^\S+@\S+\.\S+$/)|| (!email)) {
-      setErrorMessages((prev) => ({ ...prev, email: "Please provide a valid email address" }));
+    if (!['male', 'female'].includes(driverGender)) {
+      setErrorMessages((prev) => ({ ...prev, driverGender: "Gender must be Male or Female" }));
+      hasError = true;
+    }
+    if (!driverEmail.match(/^\S+@\S+\.\S+$/)|| (!driverEmail)) {
+      setErrorMessages((prev) => ({ ...prev, driverEmail: "Please provide a valid email address" }));
       hasError = true;
     }
     
-    if (!phoneNumber.match(/^((\+92)|0)(3[0-9]{2})[0-9]{7}$/)) {
-      setErrorMessages((prev) => ({ ...prev, phoneNumber: "Phone number must be a valid Pakistani number" }));
+    if (!driverPhone.match(/^((\+92)|0)(3[0-9]{2})[0-9]{7}$/)) {
+      setErrorMessages((prev) => ({ ...prev, driverPhone: "Phone number must be a valid Pakistani number" }));
       hasError = true;
     }
-    if (!cnic.match(/^\d{5}-\d{7}-\d{1}$/)) {
-      setErrorMessages((prev) => ({ ...prev, cnic: "CNIC must be in the format XXXXX-XXXXXXX-X" }));
+    if (!driverCnicNumber.match(/^\d{5}-\d{7}-\d{1}$/)) {
+      setErrorMessages((prev) => ({ ...prev, driverCnicNumber: "CNIC must be in the format XXXXX-XXXXXXX-X" }));
       hasError = true;
     }
-    if (!dateOfBirth) {
-      setErrorMessages((prev) => ({ ...prev, dateOfBirth: "Date of Birth is required" }));
+    if (!driverDOB) {
+      setErrorMessages((prev) => ({ ...prev, driverDOB: "Date of Birth is required" }));
       hasError = true;
     }
-    if(!password){
-      setErrorMessages((prev) => ({ ...prev, password: "Password is required" }));
+    if(!driverPassword){
+      setErrorMessages((prev) => ({ ...prev, driverPassword: "Password is required" }));
       hasError = true;
     }
     // Validation logic for vehicle fields
@@ -175,6 +189,10 @@ const currentYear = new Date().getFullYear();
     }
     if(!vehicleType){
       setErrorMessages((prev) => ({ ...prev, vehicleType: "Vehicle Type is required" }));
+      hasError = true;
+    }
+    if(!carType){
+      setErrorMessages((prev) => ({ ...prev, carType: "Car Type is required" }));
       hasError = true;
     }
     if (!licenseNumber.trim()) {
@@ -201,30 +219,48 @@ const currentYear = new Date().getFullYear();
       setErrorMessages((prev) => ({ ...prev, vehicleRegistrationBack: "Please add Vehicle Registration Back Photo" }));
       hasError = true;
      }
-     if(!cnicFront){
-      setErrorMessages((prev) => ({ ...prev, cnicFront: "Please add CNIC Front Photo" }));
+     if(!driverCnicFront){
+      setErrorMessages((prev) => ({ ...prev, driverCnicFront: "Please add CNIC Front Photo" }));
       hasError = true;
      }
-     if(!cnicBack){
-      setErrorMessages((prev) => ({ ...prev, cnicBack: "Please add CNIC Back Photo" }));
+     if(!driverCnicBack){
+      setErrorMessages((prev) => ({ ...prev, driverCnicBack: "Please add CNIC Back Photo" }));
       hasError = true;
      }
-     if(!driverPhoto){
-      setErrorMessages((prev) => ({ ...prev, driverPhoto: "Please add Driver Photo" }));
+     if(!driverSelfie){
+      setErrorMessages((prev) => ({ ...prev, driverSelfie: "Please add Driver Photo" }));
       hasError = true;
      }
       
       if (hasError) return;
 
 
-    const newDriver = { name, gender, email, phoneNumber, cnic, dateOfBirth, ratings,password };
-   
-       
+    const newDriver = {  driverFirstName, 
+      driverLastName, 
+      driverGender, 
+      driverEmail, 
+      driverPhone, 
+      driverCnicNumber, 
+      driverDOB, 
+      rating, 
+      driverPassword,
+      driverCnicFront,
+      driverCnicBack,
+      driverSelfie,
+      vehicleProductionYear,
+      vehicleType,
+      carType,
+      vehicleName,
+      vehicleColor,
+      licenseNumber,
+      brand,
+      vehicleRegisterationFront: vehicleRegistrationFront, // Match backend spelling
+      vehicleRegisterationBack: vehicleRegistrationBack, 
+      vehiclePhotos};
    
 
    
-      console.log(vehiclePhotos)
- 
+  console.log(newDriver)
       try {
         // Retrieve the token (example: from local storage)
         const token = localStorage.getItem('token'); // Adjust according to how you're storing the token
@@ -240,41 +276,13 @@ const currentYear = new Date().getFullYear();
         }
       );
     
-      const driverResult = driverResponse.data;
-    
-      if (driverResponse.status === 201) {
-          // Append vehicle fields to formData
-          const vehicleData = {
-            brand,
-            vehicleName,
-            vehicleColor,
-            vehicleType,
-            vehicleProductionYear,
-            licenseNumber,
-            driverPhoto, // Already a URL
-            cnicFront,
-            cnicBack,
-            vehicleRegistrationFront,
-            vehicleRegistrationBack,
-            vehiclePhotos, // Should be an array of URLs
-            driverId: driverResult._id, // Link vehicle to driver
-          };
-          console.log("Final Vehicle Data Before Sending:", vehicleData); // ✅ Debugging
+            if (driverResponse.status === 201) {
 
-          const vehicleResponse = await axios.post('http://localhost:5000/vehicles', vehicleData, {
-            headers: {
-              'Authorization': `Bearer ${token}`, // Add the token to headers
-              'Content-Type': 'application/json', //  Content-Type for JSON
-            },
-          });
+      navigate('/drivers'); // Navigate back to the drivers list after success
+    }
+     
+     
       
-          // Handle the response
-          if (vehicleResponse.status === 201) {
-            navigate('/drivers'); // Navigate back to the drivers list after success
-          } else {
-            setError(vehicleResponse.data.message || 'Error saving vehicle. Please try again.');
-          }
-        }  
         
       } catch (error) {
         console.error('Error saving data:', error);
@@ -372,7 +380,7 @@ const currentYear = new Date().getFullYear();
   
     const uploadedUrl = await uploadImageToImgbb(file);
     if (uploadedUrl) {
-      setState(uploadedUrl); // ✅ Set the URL, not the file object
+      setState(uploadedUrl); 
     } else {
       console.error("Image upload failed for:", file.name);
     }
@@ -400,14 +408,25 @@ const currentYear = new Date().getFullYear();
       Driver Details
     </Typography>
                   <TextField
-                    label="Name"
+                    label="First Name"
                     variant="outlined"
                     fullWidth
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    value={driverFirstName}
+                    onChange={(e) => setFirstName(e.target.value)}
                     margin="normal"
-                    error={!!errorMessages.name}
-                    helperText={errorMessages.name}
+                    error={!!errorMessages.driverFirstName}
+                    helperText={errorMessages.driverFirstName}
+
+                  />
+                  <TextField
+                    label="Last Name"
+                    variant="outlined"
+                    fullWidth
+                    value={driverLastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    margin="normal"
+                    error={!!errorMessages.driverLastName}
+                    helperText={errorMessages.driverLastName}
 
                   />
                   <TextField
@@ -415,24 +434,24 @@ const currentYear = new Date().getFullYear();
                     variant="outlined"
                     fullWidth
                     select
-                    value={gender}
+                    value={driverGender}
                     onChange={(e) => setGender(e.target.value)}
                     margin="normal"
-                    error={!!errorMessages.gender}
-                    helperText={errorMessages.gender}
+                    error={!!errorMessages.driverGender}
+                    helperText={errorMessages.driverGender}
                   >
-                    <MenuItem value="Male">Male</MenuItem>
-                    <MenuItem value="Female">Female</MenuItem>
+                    <MenuItem value="male">Male</MenuItem>
+                    <MenuItem value="female">Female</MenuItem>
                   </TextField>
                   <TextField
                     label="Email"
                     variant="outlined"
                     type="email"
                     fullWidth
-                    value={email}
+                    value={driverEmail}
                     onChange={(e) => setEmail(e.target.value)}
-                    error={!!errorMessages.email}
-                    helperText={errorMessages.email}
+                    error={!!errorMessages.driverEmail}
+                    helperText={errorMessages.driverEmail}
                     margin="normal"
                   />
                   <TextField
@@ -440,7 +459,7 @@ const currentYear = new Date().getFullYear();
                     variant="outlined"
                     type="tel"
                     fullWidth
-                    value={phoneNumber}
+                    value={driverPhone}
                     onChange={(e) => {
                       const input = e.target.value;
                       
@@ -451,14 +470,14 @@ const currentYear = new Date().getFullYear();
                         setPhoneNumber(input); // Otherwise, just set the value as is
                       }
                     }}                    margin="normal"
-                    error={!!errorMessages.phoneNumber}
-                    helperText={errorMessages.phoneNumber}
+                    error={!!errorMessages.driverPhone}
+                    helperText={errorMessages.driverPhone}
                   />
                     <TextField
                             label="Password"
                             name="password"
                             type="password"
-                            value={password}
+                            value={driverPassword}
                             onChange={(e) => setPassword(e.target.value)}
                             fullWidth
                           />
@@ -466,22 +485,22 @@ const currentYear = new Date().getFullYear();
                     label="CNIC"
                     variant="outlined"
                     fullWidth
-                    value={cnic}
+                    value={driverCnicNumber}
                     onChange={handleCnicChange}
                     margin="normal"
-                    error={!!errorMessages.cnic}
-                    helperText={errorMessages.cnic}
+                    error={!!errorMessages.driverCnicNumber}
+                    helperText={errorMessages.driverCnicNumber}
                   />
                   <TextField
                     label="Date of Birth"
                     variant="outlined"
                     type="date"
                     fullWidth
-                    value={dateOfBirth}
+                    value={driverDOB}
                     onChange={(e) => setDateOfBirth(e.target.value)}
                     margin="normal"
-                    error={!!errorMessages.dateOfBirth}
-                    helperText={errorMessages.dateOfBirth}
+                    error={!!errorMessages.driverDOB}
+                    helperText={errorMessages.driverDOB}
                     InputLabelProps={{ shrink: true }}
                   />
                    {/* Image Uploads */}
@@ -513,20 +532,20 @@ const currentYear = new Date().getFullYear();
           </label>
         </div>
 
-        {driverPhoto && (
+        {driverSelfie && (
              <Box sx={{ marginTop: 1 }}>
               
               <img 
-      src={typeof driverPhoto === "string" ? driverPhoto : URL.createObjectURL(driverPhoto)} 
+      src={typeof driverSelfie === "string" ? driverSelfie : URL.createObjectURL(driverSelfie)} 
       alt="Driver Photo Preview" 
       width="100%" 
     />            </Box>
          
                )}
                {/* Displaying error if any */}
-        {errorMessages.driverPhoto && (
+        {errorMessages.driverSelfie && (
           <Typography variant="body2" color="error" sx={{ marginTop: 1 }}>
-            {errorMessages.driverPhoto}
+            {errorMessages.driverSelfie}
           </Typography>
         )}
       </div>
@@ -562,19 +581,19 @@ const currentYear = new Date().getFullYear();
           </label>
         </div>
 
-        {cnicFront && (
+        {driverCnicFront && (
              <Box sx={{ marginTop: 1 }}>
                <img 
-      src={typeof cnicFront === "string" ? cnicFront : URL.createObjectURL(cnicFront)} 
+      src={typeof driverCnicFront === "string" ? driverCnicFront : URL.createObjectURL(driverCnicFront)} 
       alt="cnicFront Photo Preview" 
       width="100%" 
     />
              </Box>
          
                )}
-                 {errorMessages.cnicFront && (
+                 {errorMessages.driverCnicFront && (
           <Typography variant="body2" color="error" sx={{ marginTop: 1 }}>
-            {errorMessages.cnicFront}
+            {errorMessages.driverCnicFront}
           </Typography>
         )}
       </div>
@@ -608,19 +627,19 @@ const currentYear = new Date().getFullYear();
           </label>
         </div>
 
-        {cnicBack && (
+        {driverCnicBack && (
              <Box sx={{ marginTop: 1 }}>
                       <img 
-      src={typeof cnicBack === "string" ? cnicBack : URL.createObjectURL(cnicBack)} 
+      src={typeof driverCnicBack === "string" ? driverCnicBack : URL.createObjectURL(driverCnicBack)} 
       alt="cnicBack Photo Preview" 
       width="100%" 
     />
              </Box>
          
                )}
-                 {errorMessages.cnicBack && (
+                 {errorMessages.driverCnicBack && (
           <Typography variant="body2" color="error" sx={{ marginTop: 1 }}>
-            {errorMessages.cnicBack}
+            {errorMessages.driverCnicBack}
           </Typography>
         )}
       </div>
@@ -681,6 +700,22 @@ const currentYear = new Date().getFullYear();
                     margin="normal"
                     error={!!errorMessages.vehicleType}
                     helperText={errorMessages.vehicleType}
+                  >
+ 
+                    <MenuItem value="car">Car</MenuItem>
+                    <MenuItem value="bike">Bike</MenuItem>
+                    
+                  </TextField>
+                   <TextField
+                    label="Car Type"
+                    variant="outlined"
+                    fullWidth
+                    select
+                    value={carType}
+                    onChange={(e) => setCarType(e.target.value)}
+                    margin="normal"
+                    error={!!errorMessages.carType}
+                    helperText={errorMessages.carType}
                   >
  
                     <MenuItem value="AC Car">AC Car</MenuItem>
