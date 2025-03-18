@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import {  useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 import Avatar from '@mui/material/Avatar';
 import CircularProgress from '@mui/material/CircularProgress';
-import '../styles/passengerDetails.css';
+import '../../styles/passengerDetails.css';
 import Button from '@mui/material/Button';
 
 import Box from '@mui/material/Box';
@@ -23,7 +23,7 @@ const PassengerDetails = () => {
   const [error, setError] = useState(null);
   const [avatarLoading, setAvatarLoading] = useState(true);
   const token = localStorage.getItem('token');
-
+ 
   useEffect(() => {
     if (!token) {
       navigate('/login');
@@ -107,6 +107,12 @@ useEffect(() => {
   const handleAvatarLoad = () => {
     setAvatarLoading(false);
   };
+  const handleGoBack = () => {
+    const lastRoute = localStorage.getItem("lastVisitedRoute") || "/";
+    
+    console.log(localStorage.getItem("id"))
+    navigate(lastRoute);
+  };
 
   if (loading) {
     return <div className="loading">Loading...</div>;
@@ -159,7 +165,8 @@ useEffect(() => {
       <Button
             variant="contained"
             color="secondary"
-            onClick={() => navigate(`/passengers`)}
+            onClick={handleGoBack}
+            
             sx={{
              
               padding: 2,

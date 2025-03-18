@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TextField, Button, MenuItem, Paper, Box, Typography, Alert, Grid, Card, CardContent, CardMedia, CardHeader } from '@mui/material';
+import { TextField, Button, MenuItem, Paper, Box, Typography, Alert, Grid, Card, CardContent } from '@mui/material';
 import '../../styles/addDriver.css';
 import axios from 'axios';
 const AddDriver = () => {
+  
   const [driverFirstName, setFirstName] = useState('');
   const [driverLastName, setLastName] = useState('');
   const [driverGender, setGender] = useState('');
@@ -58,7 +59,7 @@ const AddDriver = () => {
   });
  // Fetch drivers data from the Express server when the component mounts
  useEffect(() => {
-      
+      setRatings(0)
   const fetchAllDrivers = async () => {
     try {
       const token = localStorage.getItem('token'); // Adjust according to how you're storing the token
@@ -91,8 +92,7 @@ const currentYear = new Date().getFullYear();
  
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-
+ 
     setError(''); // Clear previous error
      // Reset errors before starting validation
      setErrorMessages({

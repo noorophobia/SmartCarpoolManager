@@ -6,7 +6,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import { MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import '../styles/passengerDetails.css';
+import '../../styles/passengerDetails.css';
 
 const AddPassenger = () => {
   const navigate = useNavigate();

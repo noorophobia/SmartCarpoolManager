@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import  { useEffect, useState } from 'react';
+import { useLocation,useNavigate } from 'react-router-dom'; 
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -10,6 +10,13 @@ const Drivers = () => {
   const [drivers, setDrivers] = useState([]); // State to hold the fetched drivers data
    const navigate = useNavigate();
 
+    const location = useLocation();
+   
+      useEffect(() => {
+        // Store the current route in localStorage
+        localStorage.setItem("lastVisitedRoute", location.pathname);
+      }, [location]);
+   
   // Fetch drivers data from the Express server when the component mounts
   useEffect(() => {
     const fetchDrivers = async () => {
@@ -91,13 +98,7 @@ const Drivers = () => {
         });
         if (response.ok) {
             
-              const res_vehicle = await fetch(`http://localhost:5000/vehicles/driver/${id}`, {
-                method: 'DELETE',
-                headers: {
-                  'Authorization': `Bearer ${token}`,  // Add the token to the Authorization header
-                  'Content-Type': 'application/json',
-                },
-              });
+              
             
           setDrivers(drivers.filter(driver => driver.id !== id)); // Remove the deleted driver from state
         } else {

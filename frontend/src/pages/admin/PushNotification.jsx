@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Box,
   Paper,
@@ -98,6 +98,7 @@ const PushNotification = () => {
       message: updatedMessage,
       subject:subject,
     };
+    handleCloseDialog();
 
     try {
       const response = await fetch("http://localhost:5000/send-notification", {

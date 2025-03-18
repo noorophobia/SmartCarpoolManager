@@ -269,8 +269,7 @@ const PendingApplications = () => {
               },
             }}
             pageSizeOptions={[5, 10, 20]}
-            checkboxSelection
-            disableRowSelectionOnClick
+             disableRowSelectionOnClick
           />
         </Box>
       </div>

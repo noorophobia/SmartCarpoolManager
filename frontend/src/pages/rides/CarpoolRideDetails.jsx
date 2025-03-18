@@ -1,15 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, Link } from "react-router-dom";
+
  import { Box, Grid, Card, CardContent, Typography, Divider } from "@mui/material";
-import "../styles/rideDetails.css";
+import "../../styles/rideDetails.css";
 
 const CarpoolRides = () => {
-    const rideID = localStorage.getItem("id");
+    const rideID = localStorage.getItem("rideid");
     const driverId = localStorage.getItem("driverid");
 
     const [ride, setRide] = useState(null);
     const [loading, setLoading] = useState(true);
+    const location = useLocation();
 
+    useEffect(() => {
+      // Store the current route in localStorage
+      localStorage.setItem("lastVisitedRoute", location.pathname);
+    }, [location]);
     useEffect(() => {
         console.log("Fetching ride details for rideID:", rideID);
 
@@ -20,6 +26,20 @@ const CarpoolRides = () => {
                     console.error("No token found, redirecting...");
                     return;
                 }
+                const compositIdData = await fetch(`http://localhost:5000/api/v1/composite/ride/${rideID}`, {
+                    method: "GET",
+                    headers: {
+                      Authorization: `Bearer ${token}`, // only if route is protected
+                      "Content-Type": "application/json",
+                    },
+                  });
+              
+                  if (!compositIdData.ok) {
+                    throw new Error("Ride not found");
+                  }
+              
+                  const compositIdDatajson = await compositIdData.json();
+                  console.log("Composite Ride Data:", compositIdDatajson);
 
                 const response = await fetch(`http://localhost:5000/carpool-rides/${rideID}`, {
                     method: "GET",

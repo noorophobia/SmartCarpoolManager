@@ -1,16 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import { useLocation } from "react-router-dom";
+
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import TextField from '@mui/material/TextField';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
+ 
 import '../../styles/tables.css'; // Keeping your original styles
 import { useNavigate } from 'react-router-dom';
 
@@ -18,7 +12,12 @@ const Passengers = () => {
   const navigate = useNavigate();
    const [passengers,setPassengers]=useState(null);
    const token = localStorage.getItem('token');  // Or sessionStorage.getItem('token')
-    
+   const location = useLocation();
+
+   useEffect(() => {
+     // Store the current route in localStorage
+     localStorage.setItem("lastVisitedRoute", location.pathname);
+   }, [location]);
 
   // Fetch drivers data from the Express server when the component mounts
     useEffect(() => {

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import  { useEffect, useState } from "react";
+import { useLocation,useNavigate } from "react-router-dom";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -8,7 +8,14 @@ import { Link } from "react-router-dom";
 const Rides = () => {
   const [rides, setRides] = useState([]);
   const navigate = useNavigate();
+  const location = useLocation();
+
+    useEffect(() => {
+      // Store the current route in localStorage
+      localStorage.setItem("lastVisitedRoute", location.pathname);
+    }, [location]);
   useEffect(() => {
+    
     const fetchRides = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -19,6 +26,20 @@ const Rides = () => {
   
         console.log("Token:", token);
   
+        // Fetch composite IDs from the backend
+const compositeIdResponse = await fetch("http://localhost:5000/rides-with-composite-ids", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  },
+});
+const { allMappings } = await compositeIdResponse.json();
+const compositeMap = {};
+allMappings.forEach(mapping => {
+  compositeMap[mapping.rideID] = mapping.compositeId;
+});
+
+        
         // Fetch single rides
         const ridesResponse = await fetch("http://localhost:5000/single-rides", {
           method: "GET",
@@ -94,6 +115,8 @@ const Rides = () => {
           mode: ride.requestType || "Unknown",
           passengerCompositeId: passengerMap[ride.passengerId] || "N/A",
           driverCompositeId: driverMap[ride.driverID] || "N/A",
+          compositeId: compositeMap[ride._id] || "N/A",
+
         }));
   
         // Add compositeId mapping for carpool rides (passengers array and driver)
@@ -101,6 +124,8 @@ const Rides = () => {
           ...ride,
           passengerCompositeId: ride.passengerId.map((id) => carpoolPassengerMap[id] || "N/A"),
           driverCompositeId: carpoolDriverMap[ride.driverID] || "N/A",
+          compositeId: compositeMap[ride._id] || "N/A",
+
         }));
   
         // Merge both arrays
@@ -120,9 +145,12 @@ const Rides = () => {
   
 
   const columns = [
+    { field: "compositeId", headerName: "Ride ID", width: 100 ,    sortable: true , // This is the default
+    },
+
     { field: "requestOrigin", headerName: "Pick-Up Location", width: 300 },
     { field: "requestDestination", headerName: "Drop-Off Location", width: 300 },
-    { field: "mode", headerName: "Ride Mode", width: 150 },
+    { field: "mode", headerName: "Ride Mode", width: 120 },
     { field: "status", headerName: "Ride Status", width: 150 },
 
     {
@@ -146,7 +174,7 @@ const Rides = () => {
       field: "driverCompositeId",
       headerName: "Driver ID",
       flex: 1,
-      minWidth: 180,
+      minWidth: 150,
       renderCell: (params) => (
         <Link to={`/drivers/${params.row.driverID}`}>
           <Button variant="text" color="primary" size="small">
@@ -173,7 +201,7 @@ const Rides = () => {
           <Link
             to={destination}
             onClick={() => {
-              localStorage.setItem("id", rideId);
+              localStorage.setItem("rideid", rideId);
               localStorage.setItem("passengerid", params.row.passengerCompositeId);
               localStorage.setItem("driverid", params.row.driverCompositeId);
             }}
@@ -193,7 +221,7 @@ const Rides = () => {
         <h1>Welcome to Rides</h1>
       </div>
       <div style={{ marginTop: "20px" }}>
-        <Box sx={{ height: 500, width: "100%" }}>
+        <Box sx={{ height: 600, width: "100%" }}>
           <DataGrid
             className="dataGrid"
             rows={rides}
@@ -204,6 +232,13 @@ const Rides = () => {
               toolbar: {
                 showQuickFilter: true,
                 quickFilterProps: { debounceMs: 500 },
+              },
+            }}
+            initialState={{
+              pagination: {
+                paginationModel: {
+                  pageSize: 20,
+                },
               },
             }}
             pageSizeOptions={[5, 10, 20]}

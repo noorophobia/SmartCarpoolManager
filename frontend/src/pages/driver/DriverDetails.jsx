@@ -1,9 +1,9 @@
-import React, { useState ,useEffect} from 'react';
+import  { useState ,useEffect} from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom'; 
 
-import { Button, Box, Grid,Grid2, Card, CardContent, Typography, Divider, CardMedia, Avatar, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Button, Box,  Card, CardContent, Typography, Divider, CardMedia, Avatar, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // import the carousel styles
 
@@ -143,7 +143,11 @@ useEffect(() => {
 }, [ridesData]);
    
    
- 
+const handleGoBack = () => {
+  const lastRoute = localStorage.getItem("lastVisitedRoute") || "/";
+  
+   navigate(lastRoute);
+};
  const handleOpenCarDialog = () => {
   setOpenCarDialog(true);
 };
@@ -386,9 +390,21 @@ const handleCloseCarDialog = () => {
       </Dialog>
   
       {/* Back Button */}
-      <Button variant="contained" color="primary" onClick={() => window.history.back()} style={{ marginTop: '20px' }}>
-        Back
-      </Button>
+      <Button
+            variant="contained"
+            color="secondary"
+            onClick={handleGoBack}
+            
+            sx={{
+             
+              padding: 2,
+             marginTop:4,
+            
+            
+            }}
+          >
+            Go Back
+          </Button>
     </div>
   );
 };  

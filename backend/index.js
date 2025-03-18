@@ -9,6 +9,7 @@ const path = require('path');
      require('dotenv').config();
 
     // routes
+    const compositeIDRoutes=  require("./routes/composite-id");
  const notificationRoutes = require("./routes/notification");
  const rateSettingsRoute = require('./routes/rate-settings');  
 const driversRoutes = require('./routes/driver');  
@@ -55,7 +56,7 @@ app.use(cors({
 app.use(express.json()); // Parse JSON request bodies
 // Use the drivers route
 app.use(express.urlencoded({ extended: true }));
-
+app.use(compositeIDRoutes);
 app.use(driversRoutes);
 app.use(singlerideRoutes);
 app.use(carpoolrideRoutes);

@@ -1,15 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import  { useEffect, useState } from "react";
+import {  useLocation,Link } from "react-router-dom";
 import { Box, Grid, Card, CardContent, Typography, Divider } from "@mui/material";
-import "../styles/rideDetails.css";
+import "../../styles/rideDetails.css";
 
 const RideDetails = () => {
-  const rideID = localStorage.getItem("id");
+  const rideID = localStorage.getItem("rideid");
   const passengerId = localStorage.getItem("passengerid");
   const driverId = localStorage.getItem("driverid");
 
   const [ride, setRide] = useState(null);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
+
+  useEffect(() => {
+    // Store the current route in localStorage
+    localStorage.setItem("lastVisitedRoute", location.pathname);
+  }, [location]);
 
   useEffect(() => {
     const fetchRideDetails = async () => {

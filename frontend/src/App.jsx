@@ -3,17 +3,16 @@
   RouterProvider,
   Outlet,
   useNavigate,
-  Link,
-} from "react-router-dom";
-import React, { useEffect, useState } from "react";
+ } from "react-router-dom";
+import  { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
  import { useLocation } from "react-router-dom";
  import CircularProgress from '@mui/material/CircularProgress';
 
- import Passengers from './pages/admin/Passengers';
+ import Passengers from './pages/passenger/Passengers';
 import Drivers from './pages/driver/Drivers';
 import Settings from './pages/admin/Settings';
-import Rides from './pages/admin/Rides';
+import Rides from './pages/rides/Rides';
 import Default from './pages/Default';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -21,15 +20,15 @@ import Footer from './components/Footer';
  import Home from './pages/Home'
 import Menu from './components/Menu'
 import Map from './pages/Map'
-import PendingApplications from './pages/driver/PendingApplications';
+import PendingApplications from './pages/admin/PendingApplications';
 import '../src/styles/global.css';  
  import RatingsAndReviews from './pages/admin/RatingsAndReviews';
 import Revenue from './pages/revenue/OverallRevenue';
  import YearlyRevenue from './pages/revenue/YearlyRevenue';
 import DriverDetails from './pages/driver/DriverDetails';
 import RateSetting from './pages/admin/RateSetting';
-import PassengerDetails from './components/PassengerDetails';
-import RideDetails from './components/RideDetails';
+import PassengerDetails from './pages/passenger/PassengerDetails';
+import RideDetails from './pages/rides/RideDetails';
  import AddDriver from './pages/driver/AddDriver';
 import EditDriver from './pages/driver/EditDriver';
 import ContactUs from "./pages/admin/ContactUs";
@@ -38,9 +37,9 @@ import Packages from "./pages/admin/Packages";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import Image from './pages/Image';  
 
-import EditPassenger from "./components/EditPassenger";
-import AddPassenger from "./components/AddPassenger";
-import CarpoolRides from "./components/CarpoolRideDetails";
+import EditPassenger from "./pages/passenger/EditPassenger";
+import AddPassenger from "./pages/passenger/AddPassenger";
+import CarpoolRides from "./pages/rides/CarpoolRideDetails";
 const Layout = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);  
