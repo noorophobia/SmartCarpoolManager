@@ -187,9 +187,9 @@ const handleFilterChange = (event) => {
     <div className="main-content">
       <div className="header">
         <h1>Drivers</h1>
-        <Button variant="contained" color="primary" onClick={() => navigate('/add-driver')}>
+        <button className="button"  onClick={() => navigate('/add-driver')}>
           Add New Driver
-        </Button>
+        </button>
        
       </div>
        <div style={{ marginBottom: "20px" }}>

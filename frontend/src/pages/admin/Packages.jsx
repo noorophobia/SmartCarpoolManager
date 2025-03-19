@@ -204,13 +204,11 @@ const Packages = () => {
       <div className="main-content">
           <div className="header">
             <h1>    Packages and Commission </h1>
-            <Button
-        variant="contained"
-        color="primary"
+            <button className="button" 
         onClick={() => setOpenDialog(true)}
        >
         Add New Package
-      </Button>
+      </button>
           </div>
           
     <Box>

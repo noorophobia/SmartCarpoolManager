@@ -221,9 +221,9 @@ const RatingsAndReviews = () => {
     <div className="main-content">
       <div className="header">
         <h1>Ratings and Reviews</h1>
-        <Button variant="outlined" onClick={handleRefresh}>
+        <button className="button"  onClick={handleRefresh}>
           Refresh Reviews
-        </Button>
+        </button>
       </div>
       <div style={{ marginTop: "20px" }}>
         <Box sx={{ height: 500, width: "100%" }}>

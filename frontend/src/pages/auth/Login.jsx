@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import "../../styles/login.css";
 import { useLocation } from "react-router-dom";
 
-// Loader component for displaying during loading states
 const Loader = () => (
   <div className="loader-container">
     <div className="spinner"></div>
@@ -13,11 +12,11 @@ const Loader = () => (
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState(""); // Added state for confirm password
-  const [showForgotPassword, setShowForgotPassword] = useState(false); // State to toggle forgot password form
-  const [errorMessage, setErrorMessage] = useState(""); // Error message for login/forgot password
-  const [successMessage, setSuccessMessage] = useState(""); // Success message for forgot password
-  const [loading, setLoading] = useState(false); // Loading state for form submissions
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -25,7 +24,6 @@ const Login = () => {
     const checkAuthentication = () => {
       try {
         const token = localStorage.getItem("token");
-
         if (token) {
           navigate("/");
         }
@@ -47,7 +45,7 @@ const Login = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
-    setErrorMessage(""); // Clear any previous error messages
+    setErrorMessage("");
 
     try {
       const res = await fetch("http://localhost:5000/api/admin/login", {
@@ -60,21 +58,17 @@ const Login = () => {
 
       if (!res.ok) {
         const errorData = await res.json();
-         setErrorMessage(errorData.error || "Failed to log in. Please try again.");
+        setErrorMessage(errorData.error || "Failed to log in. Please try again.");
         setLoading(false);
         return;
       }
 
       const data = await res.json();
-       localStorage.setItem("token", data.token);
-
+      localStorage.setItem("token", data.token);
       document.body.style.backgroundColor = "white";
-
       navigate("/");
     } catch (err) {
-      
-
-      setErrorMessage(err.error || "An error occurred while logging in.");
+      setErrorMessage("An error occurred while logging in.");
     } finally {
       setLoading(false);
     }
@@ -83,7 +77,7 @@ const Login = () => {
   const handleForgotPasswordSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
-    setErrorMessage(""); // Clear any previous error messages
+    setErrorMessage("");
 
     if (!email.trim()) {
       setErrorMessage("Please enter your email.");
@@ -91,32 +85,24 @@ const Login = () => {
       setLoading(false);
       return;
     }
-
-    if (password !== confirmPassword) {
-      setErrorMessage("Passwords do not match.");
-      setSuccessMessage("");
-      setLoading(false);
-      return;
-    }
+ 
 
     try {
-      // Send password update request to backend
-      const response = await fetch("http://localhost:5000/api/admin/update-password", {
-        method: "PUT",
+      const response = await fetch("http://localhost:5000/api/admin/reset-password", {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, newPassword: password }),
+        body: JSON.stringify({ email }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
         setSuccessMessage("Password reset successful! You can now log in with your new password.");
-        // Reset fields
-        setEmail("");  
-        setPassword("");  
-        setConfirmPassword("");  
+        setEmail("");
+        setPassword("");
+        setConfirmPassword("");
       } else {
         setErrorMessage(data.error || "An error occurred. Please try again.");
         setSuccessMessage("");
@@ -132,15 +118,12 @@ const Login = () => {
   return (
     <div className="login-page">
       <div className="login-container">
-        {loading && <Loader />} {/* Display loader when loading is true */}
+        {loading && <Loader />} 
 
         {!showForgotPassword ? (
-          // Login Form
           <form onSubmit={handleSubmit}>
             <h2>Login</h2>
-
-            {errorMessage && <p className="error">{errorMessage}</p>} {/* Display error message */}
-
+            {errorMessage && <p className="error">{errorMessage}</p>}
             <input
               type="email"
               placeholder="Enter Email"
@@ -162,12 +145,10 @@ const Login = () => {
             </button>
           </form>
         ) : (
-          // Forgot Password Form
           <form onSubmit={handleForgotPasswordSubmit}>
             <h2>Forgot Password</h2>
             {errorMessage && <p className="error">{errorMessage}</p>}
             {successMessage && <p className="success">{successMessage}</p>}
-
             <input
               type="email"
               placeholder="Enter your email"
@@ -176,22 +157,7 @@ const Login = () => {
               onChange={(e) => setEmail(e.target.value)}
               required
             />
-            <input
-              type="password"
-              placeholder="New Password"
-              className="form-control"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            <input
-              type="password"
-              placeholder="Confirm New Password"
-              className="form-control"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
+             
             <button type="submit" className="btn-primary" disabled={loading}>
               {loading ? "Sending..." : "Reset Password"}
             </button>
