@@ -18,7 +18,9 @@ import {
   isWithinInterval
 } from "date-fns";
 import Box from "@mui/material/Box";
-import { useNavigate } from "react-router-dom";
+import Button from "@mui/material/Button";
+
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import '../../styles/tables.css';
 
 const Revenue = () => {
@@ -31,6 +33,13 @@ const Revenue = () => {
 
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
+   const location = useLocation();
+  
+  
+  
+    useEffect(() => {
+      localStorage.setItem("lastVisitedRoute", location.pathname);
+    }, [location]);
 
   useEffect(() => {
     if (!token) {
@@ -57,6 +66,7 @@ const Revenue = () => {
         const formatted = data.allMappings.map((ride, index) => ({
           id: index + 1,
           rideID: ride.compositeId,
+          driverID:ride.driverID,
           driverCompositeId: ride.driverCompositeId || "N/A",
           rideStatus: "completed", // You may want to use real status if it's available
           date: ride.date ? new Date(ride.date).toISOString().split("T")[0] : null,
@@ -124,7 +134,15 @@ const Revenue = () => {
 
   const columns = [
     { field: "rideID", headerName: "Ride ID", width: 150 },
-    { field: "driverCompositeId", headerName: "Driver ID", width: 200 },
+    { field: "driverCompositeId", headerName: "Driver ID", width: 200,
+      renderCell: (params) => (
+              <Link to={`/drivers/${params.row.driverID}`}>
+                <Button variant="text" color="primary" size="small">
+                  {params.value}
+                </Button>
+              </Link>
+            ),
+     },
     { field: "rideStatus", headerName: "Ride Status", width: 150 },
     { field: "date", headerName: "Date", width: 150 },
     { field: "mode", headerName: "Ride Mode", width: 150 },
