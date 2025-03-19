@@ -52,11 +52,8 @@ const DriverDetails = () => {
   
       setDriver1(data);
     } catch (err) {
-      setError(err.message);
-      console.error('Error fetching driver:', err);
-    } finally {
-      setLoading(false);
-    }
+       console.error('Error fetching driver:', err);
+    } 
   };
    
    
@@ -84,8 +81,7 @@ const DriverDetails = () => {
             setRateSettings(response.data);
         } catch (error) {
             console.error('Error fetching rate settings:', error);
-            setError('Error fetching rate settings');
-        }
+         }
     };
     const fetchRides = async () => {
       try {
@@ -99,8 +95,7 @@ const DriverDetails = () => {
           setRidesData(response.data);
       } catch (error) {
           console.error('Error fetching rate settings:', error);
-          setError('Error fetching rate settings');
-      }
+       }
   };
   
           fetchRateSettings();
@@ -141,7 +136,35 @@ useEffect(() => {
     setCancelledRides(cancelled);
   }
 }, [ridesData]);
+const handleUnBlockDriver = async () => {
    
+  try {
+    const response = await fetch(`http://localhost:5000/drivers/block/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({ isBlocked: false }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to update driver status");
+    }
+
+    alert(`Driver has been "unblocked".`);
+    setDriver1((prev) => ({
+      ...prev,
+      isBlocked: false,
+    }));
+    // You may want to refresh the driver list or update UI here
+  } catch (error) {
+    console.error("Error:", error.message);
+    alert("Something went wrong while updating driver status.");
+  }
+};
    
 const handleGoBack = () => {
   const lastRoute = localStorage.getItem("lastVisitedRoute") || "/";
@@ -160,9 +183,8 @@ const handleCloseCarDialog = () => {
 ;  
 
   const [openDialog, setOpenDialog] = useState(false);
-  const [selectedDocument, setSelectedDocument] = useState(null);
-
-  const handleOpenDialog = (doc) => {
+ 
+  const handleOpenDialog = ( ) => {
      setOpenDialog(true);
   };
 
@@ -186,7 +208,31 @@ const handleCloseCarDialog = () => {
       <Typography variant="h4" gutterBottom>
         Driver Details
       </Typography>
-  
+      {driver1 && driver1.isBlocked && (
+  <Box
+    sx={{
+      display: "flex",
+      justifyContent: "flex-end", // Align items to the right
+      alignItems: "center",
+      gap: 2, // Space between text and button
+      marginTop: 2,
+    }}
+  >
+    <Typography variant="h6" sx={{ color: "red", fontWeight: "bold" }}>
+      This Driver has been blocked
+    </Typography>
+    <Button
+      variant="contained"
+      color="error"
+      onClick={() => handleUnBlockDriver(driver1._id)}
+      sx={{ paddingX: 3, paddingY: 1 }}
+    >
+      Unblock Driver
+    </Button>
+  </Box>
+)}
+
+
       {/* Driver and Vehicle Information Section */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: '20px' }}>
         {/* Driver Details Section */}

@@ -1,6 +1,8 @@
 import  { useEffect, useState } from 'react';
 import { useLocation,useNavigate } from 'react-router-dom'; 
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import { MenuItem, Select, InputLabel, FormControl } from "@mui/material";
+
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 
@@ -9,7 +11,12 @@ import '../../styles/tables.css';
 const Drivers = () => {
   const [drivers, setDrivers] = useState([]); // State to hold the fetched drivers data
    const navigate = useNavigate();
+// State for filtering
+const [filterStatus, setFilterStatus] = useState("all");
 
+const handleFilterChange = (event) => {
+  setFilterStatus(event.target.value);
+};
     const location = useLocation();
    
       useEffect(() => {
@@ -54,6 +61,8 @@ const Drivers = () => {
             phoneNumber: driver.driverPhone,
             cnic: driver.driverCnic,
             dateOfBirth: driver.driverDOB,
+            isBlocked: driver.isBlocked // 👈 ADD THIS
+
           }))
         : [];
       
@@ -182,14 +191,33 @@ const Drivers = () => {
         <Button variant="contained" color="primary" onClick={() => navigate('/add-driver')}>
           Add New Driver
         </Button>
+       
       </div>
+       <div style={{ marginBottom: "20px" }}>
+              <FormControl variant="outlined" sx={{ minWidth: 120 ,background:"white"}}>
+       <InputLabel>Filter</InputLabel>
+      <Select
+        value={filterStatus}
+        label="Filter"
+        onChange={handleFilterChange}
+        sx={{ width: 150 }}
+      >
+        <MenuItem value="all">All</MenuItem>
+        <MenuItem value="blocked">Blocked</MenuItem>
+      </Select>
+    </FormControl>
+    </div>
 
       <div style={{ marginTop: '20px' }}>
         <Box sx={{ height: 500, width: '100%' }}>
           <DataGrid
             className="dataGrid"
-            rows={drivers}
-            columns={columns}
+            rows={
+              filterStatus === "blocked"
+                ? drivers.filter(driver => driver.isBlocked)
+                : drivers
+            }
+             columns={columns}
             getRowId={(row) => row.compositeId || row.id}  // Fallback to _id if compositeId is missing
                slots={{ toolbar: GridToolbar }}
                         slotProps={{

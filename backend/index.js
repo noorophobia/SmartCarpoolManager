@@ -9,6 +9,7 @@ const path = require('path');
      require('dotenv').config();
 
     // routes
+    const passengerRatings= require("./routes/passenger-review")
     const compositeIDRoutes=  require("./routes/composite-id");
  const notificationRoutes = require("./routes/notification");
  const rateSettingsRoute = require('./routes/rate-settings');  
@@ -62,6 +63,7 @@ app.use(singlerideRoutes);
 app.use(carpoolrideRoutes);
 app.use(packagesRoutes);
 app.use(notificationRoutes);
+app.use(passengerRatings);
 app.use(passengerRoutes);
 app.use('/api',complaintRoutes);
 app.use('/api', rateSettingsRoute);

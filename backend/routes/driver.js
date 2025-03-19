@@ -351,6 +351,38 @@ router.get("/drivers/api/approved-count", verifyToken, async (req, res) => {
   }
 });
 
+ 
 
+// PUT: Block or unblock driver
+router.put("/drivers/block/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { isBlocked } = req.body;
+
+    if (typeof isBlocked !== "boolean") {
+      return res.status(400).json({ message: "isBlocked must be a boolean." });
+    }
+
+    const updatedDriver = await Driver.findByIdAndUpdate(
+      id,
+      { isBlocked },
+      { new: true }
+    );
+
+    if (!updatedDriver) {
+      return res.status(404).json({ message: "Driver not found." });
+    }
+
+    res.status(200).json({
+      message: `Driver has been ${isBlocked ? "blocked" : "unblocked"}.`,
+      driver: updatedDriver,
+    });
+  } catch (error) {
+    console.error("Error updating driver block status:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+ 
 
 module.exports = router;

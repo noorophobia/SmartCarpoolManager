@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -8,69 +8,194 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import CardHeader from "@mui/material/CardHeader";
 import Typography from "@mui/material/Typography";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+
 import "../../styles/ratingAndReviews.css";
 
 const RatingsAndReviews = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedRide, setSelectedRide] = useState(null);
-  const [rows, setRows] = useState([
-    {
-      id: 1,
-      rideID: "RIDE123",
-      passengerID: "1",
-      passengerName: "Ali Khan",
-      passengerRating: 4.5,
-      passengerReview: "Great experience!",
-      driverID: "2",
-      driverName: "John Doe",
-      driverRating: 4.8,
-      driverReview: "Smooth ride, friendly driver!",
-      status: "new",
-    },
-    {
-      id: 2,
-      rideID: "RIDE124",
-      passengerID: "124",
-      passengerName: "Sara Ahmed",
-      passengerRating: 2.5,
-      passengerReview: "Decent ride, could be better.",
-      driverID: "457",
-      driverName: "Emily Clark",
-      driverRating: 3.2,
-      driverReview: "Good passenger, but a bit late.",
-      status: "resolved",
-    },
-  ]);
+  const [passengerRatings, setPassengerRatings] = useState([]);
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+  const location = useLocation();
 
-  // Columns for the DataGrid
+  const CACHE_KEY = "cachedPassengerRatings";
+  const CACHE_EXPIRY_MINUTES = 5;
+
+  useEffect(() => {
+    localStorage.setItem("lastVisitedRoute", location.pathname);
+  }, [location]);
+
+  useEffect(() => {
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    const cached = localStorage.getItem(CACHE_KEY);
+    const timestamp = localStorage.getItem(`${CACHE_KEY}_timestamp`);
+    const isCacheFresh = timestamp && Date.now() - Number(timestamp) < CACHE_EXPIRY_MINUTES * 60 * 1000;
+
+    if (cached && isCacheFresh) {
+      setPassengerRatings(JSON.parse(cached));
+      //If found, it parses and loads the cached data into state instead of making a network request.
+    } else {
+      fetchRatings();
+    }
+
+    async function fetchRatings() {
+      try {
+        const response = await fetch("http://localhost:5000/passenger-ride-reviews", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) throw new Error("Failed to fetch passenger reviews");
+
+        const data = await response.json();
+        setPassengerRatings(data.reviews);
+
+        localStorage.setItem(CACHE_KEY, JSON.stringify(data.reviews));
+        localStorage.setItem(`${CACHE_KEY}_timestamp`, Date.now().toString());
+      } catch (err) {
+        console.error("Error in fetchRatings:", err.message);
+      }
+    }
+  }, []);
+
+  const handleRefresh = () => {
+    localStorage.removeItem("cachedPassengerRatings");
+    localStorage.removeItem("cachedPassengerRatings_timestamp");
+    window.location.reload();
+  };
+
+  const handleViewDetails = async (row) => {
+    setSelectedRide(row);
+    setOpenDialog(true);
+
+    if (row.resolved === true) return;
+
+    try {
+      const response = await fetch(`http://localhost:5000/passenger-ride-reviews/resolve/${row._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ resolved: true }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update review status.");
+      }
+
+      const result = await response.json();
+      console.log("Resolved updated:", result);
+
+      // Update state and local cache
+      const updated = passengerRatings.map((item) =>
+        item._id === row._id ? { ...item, resolved: true } : item
+      );
+      setPassengerRatings(updated);
+      localStorage.setItem(CACHE_KEY, JSON.stringify(updated));
+    } catch (error) {
+      console.error("Error updating review resolved status:", error);
+    }
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
+  const handleBlockDriver = async (driverId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/drivers/block/${driverId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ isBlocked: true }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to update driver status");
+      }
+
+      alert(`Driver has been "blocked".`);
+    } catch (error) {
+      console.error("Error:", error.message);
+      alert("Something went wrong while updating driver status.");
+    }
+  };
+
   const columns = [
-    { field: "rideID", headerName: "Ride ID", width: 120 },
-    { field: "passengerName", headerName: "Passenger Name", width: 180 },
-    { field: "driverName", headerName: "Driver Name", width: 180 },
     {
-      field: "passengerReview",
+      field: "rideCompositeId",
+      headerName: "Ride ID",
+      width: 120,
+    },
+    {
+      field: "passengerCompositeId",
+      headerName: "Passenger ID",
+      width: 120,
+      renderCell: (params) => (
+        <Link
+          to={`/passenger-details`}
+          onClick={() => localStorage.setItem("id", params.row.passengerId)}
+        >
+          <Button variant="text" color="primary" size="small">
+            {params.value}
+          </Button>
+        </Link>
+      ),
+    },
+    {
+      field: "driverCompositeId",
+      headerName: "Driver ID",
+      width: 120,
+      renderCell: (params) => (
+        <Link to={`/drivers/${params.row.driverId}`}>
+          <Button variant="text" color="primary" size="small">
+            {params.value}
+          </Button>
+        </Link>
+      ),
+    },
+    {
+      field: "rating",
+      headerName: "Passenger Rating",
+      width: 150,
+      headerAlign: "center",
+      align: "center",
+      renderCell: (params) => (
+        <span style={{ whiteSpace: "pre" }}>{'  ' + params.value}</span>
+      ),
+    },
+    {
+      field: "review",
       headerName: "Passenger Review",
-      width: 250,
+      width: 500,
     },
     {
-      field: "driverReview",
-      headerName: "Driver Review",
-      width: 250,
-    },
-    {
-      field: "status",
+      field: "resolved",
       headerName: "Status",
       width: 120,
       renderCell: (params) => (
         <Typography
           style={{
-            color: params.row.status === "new" ? "red" : "green",
+            color: params.value ? "green" : "red",
             fontWeight: "bold",
           }}
         >
-          {params.row.status === "new" ? "New" : "Resolved"}
+          {params.value ? "Resolved" : "New"}
         </Typography>
       ),
     },
@@ -90,51 +215,15 @@ const RatingsAndReviews = () => {
     },
   ];
 
-  // Handle opening the dialog and setting the selected ride data
-  const handleViewDetails = (row) => {
-    setSelectedRide(row);
-    setOpenDialog(true);
-
-    // Update row status to "in-progress" if it is "new"
-    const updatedRows = rows.map((r) =>
-      r.id === row.id && r.status === "new" ? { ...r, status: "in-progress" } : r
-    );
-    setRows(updatedRows);
-  };
-
-  // Handle closing the dialog
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-
-    // Update row status to "resolved"
-    const updatedRows = rows.map((r) =>
-      r.id === selectedRide.id && r.status === "in-progress"
-        ? { ...r, status: "resolved" }
-        : r
-    );
-    setRows(updatedRows);
-  };
-
-  // Handle blocking passenger
-  const handleBlockPassenger = (rideId) => {
-    alert(`Passenger for ride ${rideId} has been blocked`);
-    // Logic to block passenger
-  };
-
-  // Handle blocking driver
-  const handleBlockDriver = (rideId) => {
-    alert(`Driver for ride ${rideId} has been blocked`);
-    // Logic to block driver
-  };
-
-  // Center the columns
-  columns.forEach((column) => (column.align = "left"));
   columns.forEach((column) => (column.headerAlign = "left"));
 
   return (
     <div className="main-content">
       <div className="header">
         <h1>Ratings and Reviews</h1>
+        <Button variant="outlined" onClick={handleRefresh}>
+          Refresh Reviews
+        </Button>
       </div>
       <div style={{ marginTop: "20px" }}>
         <Box sx={{ height: 500, width: "100%" }}>
@@ -143,8 +232,9 @@ const RatingsAndReviews = () => {
               params.row.status === "new" ? "new-complaint-row" : ""
             }
             className="dataGrid"
-            rows={rows}
+            rows={passengerRatings}
             columns={columns}
+            getRowId={(row) => row._id}
             slots={{ toolbar: GridToolbar }}
             slotProps={{
               toolbar: {
@@ -168,59 +258,47 @@ const RatingsAndReviews = () => {
         </Box>
       </div>
 
-      {/* Dialog for displaying ratings and reviews */}
       <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="md" fullWidth>
         <DialogTitle>Ratings and Reviews Details</DialogTitle>
-        <DialogContent sx={{ padding: "30px", marginTop: "30px" }}>
+        <DialogContent sx={{ padding: "40px", marginTop: "40px" }}>
           {selectedRide && (
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              {/* Passenger Info Card */}
+            <div style={{ display: "flex", justifyContent: "center" }}>
               <Card style={{ width: "48%", background: "#E0E0E0" }}>
-                <CardHeader title="Passenger Review" />
-                <CardContent>
+                <CardContent sx={{ padding: "20px" }}>
                   <Typography variant="body1">
-                    <strong>Passenger Name:</strong> {selectedRide.passengerName}
-                  </Typography>
-                  <Typography variant="body1">
-                    <strong>Passenger Rating:</strong> {selectedRide.passengerRating}
-                  </Typography>
-                  <Typography variant="body1">
-                    <strong>Passenger Review:</strong> {selectedRide.passengerReview}
-                  </Typography>
-                  {/* Block Button for Passenger */}
-                  {selectedRide.passengerRating < 3 && (
-                    <Button
-                      variant="contained"
-                      color="secondary"
-                      onClick={() => handleBlockPassenger(selectedRide.rideID)}
-                      style={{ marginTop: "10px" }}
+                    <strong>Passenger ID:</strong>{" "}
+                    <Link
+                      to={`/passenger-details`}
+                      onClick={() => localStorage.setItem("id", selectedRide.passengerId)}
                     >
-                      Block Passenger
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Driver Info Card */}
-              <Card style={{ width: "48%", background: "#E0E0E0" }}>
-                <CardHeader title="Driver Review" />
-                <CardContent>
+                      <Button variant="text" color="primary" size="small">
+                        {selectedRide.passengerCompositeId}
+                      </Button>
+                    </Link>
+                  </Typography>
                   <Typography variant="body1">
+                    <strong>Driver ID:</strong>{" "}
+                    <Link to={`/drivers/${selectedRide.driverId}`}>
+                      <Button variant="text" color="primary" size="small">
+                        {selectedRide.driverCompositeId}
+                      </Button>
+                    </Link>
+                  </Typography>
+                  <Typography variant="body1" sx={{ fontSize: "16px", mb: 2 }}>
+                    <strong>Passenger Rating:</strong> {selectedRide.rating}
+                  </Typography>
+                  <Typography variant="body1" sx={{ fontSize: "16px", mb: 2 }}>
+                    <strong>Passenger Review:</strong> {selectedRide.review}
+                  </Typography>
+                  <Typography variant="body1" sx={{ fontSize: "16px", mb: 2 }}>
                     <strong>Driver Name:</strong> {selectedRide.driverName}
                   </Typography>
-                  <Typography variant="body1">
-                    <strong>Driver Rating:</strong> {selectedRide.driverRating}
-                  </Typography>
-                  <Typography variant="body1">
-                    <strong>Driver Review:</strong> {selectedRide.driverReview}
-                  </Typography>
-                  {/* Block Button for Driver */}
-                  {selectedRide.driverRating < 3 && (
+                  {selectedRide.rating < 3 && (
                     <Button
                       variant="contained"
                       color="secondary"
-                      onClick={() => handleBlockDriver(selectedRide.rideID)}
-                      style={{ marginTop: "10px" }}
+                      onClick={() => handleBlockDriver(selectedRide.driverId)}
+                      sx={{ mt: 2 }}
                     >
                       Block Driver
                     </Button>
