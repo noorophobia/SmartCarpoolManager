@@ -1,5 +1,4 @@
-import React from 'react';
- import {Link} from 'react-router-dom';
+  import {Link} from 'react-router-dom';
 import '../styles/menu.css'
 const Menu = () => {
   return (
@@ -11,11 +10,7 @@ const Menu = () => {
              <span className="listItemTitle">Home </span>
           </Link>
 
-       {/*  <Link to="/profile" className="listItem"> 
-            <img src="profile.svg" alt="icon" className="icon" />
-             <span className="listItemTitle">Profile </span>
-          </Link>
-         </div> */ } 
+        
          </div>
        
          <div className="item">
@@ -41,10 +36,11 @@ const Menu = () => {
             <img src="/public/ratings_icon.svg" alt="icon" className="icon" />
              <span className="listItemTitle">Ratings and Reviews </span>
           </Link>
-          <Link to="/rate-setting" className="listItem"> 
+         {/** <Link to="/rate-setting" className="listItem"> 
             <img src="/public/rate_setting.svg" alt="icon" className="icon" />
              <span className="listItemTitle">Vehicle Rates        </span>
           </Link>
+          */} 
           <Link to="/contact-us" className="listItem" >
   <img src="/public/complaint.svg" alt="icon" className="icon" />
    <span className="listItemTitle">Complaints </span>

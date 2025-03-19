@@ -61,7 +61,7 @@ const handleFilterChange = (event) => {
             phoneNumber: driver.driverPhone,
             cnic: driver.driverCnic,
             dateOfBirth: driver.driverDOB,
-            isBlocked: driver.isBlocked // 👈 ADD THIS
+            isBlocked: driver.isBlocked 
 
           }))
         : [];
@@ -76,8 +76,7 @@ const handleFilterChange = (event) => {
     fetchDrivers(); // Call the function to fetch data
   }, []);
 
-  // Handle navigation to the driver's details page
-  const handleViewDetails = (id) => {
+   const handleViewDetails = (id) => {
     navigate(`/drivers/${id}`);
   };
 

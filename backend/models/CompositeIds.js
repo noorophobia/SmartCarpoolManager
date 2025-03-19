@@ -17,6 +17,24 @@ const compositeIdSchema = new mongoose.Schema({
     unique: true,
     default:null,
   },
+  fare: {
+    type: Number,
+default:""
+  },
+  revenue: {
+    type: Number,
+default:""
+  },
+  driverID: {
+    type: mongoose.Schema.Types.ObjectId, // or String, depending on your model
+    default:""  },
+    driverCompositeId:{
+      type: String,
+
+      default:""  },
+
+    date: { type: Date, default: " " },
+
   createdAt: {
     type: Date,
     default: Date.now,

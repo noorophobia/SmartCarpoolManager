@@ -4,6 +4,9 @@ const router = express.Router();
 const SingleRide = require("../models/single-rides");
 const CarpoolRide = require("../models/CarpoolRide");
 const CompositeId = require("../models/CompositeIds");
+const RateSettings = require("../models/RateSetting");
+const Driver = require("../models/Driver"); // adjust path if needed
+
 const Counter = require("../models/Counter");
 
 // Composite ID Generator
@@ -23,17 +26,29 @@ router.get("/rides-with-composite-ids", async (req, res) => {
     const carpoolRides = await CarpoolRide.find();
 
     let createdMappings = [];
+    // Add this before processing rides
+const rateSettings = await RateSettings.findOne();
+const commissionRate = rateSettings ? rateSettings.commission : 10; // default 10%
+
 
     const processRide = async (ride, mode) => {
       const existing = await CompositeId.findOne({ rideID: ride._id });
-
+      const date = ride.completedAt || ride.updatedAt || ride.createdAt || new Date();
       if (!existing) {
+        const driver = await Driver.findById(ride.driverID);  
+    const driverCompositeId = driver?.compositeId || null; 
         const newCompositeId = await generateCompositeId();
-
+        const fare = ride.requestFare || 0;
+        const revenue = fare * (commissionRate / 100);
         const newEntry = new CompositeId({
           rideID: ride._id,
           mode,
           compositeId: newCompositeId,
+          fare: ride.requestFare,
+          revenue,
+          driverCompositeId,
+          driverID: ride.driverID,
+date,
         });
 
         await newEntry.save();
