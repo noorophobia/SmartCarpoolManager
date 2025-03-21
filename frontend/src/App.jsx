@@ -19,8 +19,7 @@ import Footer from './components/Footer';
  import Login from './pages/auth/Login';
  import Home from './pages/Home'
 import Menu from './components/Menu'
-import Map from './pages/Map'
-import PendingApplications from './pages/admin/PendingApplications';
+ import PendingApplications from './pages/admin/PendingApplications';
 import '../src/styles/global.css';  
  import RatingsAndReviews from './pages/admin/RatingsAndReviews';
 import Revenue from './pages/revenue/OverallRevenue';
@@ -34,9 +33,7 @@ import EditDriver from './pages/driver/EditDriver';
 import ContactUs from "./pages/admin/ContactUs";
 import PushNotifications from "./pages/admin/PushNotification";
 import Packages from "./pages/admin/Packages";
-import ForgotPassword from "./pages/auth/ForgotPassword";
-import Image from './pages/Image';  
-
+ 
 import EditPassenger from "./pages/passenger/EditPassenger";
 import AddPassenger from "./pages/passenger/AddPassenger";
 import CarpoolRides from "./pages/rides/CarpoolRideDetails";
@@ -64,12 +61,13 @@ const Layout = () => {
        return;
     }else {
        setLoading(false);
-    }
+     }
     
 
      //theme check
       const savedTheme = localStorage.getItem("theme") || "light"; 
       setTheme(savedTheme);
+      // data-theme in variable.css
       document.body.setAttribute("data-theme", savedTheme);  
   
 
@@ -113,6 +111,7 @@ const Layout = () => {
 
 
 function App() {
+  //used to define all routes and their components.
   const router = createBrowserRouter([
     {
       path: "/",
@@ -178,18 +177,12 @@ function App() {
           path: "/settings",
           element: <Settings />,
         },
-         {
-          path: "/forgot-password",
-          element: <ForgotPassword />,
-        },
+        
         {
           path: "/pending-applications",
           element: <PendingApplications />,
         },
-        {
-          path: "/map",
-          element: <Map />,
-        }, 
+         
         {
           path: "/ratings-and-reviews",
           element: <RatingsAndReviews />,
@@ -229,7 +222,7 @@ function App() {
     },
     
   ]);
-
+  //RouterProvider makes routes available to the whole app.
   return <RouterProvider router={router} />;
 }
 

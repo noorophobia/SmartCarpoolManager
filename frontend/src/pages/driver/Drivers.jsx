@@ -56,7 +56,7 @@ const handleFilterChange = (event) => {
             id: driver._id,
             compositeId: driver.compositeId, // Add compositeId here
             name: driver.driverFirstName +" "+ driver.driverLastName,
-            gender: driver.driverGender,
+            gender: driver.gender && driver.gender.trim() !== null ? driver.gender : 'male',
             email: driver.driverEmail,
             phoneNumber: driver.driverPhone,
             cnic: driver.driverCnic,

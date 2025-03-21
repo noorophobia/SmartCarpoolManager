@@ -54,53 +54,43 @@ const PassengerDetails = () => {
     fetchPassenger();
   }, [id, navigate, token]);
 
+ 
 
-  
   useEffect(() => {
-   
+    if (passenger) {
+        
+    
     const fetchRides = async () => {
       try {
-          
-  
-           const response = await axios.get(`http://localhost:5000/rides/passenger/${id}`, {
-              headers: { 'Authorization': `Bearer ${token}` }
-          });
-  
-          console.log('Fetched Rides:', response.data);
-          setRidesData(response.data);
+        const response = await fetch(`http://localhost:5000/rides-with-composite-ids/passenger/${id}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+    
+        const data = await response.json(); // Parse JSON response
+        console.log('Fetched Rides:', data.rides);
+        setRidesData(data.rides); // use data.rides based on the backend response
       } catch (error) {
-          console.error('Error fetching rate settings:', error);
-          setError('Error fetching rate settings');
+        console.error('Error fetching rides:', error);
       }
-  };
-  fetchRides();
-  }, [id]);
-
-
+    };
+    
+  
+           fetchRides();
+    }
+  }, [passenger]);  
+ 
 useEffect(() => {
   if (ridesData) {
-    let total = 0;
-    let completed = 0;
-    let cancelled = 0;
+    
 
-    // Count single rides
-    if (ridesData.singlePassengerRides && Array.isArray(ridesData.singlePassengerRides)) {
-      total += ridesData.singlePassengerRides.length;
-      completed += ridesData.singlePassengerRides.filter(ride => ride.completedAt).length;
-      cancelled += ridesData.singlePassengerRides.filter(ride => ride.cancelledAt && ride.cancelledAt !== null).length;
-    }
-    
-    // Count carpool passenger rides
-    if (ridesData.carpoolPassengerRides && Array.isArray(ridesData.carpoolPassengerRides)) {
-      total += ridesData.carpoolPassengerRides.length;
-      completed += ridesData.carpoolPassengerRides.filter(ride => ride.completedAt).length;
-      cancelled += ridesData.carpoolPassengerRides.filter(ride => ride.cancelledAt && ride.cancelledAt !== null).length;
-    }
-    
+    const totalRides = ridesData.length;
+const completedRides = ridesData.filter((ride) => ride.status === "completed").length;
+const cancelledRides = ridesData.filter((ride) => ride.status === "cancelled").length;
+ 
     // Update state
-    setTotalRides(total);
-    setCompletedRides(completed);
-    setCancelledRides(cancelled);
+    setTotalRides(totalRides);
+    setCompletedRides(completedRides);
+    setCancelledRides(cancelledRides);
   }
 }, [ridesData]);
 
@@ -145,7 +135,7 @@ useEffect(() => {
           {passenger.imageUrl && avatarLoading && <CircularProgress />}
           <Avatar
             alt={`${passenger.name}`}
-            src={passenger.imageUrl || 'https://via.placeholder.com/150'}
+            src={passenger.imageUrl || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'}
             onLoad={handleAvatarLoad}
             sx={{ width: 300, height: 300, display: avatarLoading ? 'none' : 'block' }}
           />
@@ -158,7 +148,7 @@ useEffect(() => {
           <Typography variant="h6"><strong>Total Rides:</strong> {totalRides}</Typography>
           <Typography variant="h6"><strong>Completed Rides:</strong> {completedRides}</Typography>
           <Typography variant="h6"><strong>Cancelled Rides:</strong> {cancelledRides}</Typography>
-          <Typography variant="h6"><strong>Ratings:</strong> {passenger.ratings}</Typography>
+          <Typography variant="h6"><strong>Ratings:</strong> {passenger.ratings || '0'}</Typography>
         </Box>
         
       </Box>

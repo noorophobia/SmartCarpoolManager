@@ -4,10 +4,8 @@
      display: flex;
     justify-content: center;
     align-items: center;
-     padding-top: 60px; /* Space for the navbar */
+     padding-top: 60px;  
      background: linear-gradient(to right, #3D52A0, #1F4D75, #8697C4);
-
-
   }
   
   .login-page .login-container {
@@ -61,6 +59,7 @@
     color: #0056b3;
     text-decoration: underline;
   }
+  
   /* Forgot Password Form */
 .forgot-password .form-control {
   margin-bottom: 1rem;

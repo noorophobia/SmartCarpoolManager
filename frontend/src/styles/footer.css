@@ -1,12 +1,12 @@
 .footer {
   width: 100%;
   display: flex;
-  justify-content: center; /* Center content horizontally */
-  align-items: center; /* Center content vertically */
-  padding: 120px; /* Reduced padding for better size */
+  justify-content: center;  
+  align-items: center; 
+  padding: 120px;  
   color: white;
-  background-color: var(--menu-bg); /* Background color */
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); /* Shadow for elevation */
-  text-align: center; /* Center text */
-  position: relative; /* Allow footer to flow naturally with content */
+  background-color: var(--menu-bg);  
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);  
+  text-align: center; 
+  position: relative;  
 }

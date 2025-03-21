@@ -53,7 +53,7 @@ const Passengers = () => {
              id: passenger._id,
             compositeId: passenger.compositeId, // Add compositeId here
             name: passenger.name,
-            gender: passenger.gender,
+            gender: passenger.gender && passenger.gender.trim() !== null ? passenger.gender : 'male',
             email: passenger.email,
             phone: passenger.phone,
            }))

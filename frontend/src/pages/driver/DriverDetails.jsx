@@ -65,75 +65,39 @@ const DriverDetails = () => {
   }, [id]);
   useEffect(() => {
     if (driver1) {
-      const fetchRateSettings = async () => {
-        try {
-            if (!driver1 || !driver1.carType) {
-                console.warn("Driver1 or carType is null, skipping API call.");
-                return;
-            }
+        
     
-            console.log("Driver vehicle type: " + driver1.carType);
-            const response = await axios.get(`http://localhost:5000/api/rate-settings/${driver1.carType}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-    
-            console.log('Fetched Rate Settings:', response.data);
-            setRateSettings(response.data);
-        } catch (error) {
-            console.error('Error fetching rate settings:', error);
-         }
-    };
     const fetchRides = async () => {
       try {
-          
-  
-           const response = await axios.get(`http://localhost:5000/rides/driver/${id}`, {
-              headers: { 'Authorization': `Bearer ${token}` }
-          });
-  
-          console.log('Fetched Rides:', response.data);
-          setRidesData(response.data);
+        const response = await fetch(`http://localhost:5000/rides-with-composite-ids/${driver1.compositeId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+    
+        const data = await response.json(); // Parse JSON response
+        console.log('Fetched Rides:', data.rides);
+        setRidesData(data.rides); // use data.rides based on the backend response
       } catch (error) {
-          console.error('Error fetching rate settings:', error);
-       }
-  };
+        console.error('Error fetching rides:', error);
+      }
+    };
+    
   
-          fetchRateSettings();
-          fetchRides();
+           fetchRides();
     }
   }, [driver1]);  
  
 useEffect(() => {
   if (ridesData) {
-    let total = 0;
-    let completed = 0;
-    let cancelled = 0;
+    
 
-    // Count single rides
-    if (ridesData.singleRides && Array.isArray(ridesData.singleRides)) {
-      total += ridesData.singleRides.length;
-      completed += ridesData.singleRides.filter(ride => ride.completedAt).length;
-    }
-
-    // Count carpool rides
-    if (ridesData.carpoolRides && Array.isArray(ridesData.carpoolRides)) {
-      total += ridesData.carpoolRides.length;
-      completed += ridesData.carpoolRides.filter(ride => ride.completedAt).length;
-    }
-  
-    // Check single rides
-    if (ridesData.singleRides && Array.isArray(ridesData.singleRides)) {
-      cancelled += ridesData.singleRides.filter(ride =>ride.cancelledAt&& ride.cancelledAt !== null).length;
-    }
-  
-    // Check carpool rides
-    if (ridesData.carpoolRides && Array.isArray(ridesData.carpoolRides)) {
-      cancelled += ridesData.carpoolRides.filter(ride =>ride.cancelledAt&& ride.cancelledAt !== null).length;
-    }
+    const totalRides = ridesData.length;
+const completedRides = ridesData.filter((ride) => ride.status === "completed").length;
+const cancelledRides = ridesData.filter((ride) => ride.status === "cancelled").length;
+ 
     // Update state
-    setTotalRides(total);
-    setCompletedRides(completed);
-    setCancelledRides(cancelled);
+    setTotalRides(totalRides);
+    setCompletedRides(completedRides);
+    setCancelledRides(cancelledRides);
   }
 }, [ridesData]);
 const handleUnBlockDriver = async () => {
@@ -343,26 +307,7 @@ const handleCloseCarDialog = () => {
       {/* Ride Statistics and Rates Section */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: '20px', marginTop: '20px' }}>
         {/* Ride Statistics Section */}
-        <Box sx={{ flex: 1 }}>
-          <Card sx={{ height: '100%' }}>
-            <CardContent sx={{ backgroundColor: '#f5f5f5' }}>
-              <Box sx={{ backgroundColor: '#2F4E6F', color: 'white', padding: '8px', borderRadius: '4px' }}>
-                <Typography variant="h6" gutterBottom>Rates</Typography>
-              </Box>
-              <Divider />
-              {rateSettings &&
-               <div>
-                <Typography sx={{ fontSize: '1rem',marginTop:2, marginBottom: 1 ,marginLeft:4}}><strong>Vehicle Type :</strong> {driver1.vehicleType}</Typography>
-
-          <Typography sx={{ fontSize: '1rem', marginBottom: 1 ,marginLeft:4}}><strong>Distance Rate per Km:</strong> {rateSettings.distanceRatePerKm}</Typography>
-          <Typography sx={{ fontSize: '1rem', marginBottom: 1,marginLeft:4 }}><strong>Time Rate per Minute:</strong> {rateSettings.timeRatePerMinute}</Typography>
-          <Typography sx={{ fontSize: '1rem', marginBottom: 1,marginLeft:4 }}><strong>Fixed Driver Fee:</strong> {rateSettings.fixedDriverFee}</Typography>
-          <Typography sx={{ fontSize: '1rem', marginBottom: 1,marginLeft:4 }}><strong>Peak Rate Multiplier:</strong> {rateSettings.peakRateMultiplier}</Typography>
-          <Typography sx={{ fontSize: '1rem', marginBottom: 1,marginLeft:4 }}><strong>Discounts:</strong> {rateSettings.discounts}</Typography>
-               </div>}
-            </CardContent>
-          </Card>
-        </Box>
+        
   
         {/* Rates Section */}
         <Box sx={{ flex: 1 }}>
@@ -373,7 +318,7 @@ const handleCloseCarDialog = () => {
               </Box>
               <Divider />
               <div>
-            <Typography sx={{ fontSize: '1rem', marginBottom: 1, marginTop: 2,marginLeft:4}}><strong>Total Rides:</strong> {totalRides}</Typography>
+            <Typography sx={{ fontSize: '1rem', marginBottom: 1, marginTop: 4,marginLeft:4}}><strong>Total Rides:</strong> {totalRides}</Typography>
                  <Typography sx={{ fontSize: '1rem', marginBottom: 1,marginTop: 2,marginLeft:4}}><strong>Completed Rides:</strong> {completedRides}</Typography>
                  <Typography sx={{ fontSize: '1rem',marginTop: 2,marginLeft:4,marginBottom:11}}><strong>Cancelled Rides:</strong> {cancelledRides}</Typography>
               </div>

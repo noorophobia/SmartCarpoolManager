@@ -1,5 +1,5 @@
 const express = require("express");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcrypt"); // to hash and compare passwords
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
 const dotenv = require("dotenv");
@@ -14,6 +14,7 @@ router.post("/login", async (req, res) => {
 
   try {
     const admin = await Admin.findOne({ email });
+
     if (!admin) {
       return res.status(400).json({ error: "Invalid email or password" });
     }
@@ -25,12 +26,11 @@ router.post("/login", async (req, res) => {
     console.log("JWT_SECRET:", process.env.JWT_SECRET);
 
 
-    const token = jwt.sign(
-      { id: admin._id, email: admin.email },
-      process.env.JWT_SECRET, // Use environment variable
-      { expiresIn: "1h" }
-    );
-
+    const token = jwt.sign({ id: admin._id, email: admin.email }, 
+      process.env.JWT_SECRET,
+      {
+      expiresIn: "1h",
+    });
     res.json({ message: "Login successful", token });
   } catch (err) {
     console.error("Login error:", err);

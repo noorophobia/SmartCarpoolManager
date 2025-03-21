@@ -34,6 +34,7 @@ const commissionRate = rateSettings ? rateSettings.commission : 10; // default 1
     const processRide = async (ride, mode) => {
       const existing = await CompositeId.findOne({ rideID: ride._id });
       const date = ride.completedAt || ride.updatedAt || ride.createdAt || new Date();
+      const status= ride.status || "N/A";
       if (!existing) {
         const driver = await Driver.findById(ride.driverID);  
     const driverCompositeId = driver?.compositeId || null; 
@@ -43,9 +44,11 @@ const commissionRate = rateSettings ? rateSettings.commission : 10; // default 1
         const newEntry = new CompositeId({
           rideID: ride._id,
           mode,
+          status,
           compositeId: newCompositeId,
           fare: ride.requestFare,
           revenue,
+              passengerId: ride.passengerId,
           driverCompositeId,
           driverID: ride.driverID,
 date,
@@ -102,5 +105,39 @@ router.get("/composite/ride/:rideID", async (req, res) => {
     }
   });
   
+// Route to fetch all rides for a specific driver using driverCompositeId
+router.get("/rides-with-composite-ids/:driverCompositeId", async (req, res) => {
+  const { driverCompositeId } = req.params;
+
+  try {
+    const rides = await CompositeId.find({ driverCompositeId });
+
+    if (rides.length === 0) {
+      return res.status(404).json({ message: "No rides found for this driver." });
+    }
+
+    res.status(200).json({ rides });
+  } catch (error) {
+    console.error("Error fetching rides for driver:", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+// Route to fetch all rides for a specific passenger
+router.get("/rides-with-composite-ids/passenger/:passengerId", async (req, res) => {
+  const { passengerId } = req.params;
+
+  try {
+    const rides = await CompositeId.find({ passengerId });
+
+    if (rides.length === 0) {
+      return res.status(404).json({ message: "No rides found for this passenger." });
+    }
+
+    res.status(200).json({ rides });
+  } catch (error) {
+    console.error("Error fetching rides for passenger:", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 module.exports = router;

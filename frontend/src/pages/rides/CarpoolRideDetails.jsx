@@ -26,7 +26,7 @@ const CarpoolRides = () => {
                     console.error("No token found, redirecting...");
                     return;
                 }
-                const compositIdData = await fetch(`http://localhost:5000/api/v1/composite/ride/${rideID}`, {
+           {/*   const compositIdData = await fetch(`http://localhost:5000/api/v1/composite/ride/${rideID}`, {
                     method: "GET",
                     headers: {
                       Authorization: `Bearer ${token}`, // only if route is protected
@@ -37,9 +37,11 @@ const CarpoolRides = () => {
                   if (!compositIdData.ok) {
                     throw new Error("Ride not found");
                   }
+                    
               
                   const compositIdDatajson = await compositIdData.json();
                   console.log("Composite Ride Data:", compositIdDatajson);
+                  */ }  
 
                 const response = await fetch(`http://localhost:5000/carpool-rides/${rideID}`, {
                     method: "GET",

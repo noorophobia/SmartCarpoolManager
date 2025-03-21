@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import '../styles/home.css';
 import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
-  LineChart, Line, XAxis, YAxis, Tooltip as LineTooltip, Legend
+  LineChart, Line, XAxis, YAxis, Tooltip as LineTooltip
 } from 'recharts';
 import { ToggleButton, ToggleButtonGroup } from '@mui/material';
-import { useLocation } from "react-router-dom";
-import axios from 'axios';
-
+ import axios from 'axios';
+//useState Runs code when the component mounts, updates, or unmounts
+// useEffect create and manage local state (variables that change)
 const COLORS = ['#4CAF50', '#FFC107'];
 
 const Home = () => {
@@ -23,13 +23,14 @@ const Home = () => {
   const [completedRides, setCompletedRides] = useState(0);
   const [cancelledRides, setCancelledRides] = useState(0);
   const [totalEarnings, setTotalEarnings] = useState(0);
-
+//axios  built-in browser API for making HTTP requests.
   useEffect(() => {
     const fetchDriverCount = async () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get("http://localhost:5000/drivers/api/count", {
-          headers: { Authorization: `Bearer ${token}` },
+
+           headers: { Authorization: `Bearer ${token}` },
         });
         if (typeof response.data.totalDrivers === "number") {
           setDriverCount(response.data.totalDrivers);
@@ -90,6 +91,7 @@ const Home = () => {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
+            //data sending format
             "Content-Type": "application/json"
           }
         });
@@ -115,6 +117,7 @@ const Home = () => {
           const total = formatted.length;
           const completed = formatted.filter(r => r.rideStatus === "completed").length;
           const cancelled = formatted.filter(r => r.rideStatus === "cancelled").length;
+          //loops through each ride
           const earnings = formatted.reduce((sum, r) => sum + (r.revenue || 0), 0);
 
           setTotalRides(total);
@@ -128,14 +131,15 @@ const Home = () => {
 
           formatted.forEach(ride => {
             if (!ride.date) return;
-
+          //month name in short form (e.g., Jan, Feb, Mar) 
             const monthKey = ride.date.toLocaleString('default', { month: 'short' });
+            //unique day key, for example:"Mar-20" for March 20th.
             const dayKey = `${monthKey}-${ride.date.getDate()}`;
 
             monthlyMap[monthKey] = (monthlyMap[monthKey] || 0) + ride.revenue;
             dailyMap[dayKey] = (dailyMap[dayKey] || 0) + ride.revenue;
           });
-
+           //Convert objects to arrays for chart-friendly data:
           const monthlyArr = Object.entries(monthlyMap).map(([name, revenue]) => ({ name, revenue }));
           const dailyArr = Object.entries(dailyMap).map(([name, revenue]) => ({ name, revenue }));
 
@@ -143,7 +147,10 @@ const Home = () => {
           dailyArr.sort((a, b) => {
             const [monthA, dayA] = a.name.split("-");
             const [monthB, dayB] = b.name.split("-");
-            return parseInt(dayA) - parseInt(dayB);
+            //splits "Mar-20" into two parts: monthA = "Mar", dayA = "20" for the first item.
+            return parseInt(dayA) - parseInt(dayB); //If the result is positive → a comes after b,
+            //   If negative → a comes before b
+           // If zero → they are equal.
           });
 
           setMonthlyData(monthlyArr);
@@ -161,6 +168,7 @@ const Home = () => {
     fetchRevenue();
   }, []);
 
+// ignore event 
   const handleViewToggle = (_, newView) => {
     if (newView !== null) {
       setView(newView);
@@ -244,7 +252,7 @@ const Home = () => {
           <ToggleButtonGroup
             value={view}
             orientation="vertical"
-            exclusive
+            exclusive /** only one button can be selected*/
             onChange={handleViewToggle}
             aria-label="Revenue View"
             sx={{ padding: '10px 20px', color: 'black' }}
@@ -268,6 +276,7 @@ const Home = () => {
               data={pieData}
               dataKey="value"
               nameKey="name"
+              //centers the pie chart inside the container.
               cx="50%"
               cy="50%"
               outerRadius={100}
@@ -283,6 +292,7 @@ const Home = () => {
                 border: '1px solid #ccc',
                 borderRadius: '8px',
               }}
+              //formatter customizes the text like"20 Requests".
               formatter={(value, name) => [`${value} Requests`, name]}
             />
           </PieChart>

@@ -6,9 +6,9 @@
   justify-content: space-between;
   margin-bottom: 20px;
   padding: 10px 20px;
-  background-color:var(--menu-bg); /* A teal shade */
-  color: white; /* White text for contrast */
-  border-radius: 8px; /* Rounded corners */
+  background-color:var(--menu-bg);  
+  color: white;  
+  border-radius: 8px;  
 }
 
 .header h1 {
@@ -18,7 +18,7 @@
 }
 
 .header .button {
-  background-color: var(--dark-color); /* Slightly lighter teal for the button */
+  background-color: var(--dark-color);  
   color: white;
   padding: 10px 15px;
   font-size: 1rem;
@@ -29,16 +29,15 @@
 }
 
 .header .button:hover {
-  background-color: #00695c; /* Darker teal on hover */
+  background-color: #00695c;  
 }
 
 .dataGrid {
   background: white;
   padding: 20px;
   flex-direction: row-reverse;
-
-  border-radius: 8px; /* Rounded corners for the table */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+  border-radius: 8px;  
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);  
    .MuiDataGrid-toolbarContainer{
     flex-direction: row-reverse;
    }

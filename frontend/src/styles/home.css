@@ -1,8 +1,8 @@
 .home {
     display: grid;
     gap: 20px;
-    grid-template-columns: repeat(4, 1fr); /* 4 equal columns */
-    grid-template-rows: auto auto auto; /*  rows  auto for dynamic height */
+    grid-template-columns: repeat(4, 1fr); 
+    grid-template-rows: auto auto auto;  
     padding: 20px;
     position: relative;
 }
@@ -99,27 +99,27 @@
   
  .legend {
     display: flex;
-    justify-content: center; /* Center legend below the chart */
+    justify-content: center; 
     align-items: center;
-    margin-top: 20px; /* Add space between pie chart and legend */
+    margin-top: 20px;  
   }
   
   .legend-item {
     display: flex;
     align-items: center;
-    margin: 0 15px; /* Space between legend items */
+    margin: 0 15px; 
   }
   
   .color-box {
-    width: 16px; /* Square size */
+    width: 16px;  
     height: 16px;
-    margin-right: 8px; /* Space between box and text */
-    border-radius: 2px; /* Optional: Slight rounding */
+    margin-right: 8px;  
+    border-radius: 2px;  
   }
   
   .legend-text {
     font-size: 14px;
-    font-weight: normal; /* Adjust font weight for better readability */
+    font-weight: normal; 
   }
   
 

@@ -7,21 +7,20 @@
     padding: 10px 20px;
     background: var(--soft-color);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    z-index: 1000; /* Ensure it appears above other elements */
+    z-index: 1000;  
     top: 0;
     position: absolute;
     
-    height: 90px; /* Set a fixed height for consistency */
+    height: 90px;  
 }
  
- /* Ensure content below navbar doesn't overlap */
-body {
+ body {
     margin: 0; /* Reset any default margin */
     padding-top: 90px; /* Match the navbar height */
 }
 
 .logo {
-    width: 250px; /* Adjust size if necessary */
+    width: 250px; 
     height: auto;
 }
 
@@ -45,7 +44,7 @@ body {
     background-color: white;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     border-radius: 5px;
-    z-index: 1100; /* Ensure it appears above other dropdowns or elements */
+    z-index: 1100;  
     overflow: hidden;
 }
 
