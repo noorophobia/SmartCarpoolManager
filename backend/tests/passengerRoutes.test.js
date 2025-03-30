@@ -69,14 +69,21 @@ it("Should fetch a single passenger by ID", async () => {
 
 // Test: Update a passenger
 it("Should update the passenger details", async () => {
-    const res = await request(app)
+    const updateRes = await request(app)
         .put(`/passengers/${passengerId}`)
         .set("Authorization", `Bearer ${token}`)
-        .send({ phone: "0987654321" });
+        .send({
+            name: "Alice Smith",
+            phone: "0987654321",
+            gender: "female"
+        });
 
-    expect(res.statusCode).toBe(200);
-    expect(res.body.phone).toBe("0987654321");
+    expect(updateRes.statusCode).toBe(200);
+    expect(updateRes.body).toHaveProperty("_id", passengerId);
+    expect(updateRes.body.name).toBe("Alice Smith");
+    expect(updateRes.body.phone).toBe("0987654321");
 });
+
 
 // Test: Delete a passenger
 it("Should delete a passenger", async () => {
@@ -90,6 +97,8 @@ it("Should delete a passenger", async () => {
 
 // Cleanup after tests
 afterAll(async () => {
+        await mongoose.connection.db.collection("passengers").deleteMany({});
+    
     await mongoose.connection.close();
     if (server) {
         server.close();

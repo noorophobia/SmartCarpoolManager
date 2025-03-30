@@ -69,8 +69,7 @@ router.get('/drivers/:id', verifyToken,async (req, res) => {
 
   try {
      const driver = await Driver.findById(id);   
-console.log(driver)
-     if (!driver) {
+      if (!driver) {
       return res.status(404).json({ message: 'Driver not found' });
     }
 
@@ -93,7 +92,7 @@ const generateCompositeId = async () => {
   return `DR-${String(counter.value).padStart(3, '0')}`;
 };
  
-// ✅ Add a new driver
+//  Add a new driver
 router.post('/drivers', verifyToken, async (req, res) => {
   try {
     const { 
@@ -120,8 +119,7 @@ router.post('/drivers', verifyToken, async (req, res) => {
       vehicleRegisterationBack,
       vehiclePhotos
     } = req.body;
-    console.log(req.body)
-    if (!driverDOB) {
+     if (!driverDOB) {
       return res.status(400).json({ message: 'Date of Birth is required.' });
     }
 
@@ -181,7 +179,7 @@ router.post('/drivers', verifyToken, async (req, res) => {
   }
 });
 
-// ✅ Update driver details
+// Update driver details
 router.put('/drivers/:id', verifyToken, async (req, res) => {
   const { id } = req.params;
   const { 
@@ -232,8 +230,7 @@ router.put('/drivers/:id', verifyToken, async (req, res) => {
       ...(vehicleRegisterationBack && { vehicleRegisterationBack }),
       ...(vehiclePhotos && { vehiclePhotos }),
     };
-console.log("update "+req.body)
-    // 🔹 Update the driver in the database
+     // 🔹 Update the driver in the database
     const driver = await Driver.findByIdAndUpdate(id, updateFields, { new: true });
 
     if (!driver) {
@@ -270,8 +267,7 @@ router.get('/drivers/composite/:compositeId', verifyToken, async (req, res) => {
   try {
      const driver = await Driver.findOne({ compositeId: compositeId });   
 
- console.log(driver);
-     if (!driver) {
+      if (!driver) {
       return res.status(404).json({ message: 'Driver not found' });
     }
 

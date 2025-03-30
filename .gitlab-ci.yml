@@ -1,0 +1,13 @@
+stages:
+  - test
+
+jest_test:
+  stage: test
+  image: node:18
+  before_script:
+    - npm install
+  script:
+    - npm test -- --coverage
+  only:
+    - main
+    - dev

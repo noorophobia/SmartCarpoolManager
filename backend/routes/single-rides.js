@@ -5,12 +5,10 @@ const SingleRide = require('../models/single-rides'); // Import SingleRide model
 // Get all single rides (GET)
 router.get('/single-rides', async (req, res) => {
     try {
-        console.log("Fetching all single rides");
-
+ 
         const singleRides = await SingleRide.find();
 
-        console.log("Fetched Single Rides:", singleRides);
-
+ 
         res.status(200).json(singleRides);
     } catch (error) {
         console.error("Error fetching rides:", error.message);
@@ -21,8 +19,7 @@ router.get('/single-rides', async (req, res) => {
 // Get a single ride by ID (GET)
 router.get('/single-rides/:id', async (req, res) => {
     try {
-        console.log("req id "+ req.params.id)
-        const singleRide = await SingleRide.findById(req.params.id);
+         const singleRide = await SingleRide.findById(req.params.id);
          if (!singleRide) return res.status(404).json({ message: 'Single Ride not found' });
 
         res.status(200).json(singleRide);
