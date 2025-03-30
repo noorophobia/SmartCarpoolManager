@@ -19,9 +19,10 @@ import {
 } from "date-fns";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import '../../styles/tables.css';
+
+import { fetchRevenueData } from "../../services/revenueService"; // Import service
 
 const Revenue = () => {
   const [filter, setFilter] = useState("all");
@@ -33,55 +34,23 @@ const Revenue = () => {
 
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
-   const location = useLocation();
-  
-  
-  
-    useEffect(() => {
-      localStorage.setItem("lastVisitedRoute", location.pathname);
-    }, [location]);
+  const location = useLocation();
+
+  useEffect(() => {
+    localStorage.setItem("lastVisitedRoute", location.pathname);
+  }, [location]);
 
   useEffect(() => {
     if (!token) {
       navigate("/login");
       return;
     }
-
     fetchRevenue();
   }, []);
 
   const fetchRevenue = async () => {
-    try {
-      const response = await fetch("http://localhost:5000/rides-with-composite-ids", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
-        }
-      });
-
-      const data = await response.json();
-
-      if (Array.isArray(data.allMappings)) {
-        const formatted = data.allMappings.map((ride, index) => ({
-          id: index + 1,
-          rideID: ride.compositeId,
-          driverID:ride.driverID,
-          driverCompositeId: ride.driverCompositeId || "N/A",
-          rideStatus: "completed", // You may want to use real status if it's available
-          date: ride.date ? new Date(ride.date).toISOString().split("T")[0] : null,
-          revenue: ride.revenue || 0,
-          fare: ride.fare || 0,
-          mode: ride.mode
-        }));
-
-        setRevenueData(formatted);
-      } else {
-        setRevenueData([]);
-      }
-    } catch (error) {
-      console.error("Error fetching revenue:", error.message);
-    }
+    const data = await fetchRevenueData(token);
+    setRevenueData(data);
   };
 
   const filterRides = () => {
@@ -119,7 +88,6 @@ const Revenue = () => {
 
   const filteredRides = filterRides();
 
-  // 💡 New useEffect to calculate summary values
   useEffect(() => {
     const completed = filteredRides.filter((ride) => ride.rideStatus === "completed");
     const cancelled = filteredRides.filter((ride) => ride.rideStatus === "cancelled");
@@ -134,15 +102,16 @@ const Revenue = () => {
 
   const columns = [
     { field: "rideID", headerName: "Ride ID", width: 150 },
-    { field: "driverCompositeId", headerName: "Driver ID", width: 200,
+    {
+      field: "driverCompositeId", headerName: "Driver ID", width: 200,
       renderCell: (params) => (
-              <Link to={`/drivers/${params.row.driverID}`}>
-                <Button variant="text" color="primary" size="small">
-                  {params.value}
-                </Button>
-              </Link>
-            ),
-     },
+        <Link to={`/drivers/${params.row.driverID}`}>
+          <Button variant="text" color="primary" size="small">
+            {params.value}
+          </Button>
+        </Link>
+      ),
+    },
     { field: "rideStatus", headerName: "Ride Status", width: 150 },
     { field: "date", headerName: "Date", width: 150 },
     { field: "mode", headerName: "Ride Mode", width: 150 },
@@ -166,7 +135,6 @@ const Revenue = () => {
         <h1>Rides Revenue Report</h1>
       </div>
 
-      {/* Summary Cards */}
       <div style={{ display: "flex", justifyContent: "space-around", marginBottom: "20px" }}>
         <Card sx={{ minWidth: 275, backgroundColor: "#f5f5f5" }}>
           <CardContent>
@@ -194,7 +162,6 @@ const Revenue = () => {
         </Card>
       </div>
 
-      {/* Filter Dropdown */}
       <div style={{ marginBottom: "20px", maxWidth: 200 }}>
         <FormControl fullWidth variant="outlined" sx={{ background: "white" }}>
           <InputLabel>Filter</InputLabel>
@@ -211,7 +178,6 @@ const Revenue = () => {
         </FormControl>
       </div>
 
-      {/* DataGrid Table */}
       <Box sx={{ height: 500, width: "100%", backgroundColor: "#ffffff", padding: 2 }}>
         <DataGrid
           sx={{

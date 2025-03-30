@@ -1,6 +1,7 @@
-import  { useEffect, useState } from "react";
-import {  useLocation,Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, Link } from "react-router-dom";
 import { Box, Grid, Card, CardContent, Typography, Divider } from "@mui/material";
+import RideDetailsService from "../../services/RideDetailsService"; // Import service
 import "../../styles/rideDetails.css";
 
 const RideDetails = () => {
@@ -13,41 +14,29 @@ const RideDetails = () => {
   const location = useLocation();
 
   useEffect(() => {
-    // Store the current route in localStorage
     localStorage.setItem("lastVisitedRoute", location.pathname);
   }, [location]);
 
   useEffect(() => {
-    const fetchRideDetails = async () => {
+    const fetchRideData = async () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) {
-          console.error("No token found, redirecting...");
+          console.error("No token found");
           return;
         }
 
-        const response = await fetch(`http://localhost:5000/single-rides/${rideID}`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-
-        const data = await response.json();
-        if (response.ok) {
-          setRide(data);
-        } else {
-          console.error("Error fetching ride:", data.message);
-        }
+        const rideService = new RideDetailsService(token);
+        const data = await rideService.fetchRideDetails(rideID);
+        setRide(data);
       } catch (error) {
-        console.error("Failed to fetch ride details:", error);
+        console.error("Error:", error.message);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchRideDetails();
+    fetchRideData();
   }, [rideID]);
 
   if (loading) return <div>Loading ride details...</div>;
@@ -64,8 +53,6 @@ const RideDetails = () => {
           </tr>
         </thead>
         <tbody>
-              
-   {/*   <tr><td className="bold">Ride ID</td><td>{ride._id}</td></tr>*/}
           <tr><td className="bold">Pick-Up Location</td><td>{ride.requestOrigin}</td></tr>
           <tr><td className="bold">Drop-Off Location</td><td>{ride.requestDestination}</td></tr>
           <tr><td className="bold">Ride Status</td><td>{ride.status}</td></tr>
@@ -77,20 +64,18 @@ const RideDetails = () => {
         </tbody>
       </table>
 
-      {/* Passenger & Driver Details in Cards */}
       <Box sx={{ mt: 4 }}>
         <Grid container spacing={3}>
-          {/* Passenger Card */}
           <Grid item xs={12} sm={6}>
             <Card sx={{ padding: 2 }}>
               <CardContent>
                 <Typography variant="h6">Passenger Details</Typography>
                 <Divider sx={{ my: 1 }} />
                 <Typography variant="body1"><b>Name:</b> {ride.passengerName}</Typography>
-                <Typography variant="body1"><b>Passenger ID:</b> 
+                <Typography variant="body1"><b>Passenger ID:</b>
                   {passengerId ? (
-                    <Link 
-                      to={`/passenger-details`} 
+                    <Link
+                      to={`/passenger-details`}
                       style={{ color: "blue", marginLeft: "8px" }}
                       onClick={() => localStorage.setItem("id", ride.passengerId)}
                     >
@@ -103,17 +88,16 @@ const RideDetails = () => {
             </Card>
           </Grid>
 
-          {/* Driver Card */}
           <Grid item xs={12} sm={6}>
             <Card sx={{ padding: 2 }}>
               <CardContent>
                 <Typography variant="h6">Driver Details</Typography>
                 <Divider sx={{ my: 1 }} />
                 <Typography variant="body1"><b>Name:</b> {ride.driverName}</Typography>
-                <Typography variant="body1"><b>Driver ID:</b> 
+                <Typography variant="body1"><b>Driver ID:</b>
                   {driverId ? (
-                    <Link 
-                      to={`/drivers/${ride.driverID}`} 
+                    <Link
+                      to={`/drivers/${ride.driverID}`}
                       style={{ color: "blue", marginLeft: "8px" }}
                       onClick={() => localStorage.setItem("driverId", ride.driverID)}
                     >

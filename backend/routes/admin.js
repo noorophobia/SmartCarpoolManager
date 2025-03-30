@@ -16,8 +16,12 @@ router.post("/login", async (req, res) => {
     const admin = await Admin.findOne({ email });
 
     if (!admin) {
+      console.log(" Admin not found!");
+
       return res.status(400).json({ error: "Invalid email or password" });
     }
+    console.log("Stored Password:", admin.password);  
+    console.log("Entered Password:", password);
 
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) {

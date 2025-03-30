@@ -31,5 +31,18 @@ router.get('/carpool-rides/:id', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+// POST: Create a new carpool ride
+router.post("/carpool-rides", async (req, res) => {
+    try {
+      const newRide = new CarpoolRide(req.body);
+      const savedRide = await newRide.save();
+      res.status(201).json({
+        message: "Carpool ride created successfully",
+        ride: savedRide,
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error", error: error.message });
+    }
+  });
 
 module.exports = router;

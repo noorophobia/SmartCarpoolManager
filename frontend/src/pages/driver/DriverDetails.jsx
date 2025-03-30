@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Box,  Card, CardContent, Typography, Divider, CardMedia, Avatar, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // import the carousel styles
+import DriverService from '../../services/DriverService';
 
 const DriverDetails = () => {
   const { id } = useParams();
@@ -33,30 +34,13 @@ const DriverDetails = () => {
     
   const fetchDriver = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/drivers/${id}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-  
-      console.log('Driver API Response:', response); // Check status code
-  
-      if (!response.ok) {
-        throw new Error('Failed to fetch driver details');
-      }
-  
-      const data = await response.json();
-      console.log('Driver Data:', data); // Ensure data is correct
-  
+      const data = await DriverService.getDriverById(id);
       setDriver1(data);
     } catch (err) {
-       console.error('Error fetching driver:', err);
-    } 
+      console.error('Error fetching driver:', err);
+    }
   };
-   
-   
+  
     
     
 
@@ -66,20 +50,15 @@ const DriverDetails = () => {
   useEffect(() => {
     if (driver1) {
         
-    
-    const fetchRides = async () => {
-      try {
-        const response = await fetch(`http://localhost:5000/rides-with-composite-ids/${driver1.compositeId}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-    
-        const data = await response.json(); // Parse JSON response
-        console.log('Fetched Rides:', data.rides);
-        setRidesData(data.rides); // use data.rides based on the backend response
-      } catch (error) {
-        console.error('Error fetching rides:', error);
-      }
-    };
+      const fetchRides = async () => {
+        try {
+          const rides = await DriverService.fetchRidesByCompositeId(driver1.compositeId);
+          setRidesData(rides);
+        } catch (error) {
+          console.error('Error fetching rides:', error);
+        }
+      };
+      
     
   
            fetchRides();
@@ -101,34 +80,19 @@ const cancelledRides = ridesData.filter((ride) => ride.status === "cancelled").l
   }
 }, [ridesData]);
 const handleUnBlockDriver = async () => {
-   
   try {
-    const response = await fetch(`http://localhost:5000/drivers/block/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-      body: JSON.stringify({ isBlocked: false }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to update driver status");
-    }
-
+    await DriverService.unblockDriver(id);
     alert(`Driver has been "unblocked".`);
     setDriver1((prev) => ({
       ...prev,
       isBlocked: false,
     }));
-    // You may want to refresh the driver list or update UI here
   } catch (error) {
     console.error("Error:", error.message);
     alert("Something went wrong while updating driver status.");
   }
 };
+ 
    
 const handleGoBack = () => {
   const lastRoute = localStorage.getItem("lastVisitedRoute") || "/";

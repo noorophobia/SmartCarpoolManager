@@ -10,7 +10,7 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-
+import RatingsAndReviewsService from "../../services/RatingsAndReviewsService"; // ✅ Service import
 import "../../styles/ratingAndReviews.css";
 
 const RatingsAndReviews = () => {
@@ -18,7 +18,6 @@ const RatingsAndReviews = () => {
   const [selectedRide, setSelectedRide] = useState(null);
   const [passengerRatings, setPassengerRatings] = useState([]);
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
   const location = useLocation();
 
   const CACHE_KEY = "cachedPassengerRatings";
@@ -29,48 +28,31 @@ const RatingsAndReviews = () => {
   }, [location]);
 
   useEffect(() => {
-    if (!token) {
-      navigate("/login");
-      return;
-    }
-
     const cached = localStorage.getItem(CACHE_KEY);
     const timestamp = localStorage.getItem(`${CACHE_KEY}_timestamp`);
     const isCacheFresh = timestamp && Date.now() - Number(timestamp) < CACHE_EXPIRY_MINUTES * 60 * 1000;
 
     if (cached && isCacheFresh) {
       setPassengerRatings(JSON.parse(cached));
-      //If found, it parses and loads the cached data into state instead of making a network request.
     } else {
       fetchRatings();
     }
-
-    async function fetchRatings() {
-      try {
-        const response = await fetch("http://localhost:5000/passenger-ride-reviews", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!response.ok) throw new Error("Failed to fetch passenger reviews");
-
-        const data = await response.json();
-        setPassengerRatings(data.reviews);
-
-        localStorage.setItem(CACHE_KEY, JSON.stringify(data.reviews));
-        localStorage.setItem(`${CACHE_KEY}_timestamp`, Date.now().toString());
-      } catch (err) {
-        console.error("Error in fetchRatings:", err.message);
-      }
-    }
   }, []);
 
+  const fetchRatings = async () => {
+    try {
+      const reviews = await RatingsAndReviewsService.getPassengerRideReviews(); // ✅ use service
+      setPassengerRatings(reviews);
+      localStorage.setItem(CACHE_KEY, JSON.stringify(reviews));
+      localStorage.setItem(`${CACHE_KEY}_timestamp`, Date.now().toString());
+    } catch (err) {
+      console.error("Error fetching ratings:", err);
+    }
+  };
+
   const handleRefresh = () => {
-    localStorage.removeItem("cachedPassengerRatings");
-    localStorage.removeItem("cachedPassengerRatings_timestamp");
+    localStorage.removeItem(CACHE_KEY);
+    localStorage.removeItem(`${CACHE_KEY}_timestamp`);
     window.location.reload();
   };
 
@@ -81,23 +63,7 @@ const RatingsAndReviews = () => {
     if (row.resolved === true) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/passenger-ride-reviews/resolve/${row._id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ resolved: true }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to update review status.");
-      }
-
-      const result = await response.json();
-      console.log("Resolved updated:", result);
-
-      // Update state and local cache
+      await RatingsAndReviewsService.markReviewResolved(row._id); // ✅ use service
       const updated = passengerRatings.map((item) =>
         item._id === row._id ? { ...item, resolved: true } : item
       );
@@ -108,32 +74,18 @@ const RatingsAndReviews = () => {
     }
   };
 
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-  };
-
   const handleBlockDriver = async (driverId) => {
     try {
-      const response = await fetch(`http://localhost:5000/drivers/block/${driverId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({ isBlocked: true }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to update driver status");
-      }
-
+      await RatingsAndReviewsService.blockDriver(driverId); // ✅ use service
       alert(`Driver has been "blocked".`);
     } catch (error) {
-      console.error("Error:", error.message);
+      console.error("Error:", error);
       alert("Something went wrong while updating driver status.");
     }
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
   };
 
   const columns = [
@@ -221,7 +173,7 @@ const RatingsAndReviews = () => {
     <div className="main-content">
       <div className="header">
         <h1>Ratings and Reviews</h1>
-        <button className="button"  onClick={handleRefresh}>
+        <button className="button" onClick={handleRefresh}>
           Refresh Reviews
         </button>
       </div>

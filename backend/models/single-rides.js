@@ -12,8 +12,7 @@ const singleRideSchema = new mongoose.Schema({
   },
 
   paymentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Payment',default:null },
-  vehicleId: { type: mongoose.Schema.Types.ObjectId, ref: 'Vehicle',default:null },
-   
+    
   passengerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Passenger' },
     driverID: { type: mongoose.Schema.Types.ObjectId, ref: 'Driver' },
 

@@ -1,4 +1,4 @@
-import  { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -6,11 +6,11 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import '../../styles/passengerDetails.css';
+import EditPassengerService from '../../services/EditPassengerService';
 
 const EditPassenger = () => {
   const id = localStorage.getItem('id');
-
-   const navigate = useNavigate();
+  const navigate = useNavigate();
   const [passenger, setPassenger] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -18,26 +18,18 @@ const EditPassenger = () => {
   const [imagePreview, setImagePreview] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const token = localStorage.getItem('token');
-    useEffect(() => {
+
+  useEffect(() => {
     if (!token) {
       navigate('/login');
       return;
     }
-     const fetchPassenger = async () => {
+
+    const fetchPassenger = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/passengers/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch passenger details');
-        }
-
-        const data = await response.json();
+        const data = await EditPassengerService.getPassengerById(id);
         setPassenger(data);
-        setImagePreview(data.imageUrl || ''); // Set initial image preview
+        setImagePreview(data.imageUrl || '');
       } catch (err) {
         setError(err.message);
       } finally {
@@ -57,41 +49,18 @@ const EditPassenger = () => {
     const file = e.target.files[0];
     if (file) {
       setSelectedFile(file);
-      setImagePreview(URL.createObjectURL(file)); // Create a temporary URL for preview
+      setImagePreview(URL.createObjectURL(file));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
- 
-    const formData = new FormData();
-    formData.append('name', passenger.name);
-    formData.append('gender', passenger.gender);
 
-     formData.append('email', passenger.email);
-    formData.append('phoneNumber', passenger.phone);
- 
-    if (selectedFile) {
-      formData.append('photo', selectedFile); // Append the selected file
-    }
-
-    console.log(passenger.name);
     try {
-      const response = await fetch(`http://localhost:5000/passengers/${id}`, {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update passenger details');
-      }
+      await EditPassengerService.updatePassenger(id, passenger, selectedFile);
       localStorage.setItem('id', id);
-
-       navigate(`/passenger-details`); // Redirect to Passenger Details page
+      navigate(`/passenger-details`);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -124,7 +93,6 @@ const EditPassenger = () => {
           borderRadius: 2,
           boxShadow: 2,
           backgroundColor: '#fff',
-          
         }}
       >
         <TextField
@@ -133,14 +101,15 @@ const EditPassenger = () => {
           value={passenger.name || ''}
           onChange={handleChange}
           fullWidth
+          required
         />
-        
         <TextField
           label="Email"
           name="email"
           value={passenger.email || ''}
           onChange={handleChange}
           fullWidth
+          required
         />
         <TextField
           label="Phone Number"
@@ -148,6 +117,7 @@ const EditPassenger = () => {
           value={passenger.phone || ''}
           onChange={handleChange}
           fullWidth
+          required
         />
         <TextField
           label="Gender"
@@ -155,7 +125,9 @@ const EditPassenger = () => {
           value={passenger.gender || ''}
           onChange={handleChange}
           fullWidth
+          required
         />
+
         <div>
           <Typography variant="h6">Photo</Typography>
           <input
@@ -167,15 +139,16 @@ const EditPassenger = () => {
             <img
               src={imagePreview}
               alt="Preview"
-              style={{ width: '100%', marginTop: 10, borderRadius: 8 }}
+              style={{ width: '50%', marginTop: 10, borderRadius: 8 }}
             />
           )}
         </div>
+
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Button
             variant="contained"
             color="secondary"
-            onClick={() => navigate(`/passengers`)}
+            onClick={() => navigate('/passengers')}
           >
             Go Back
           </Button>
@@ -188,10 +161,7 @@ const EditPassenger = () => {
             {saving ? 'Saving...' : 'Save Changes'}
           </Button>
         </Box>
-        
       </Box>
-     
-      
     </div>
   );
 };

@@ -1,57 +1,35 @@
-import { useEffect, useState } from 'react';
-import { DataGrid } from '@mui/x-data-grid';
-import { Box, CircularProgress, Typography } from '@mui/material';
-import '../../styles/tables.css';
+import { useEffect, useState } from "react";
+import { DataGrid } from "@mui/x-data-grid";
+import { Box, CircularProgress, Typography } from "@mui/material";
+import "../../styles/tables.css";
+
+import { fetchYearlyRevenueData } from "../../services/yearlyRevenueService"; // ✅ Import service
 
 const YearlyRevenue = () => {
   const [ridesData, setRidesData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [yearlyStats, setYearlyStats] = useState([]);
   const [error, setError] = useState(null);
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchRevenue = async () => {
       try {
-        const res = await fetch('http://localhost:5000/rides-with-composite-ids', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
+        const data = await fetchYearlyRevenueData(token);
+        setRidesData(data);
 
-        const data = await res.json();
+        const yearsInData = [
+          ...new Set(
+            data
+              .filter((ride) => ride.date)
+              .map((ride) => new Date(ride.date).getFullYear())
+          ),
+        ].sort((a, b) => b - a);
 
-        if (Array.isArray(data.allMappings)) {
-          const formatted = data.allMappings.map((ride, index) => ({
-            id: index + 1,
-            rideID: ride.compositeId,
-            date: ride.date ? new Date(ride.date).toISOString().split('T')[0] : null,
-            rideStatus: ride.rideStatus || 'Completed',
-            passengerID: ride.passengerCompositeId || 'N/A',
-            driverID: ride.driverCompositeId || 'N/A',
-            revenue: ride.revenue || 0,
-          }));
-
-          setRidesData(formatted);
-
-          // 🔥 Extract unique years from valid ride dates
-          const yearsInData = [
-            ...new Set(
-              formatted
-                .filter((ride) => ride.date)
-                .map((ride) => new Date(ride.date).getFullYear())
-            ),
-          ].sort((a, b) => b - a); // Optional: sort years descending
-
-          // 🔥 Only include years that are actually present in the data
-          const stats = yearsInData.map((year) => calculateYearlyStats(formatted, year));
-          setYearlyStats(stats);
-        } else {
-          setError('Unexpected data format from server');
-        }
+        const stats = yearsInData.map((year) => calculateYearlyStats(data, year));
+        setYearlyStats(stats);
       } catch (err) {
-        setError(err.message || 'Something went wrong');
+        setError(err.message || "Something went wrong");
       } finally {
         setLoading(false);
       }
@@ -67,8 +45,8 @@ const YearlyRevenue = () => {
     });
 
     const totalRides = yearRides.length;
-    const completedRides = yearRides.filter((r) => r.rideStatus === 'Completed').length;
-    const cancelledRides = yearRides.filter((r) => r.rideStatus === 'Cancelled').length;
+    const completedRides = yearRides.filter((r) => r.rideStatus === "Completed").length;
+    const cancelledRides = yearRides.filter((r) => r.rideStatus === "Cancelled").length;
     const totalRevenue = yearRides.reduce((acc, r) => acc + (r.revenue || 0), 0).toFixed(2);
 
     const uniqueDrivers = new Set(yearRides.map((r) => r.driverID));
@@ -86,18 +64,18 @@ const YearlyRevenue = () => {
   };
 
   const columns = [
-    { field: 'year', headerName: 'Year', width: 150 },
-    { field: 'totalRides', headerName: 'Total Rides', width: 150 },
-    { field: 'completedRides', headerName: 'Completed Rides', width: 180 },
-    { field: 'cancelledRides', headerName: 'Cancelled Rides', width: 180 },
-    { field: 'totalRevenue', headerName: 'Revenue (Rs)', width: 160, type: 'number' },
-    { field: 'totalDrivers', headerName: 'Total Active Drivers ', width: 150 },
-    { field: 'totalPassengers', headerName: 'Total Active Passengers', width: 170 },
+    { field: "year", headerName: "Year", width: 150 },
+    { field: "totalRides", headerName: "Total Rides", width: 150 },
+    { field: "completedRides", headerName: "Completed Rides", width: 180 },
+    { field: "cancelledRides", headerName: "Cancelled Rides", width: 180 },
+    { field: "totalRevenue", headerName: "Revenue (Rs)", width: 160, type: "number" },
+    { field: "totalDrivers", headerName: "Total Active Drivers ", width: 150 },
+    { field: "totalPassengers", headerName: "Total Active Passengers", width: 170 },
   ];
 
   columns.forEach((column) => {
-    column.align = 'center';
-    column.headerAlign = 'center';
+    column.align = "center";
+    column.headerAlign = "center";
   });
 
   return (
@@ -107,13 +85,15 @@ const YearlyRevenue = () => {
       </div>
 
       {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
           <CircularProgress />
         </Box>
       ) : error ? (
-        <Typography color="error" sx={{ mt: 2 }}>{error}</Typography>
+        <Typography color="error" sx={{ mt: 2 }}>
+          {error}
+        </Typography>
       ) : (
-        <Box sx={{ height: 500, width: '100%', backgroundColor: '#ffffff' }}>
+        <Box sx={{ height: 500, width: "100%", backgroundColor: "#ffffff" }}>
           <DataGrid
             className="dataGrid"
             rows={yearlyStats}

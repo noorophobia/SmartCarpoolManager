@@ -1,52 +1,38 @@
 import React, { useState, useEffect } from "react";
 import "../../styles/setting.css";
+import SettingsService from "../../services/SettingsService"; // ✅ Import service
 
 const Settings = () => {
-  // State variables for settings
-  const [theme, setTheme] = useState("light"); // Default theme
-   const [password, setPassword] = useState(""); // New password
-  const [email, setEmail] = useState(""); // Email for password update
-  const [confirmPassword, setConfirmPassword] = useState(""); // Confirm password
-  const [passwordError, setPasswordError] = useState(""); // Error message for password mismatch
-  const [successMessage, setSuccessMessage] = useState(""); // Success message for password update
-  const [loading, setLoading] = useState(false); // Loading state
+  const [theme, setTheme] = useState("light");
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // Save settings to localStorage
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") || "light";
     setTheme(savedTheme);
-    document.body.setAttribute("data-theme", savedTheme); // Apply saved theme on load
+    document.body.setAttribute("data-theme", savedTheme);
   }, []);
 
   const handleThemeChange = (event) => {
     const selectedTheme = event.target.value;
     setTheme(selectedTheme);
-    document.body.setAttribute("data-theme", selectedTheme); // Update theme dynamically
-    localStorage.setItem("theme", selectedTheme); // Save theme in localStorage
-  };
-
-  const handlePasswordChange = (event) => {
-    setPassword(event.target.value);
-  };
-
-  const handleEmailChange = (event) => {
-    setEmail(event.target.value);
-  };
-
-  const handleConfirmPasswordChange = (event) => {
-    setConfirmPassword(event.target.value);
+    document.body.setAttribute("data-theme", selectedTheme);
+    localStorage.setItem("theme", selectedTheme);
   };
 
   const handlePasswordSubmit = async (event) => {
     event.preventDefault();
 
-        // Empty fields validation
-        if (!email.trim() || !password.trim() || !confirmPassword.trim()) {
-          setPasswordError("All fields are required.");
-          setSuccessMessage("");
-          return;
-        }
-    
+    if (!email.trim() || !password.trim() || !confirmPassword.trim()) {
+      setPasswordError("All fields are required.");
+      setSuccessMessage("");
+      return;
+    }
+
     if (password !== confirmPassword) {
       setPasswordError("Passwords do not match.");
       setSuccessMessage("");
@@ -57,28 +43,13 @@ const Settings = () => {
     setLoading(true);
 
     try {
-      // Send password update request to backend
-      const response = await fetch("http://localhost:5000/api/admin/update-password", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, newPassword: password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setSuccessMessage("Password updated successfully!");
-        setPassword(""); // Reset fields
-        setConfirmPassword("");
-        setEmail("");
-      } else {
-        setPasswordError(data.error || "An error occurred while updating the password.");
-        setSuccessMessage("");
-      }
+      await SettingsService.updatePassword(email, password); // ✅ Use service
+      setSuccessMessage("Password updated successfully!");
+      setPassword("");
+      setConfirmPassword("");
+      setEmail("");
     } catch (err) {
-      setPasswordError("An error occurred. Please try again.");
+      setPasswordError(err);
       setSuccessMessage("");
     } finally {
       setLoading(false);
@@ -100,67 +71,65 @@ const Settings = () => {
 
       {/* Password Change Form */}
       <div className="password-change">
-        <h3  style={{ display: 'block', marginBottom: '15px !important' ,marginTop:'10px', fontSize:'20px'
-
-        }}
-
-
-        
-        >Change Password</h3>
+        <h3
+          style={{
+            display: "block",
+            marginBottom: "15px",
+            marginTop: "10px",
+            fontSize: "20px",
+          }}
+        >
+          Change Password
+        </h3>
         <form onSubmit={handlePasswordSubmit}>
           <div className="form-group">
- 
-          <label htmlFor="email" style={{ display: 'block', marginBottom: '15px !important' ,marginTop:'10px'
-
-          }}>
-  Email:
-</label>
-
-
+            <label htmlFor="email" style={{ marginBottom: "10px", display: "block" }}>
+              Email:
+            </label>
             <input
               type="email"
               id="email"
               value={email}
-              onChange={handleEmailChange}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
           <div className="form-group">
-            <label htmlFor="password"
-            style={{ marginBottom: '10px', display:' inline-block',  marginTop:'10px'
-
-
-
-             }}
-            >New Password:</label>
+            <label
+              htmlFor="password"
+              style={{ marginBottom: "10px", display: "block", marginTop: "10px" }}
+            >
+              New Password:
+            </label>
             <input
               type="password"
               id="password"
               value={password}
-              onChange={handlePasswordChange}
+              onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
           <div className="form-group">
-            <label htmlFor="confirmPassword
-            " 
-            style={{ marginBottom: '10px', display:' inline-block',  marginTop:'10px'}}
-
-            >Confirm Password:</label>
+            <label
+              htmlFor="confirmPassword"
+              style={{ marginBottom: "10px", display: "block", marginTop: "10px" }}
+            >
+              Confirm Password:
+            </label>
             <input
               type="password"
               id="confirmPassword"
               value={confirmPassword}
-              onChange={handleConfirmPasswordChange}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               required
             />
           </div>
           {passwordError && <p className="error">{passwordError}</p>}
-          {successMessage && <p className="success" style={{color:"green", marginTop:"10px", marginBottom:"10px"
-
-          }}
-          
-          >{successMessage}</p>}
+          {successMessage && (
+            <p className="success" style={{ color: "green", marginTop: "10px", marginBottom: "10px" }}>
+              {successMessage}
+            </p>
+          )}
           <button type="submit" disabled={loading}>
             {loading ? "Updating..." : "Update Password"}
           </button>

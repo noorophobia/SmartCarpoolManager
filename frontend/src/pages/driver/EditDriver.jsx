@@ -7,7 +7,8 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
- 
+import DriverService from '../../services/DriverService';
+
 
 const EditDriver = () => {
     const [driverFirstName, setFirstName] = useState('');
@@ -104,14 +105,7 @@ const updateState = (key, value) => {
       // Fetch the driver data if editing
       const fetchDriver = async () => {
         try {
-           const response = await fetch(`http://localhost:5000/drivers/${id}`, {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${token}`,  // Add the token to the Authorization header
-              'Content-Type': 'application/json',
-            },
-          });
-          const data = await response.json();
+          const data = await DriverService.getDriverById(id);
           if (data) {
             setFirstName(data.driverFirstName || '');
             setLastName(data.driverLastName || '');
@@ -121,7 +115,6 @@ const updateState = (key, value) => {
             setOldCnic(data.driverCnicNumber || '');
             setOldEmail(data.driverEmail || '');
             setOldPhone(data.driverPhone || '');
-         //   setPassword(data.); // Keeping password empty for security
             setPhoneNumber(data.driverPhone || '');
             setDateOfBirth(data.driverDOB ? data.driverDOB.split('T')[0] : '');
             setRatings(data.rating || 0);
@@ -137,30 +130,22 @@ const updateState = (key, value) => {
             setVehicleRegistrationBack(data.vehicleRegistrationBack || null);
             setCnicFront(data.driverCnicFront || null);
             setCnicBack(data.driverCnicBack || null);
-            setDriverPhoto(data.driverSelfie || null);}
-  
+            setDriverPhoto(data.driverSelfie || null);
+          }
         } catch (error) {
           console.error('Failed to fetch driver:', error);
         }
       };
+      
 
       const fetchAllDrivers = async () => {
         try {
-           const response = await fetch(`http://localhost:5000/drivers`, {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${token}`,  // Add the token to the Authorization header
-              'Content-Type': 'application/json',
-            },
-          });
-          const data = await response.json();
-         
-         setEmails( data.map(driver => driver.email))
-          setPhoneNumbers (data.map(driver => driver.phoneNumber));
+          const data = await DriverService.getAllDrivers();
+          setEmails(data.map(driver => driver.email));
+          setPhoneNumbers(data.map(driver => driver.phoneNumber));
           setCnics(data.map(driver => driver.cnic));
-
         } catch (error) {
-          console.error('Failed to fetch driver:', error);
+          console.error('Failed to fetch drivers:', error);
         }
       };
       
@@ -174,156 +159,18 @@ const updateState = (key, value) => {
   }, [id]);
 
     
-    
-   const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(''); // Clear previous error
-     // Reset errors before starting validation
-     setErrorMessages({
-      driverFirstName: "",
-      driverLastName: "",
+    if (hasError) return;
   
-      driverGender: "",
-      driverEmail: "",
-      driverPhone: "",
-      driverCnicNumber: "",
-      driverDOB: "",
-      vehicleName: "",
-      brand:"",
-      vehicleColor:"",
-      vehicleType:"",
-      carType:"",
-    //  driverPassword:"",
-      vehicleProductionYear: "",
-      licenseNumber: "",
-      vehiclePhotos : "",
-      vehicleRegistrationFront: "",
-     vehicleRegistrationBack: "",
-     driverCnicFront: "",
-     driverCnicBack: "",
-     driverSelfie: "",
-    });
-    let hasError = false;
-console.log("inside handel")
-if (driverEmail !== oldEmail && emails.includes(driverEmail)) {
-  setErrorMessages((prev) => ({ ...prev, driverEmail: "Email is already in use" }));
-  hasError = true;
-}
-
-if (driverPhone !== oldPhone && phoneNumbers.includes(driverPhone)) {
-  setErrorMessages((prev) => ({ ...prev, driverPhone: "Phone Number is already in use" }));
-  hasError = true;
-}
-
-if (driverCnicNumber !== oldCnic && cnics.includes(driverCnicNumber)) {
-  setErrorMessages((prev) => ({ ...prev, driverCnicNumber: "CNIC is already in use" }));
-  hasError = true;
-}
-
-    // Validation logic for driver fields
-    if (!driverFirstName.trim()) {
-       
-      setErrorMessages((prev) => ({ ...prev, driverFirstName: "First Name is required" }));
-      hasError = true;
-    }
-    if (!driverLastName.trim()) {
-       
-      setErrorMessages((prev) => ({ ...prev, driverLastName: "Last Name is required" }));
-      hasError = true;
-    }
-    if (!['male', 'female'].includes(driverGender)) {
-      setErrorMessages((prev) => ({ ...prev, driverGender: "Gender must be Male or Female" }));
-      hasError = true;
-    }
-    if (!driverEmail.match(/^\S+@\S+\.\S+$/)|| (!driverEmail)) {
-      setErrorMessages((prev) => ({ ...prev, driverEmail: "Please provide a valid email address" }));
-      hasError = true;
-    }
-    
-    if (!driverPhone.match(/^((\+92)|0)(3[0-9]{2})[0-9]{7}$/)) {
-      setErrorMessages((prev) => ({ ...prev, driverPhone: "Phone number must be a valid Pakistani number" }));
-      hasError = true;
-    }
-    if (!driverCnicNumber.match(/^\d{5}-\d{7}-\d{1}$/)) {
-      setErrorMessages((prev) => ({ ...prev, driverCnicNumber: "CNIC must be in the format XXXXX-XXXXXXX-X" }));
-      hasError = true;
-    }
-    if (!driverDOB) {
-      setErrorMessages((prev) => ({ ...prev, driverDOB: "Date of Birth is required" }));
-      hasError = true;
-    }
-    /*if(!driverPassword){
-      setErrorMessages((prev) => ({ ...prev, driverPassword: "Password is required" }));
-      hasError = true;
-    }*/
-    // Validation logic for vehicle fields
-    if (!vehicleName.trim()) {
-      setErrorMessages((prev) => ({ ...prev, vehicleName: "Vehicle Name is required" }));
-      hasError = true;
-    }
-    if(!brand){
-      setErrorMessages((prev) => ({ ...prev, brand: "Vehicle Brand is required" }));
-      hasError = true;
-    }
-    if(!vehicleColor){
-      setErrorMessages((prev) => ({ ...prev, vehicleColor: "Vehicle Color is required" }));
-      hasError = true;
-    }
-    if(!vehicleType){
-      setErrorMessages((prev) => ({ ...prev, vehicleType: "Vehicle Type is required" }));
-      hasError = true;
-    }
-    if(!carType){
-      setErrorMessages((prev) => ({ ...prev, carType: "Car Type is required" }));
-      hasError = true;
-    }
-    if (!licenseNumber.trim()) {
-      setErrorMessages((prev) => ({ ...prev, licenseNumber: "License Number is required" }));
-      hasError = true;
-    }
-    if (!vehicleProductionYear  || (vehicleProductionYear < 1900 && vehicleProductionYear > currentYear)) {
-      setErrorMessages((prev) => ({ ...prev, vehicleProductionYear: "Please enter a valid production year" }));
-      hasError = true;
-     }
-     
-     if (vehiclePhotos.length === 0) {
-      setErrorMessages((prev) => ({
-        ...prev,
-        vehiclePhotos: 'Please upload at least one vehicle photo.',
-      }));
-    }
-    
-     if(!vehicleRegistrationFront){
-      setErrorMessages((prev) => ({ ...prev, vehicleRegistrationFront: "Please add Vehicle Registration Front Photo" }));
-      hasError = true;
-     }
-     if(!vehicleRegistrationBack){
-      setErrorMessages((prev) => ({ ...prev, vehicleRegistrationBack: "Please add Vehicle Registration Back Photo" }));
-      hasError = true;
-     }
-     if(!driverCnicFront){
-      setErrorMessages((prev) => ({ ...prev, driverCnicFront: "Please add CNIC Front Photo" }));
-      hasError = true;
-     }
-     if(!driverCnicBack){
-      setErrorMessages((prev) => ({ ...prev, driverCnicBack: "Please add CNIC Back Photo" }));
-      hasError = true;
-     }
-     if(!driverSelfie){
-      setErrorMessages((prev) => ({ ...prev, driverSelfie: "Please add Driver Photo" }));
-      hasError = true;
-     }
-      console.log(hasError)
-      if (hasError) return;
-    
-
-    const newDriver = {  driverFirstName,
-      driverLastName, 
-      driverGender, 
-      driverEmail, 
-      driverPhone, 
-      driverCnicNumber, 
-      driverDOB, 
+    const updatedDriver = {
+      driverFirstName,
+      driverLastName,
+      driverGender,
+      driverEmail,
+      driverPhone,
+      driverCnicNumber,
+      driverDOB,
       rating,
       driverCnicFront,
       driverCnicBack,
@@ -337,45 +184,19 @@ if (driverCnicNumber !== oldCnic && cnics.includes(driverCnicNumber)) {
       brand,
       vehicleRegistrationFront,
       vehicleRegistrationBack,
-      vehiclePhotos};
-
-       
+      vehiclePhotos
+    };
+  
     try {
-      const token = localStorage.getItem('token');  // Or sessionStorage.getItem('token')
-        
-         if (!token) {
-          // If no token is found, redirect to the login page
-          navigate('/login');
-          return;
-        }
-
-         
-      const response = await axios.put(
-        `http://localhost:5000/drivers/${id}`,  
-        newDriver,
-        {
-          headers: {
-            'Content-Type': 'application/json', // Important for FormData
-            'Authorization': `Bearer ${token}`,  
-          }
-        }
-      );
-console.log("response came")
-
-      // Handle response
-      if (response.status === 200) {
-        console.log('Driver updated successfully');
-        navigate('/drivers'); 
-
-      }
+      await DriverService.updateDriver(id, updatedDriver);
+      console.log('Driver updated successfully');
+      navigate('/drivers');
     } catch (error) {
       console.error('Error saving data:', error);
       setError('Error saving data. Please try again.');
     }
-
-    
-
-   };
+  };
+  
    
   const handleCnicChange = (e) => {
     let value = e.target.value.replace(/\D/g, ''); // Remove non-digit characters

@@ -3,18 +3,13 @@ const mongoose = require('mongoose');
 const Passenger = require('../models/Passenger'); // Import the Passenger model
 const verifyToken = require('../middleware/auth');
 const router = express.Router();
- const multer = require('multer');
-const upload = multer({ dest: 'uploads/' }); // Configure where to store the file
-  // Function to generate composite ID// Function to generate a composite ID for Payment
+   // Function to generate composite ID// Function to generate a composite ID for Payment
   const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const generateCompositeId = async () => {
   const passengerCount = await Passenger.countDocuments();
   return `PR-${String(passengerCount + 1).padStart(3, '0')}`; // Generates IDs like PAY-001, PAY-002, etc.
 };
-
-
-
 
  // Fetch all passengers
 router.get('/passengers', verifyToken, async (req, res) => {
@@ -108,7 +103,7 @@ const hashedPassword = await bcrypt.hash(password, saltRounds);
 });
 
 // Define the route for updating the passenger
-router.put('/passengers/:id', verifyToken, upload.single('photo'), async (req, res) => {
+router.put('/passengers/:id', verifyToken, async (req, res) => {
   const { id } = req.params;
   const { name, email, phone, gender } = req.body; // req.body will contain non-file fields
   const photo = req.file; // req.file will contain the uploaded file

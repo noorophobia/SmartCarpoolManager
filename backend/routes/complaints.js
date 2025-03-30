@@ -6,7 +6,33 @@ const generateCompositeId = async (pickUpLocation, dropOffLocation, rideMode) =>
   const complaintCount = await Complaints.countDocuments();
   return `CM-${String(complaintCount + 1).padStart(3, '0')}`; // Generates IDs like PAY-001, PAY-002, etc.
 };
+// Route to add a new complaint
+router.post('/complaints', async (req, res) => {
+  try {
+    const { userId, name, email, phone, complaint } = req.body;
 
+    if (!userId || !name || !email || !phone || !complaint) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    const compositeId = await generateCompositeId(); // Generate unique ID
+
+    const newComplaint = new Complaints({
+      userId,
+      name,
+      email,
+      phone,
+      complaint,
+      compositeId
+    });
+
+    await newComplaint.save();
+    res.status(201).json({ message: 'Complaint submitted successfully', complaint: newComplaint });
+  } catch (error) {
+    console.error('Error adding complaint:', error.message);
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+});
 
 router.get('/complaints', async (req, res) => {
   try {

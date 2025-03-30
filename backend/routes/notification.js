@@ -9,8 +9,8 @@ const router = express.Router();
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "smartcarpool1@gmail.com",  // Replace with your email
-    pass: "apfs ytux zfci wmvi",     // Replace with your email password or app password
+    user: "smartcarpool1@gmail.com",   
+    pass: "apfs ytux zfci wmvi",     //   app password
   },
   tls: {
     rejectUnauthorized: false,
@@ -28,6 +28,7 @@ router.post("/send-notification", async (req, res) => {
   let recipients = [];
 
   try {
+    // fetch all passengers , drivers or specific email
     if (recipientType === "allPassengers") {
       const passengers = await Passenger.find();
       recipients = passengers.map(passenger => passenger.email);
@@ -50,8 +51,7 @@ router.post("/send-notification", async (req, res) => {
       to: recipients,  // Recipients
       subject: subject,  // Subject line
       html: message,
-      //'<html> <body> <h1>Test Notification</h1> <p>This is a test notification with an image.</p><img src="https://images.pexels.com/photos/326055/pexels-photo-326055.jpeg" alt="Test Image" /></body>  </html>',  // Send the message as HTML
-    };
+     };
 
     await transporter.sendMail(mailOptions);
     res.status(200).json({ message: "Notification sent successfully!" });

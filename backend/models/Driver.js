@@ -36,9 +36,7 @@ const driverSchema = new mongoose.Schema({
     type: String, 
     unique: true,
     required: [true, 'CNIC is required.'],
-    maxlength: [15, 'CNIC cannot exceed 15 characters.'], 
-    match: [/^\d{5}-\d{7}-\d{1}$/, 'CNIC must be in the format XXXXX-XXXXXXX-X.']
-  },
+   },
   driverCnicFront: { type: String, required: true },
   driverCnicBack: { type: String, required: true },
   driverSelfie: { type: String, required: true },

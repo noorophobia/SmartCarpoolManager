@@ -1,29 +1,27 @@
 import { useEffect, useState } from 'react';
-import {  useNavigate } from 'react-router-dom';
-import axios from 'axios';
-
+import { useNavigate } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
 import CircularProgress from '@mui/material/CircularProgress';
-import '../../styles/passengerDetails.css';
 import Button from '@mui/material/Button';
-
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import '../../styles/passengerDetails.css';
+import PassengerDetailsService from '../../services/PassengerDetailsService';
 
 const PassengerDetails = () => {
   const id = localStorage.getItem('id');
-   const [ridesData, setRidesData] = useState(null); // Store rate settings
- const [totalRides, setTotalRides] = useState(0);
-   const [completedRides, setCompletedRides] = useState(0);
-   const [cancelledRides, setCancelledRides] = useState(0);
- 
+  const token = localStorage.getItem('token');
   const navigate = useNavigate();
+
   const [passenger, setPassenger] = useState(null);
+  const [ridesData, setRidesData] = useState([]);
+  const [totalRides, setTotalRides] = useState(0);
+  const [completedRides, setCompletedRides] = useState(0);
+  const [cancelledRides, setCancelledRides] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [avatarLoading, setAvatarLoading] = useState(true);
-  const token = localStorage.getItem('token');
- 
+
   useEffect(() => {
     if (!token) {
       navigate('/login');
@@ -32,17 +30,7 @@ const PassengerDetails = () => {
 
     const fetchPassenger = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/passengers/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch passenger details');
-        }
-
-        const data = await response.json();
+        const data = await PassengerDetailsService.getPassengerById(id);
         setPassenger(data);
       } catch (err) {
         setError(err.message);
@@ -54,53 +42,35 @@ const PassengerDetails = () => {
     fetchPassenger();
   }, [id, navigate, token]);
 
- 
-
   useEffect(() => {
-    if (passenger) {
-        
-    
     const fetchRides = async () => {
-      try {
-        const response = await fetch(`http://localhost:5000/rides-with-composite-ids/passenger/${id}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-    
-        const data = await response.json(); // Parse JSON response
-        console.log('Fetched Rides:', data.rides);
-        setRidesData(data.rides); // use data.rides based on the backend response
-      } catch (error) {
-        console.error('Error fetching rides:', error);
+      if (passenger) {
+        try {
+          const rides = await PassengerDetailsService.getRidesByPassengerId(id);
+          setRidesData(rides);
+        } catch (error) {
+          console.error('Error fetching rides:', error);
+        }
       }
     };
-    
-  
-           fetchRides();
-    }
-  }, [passenger]);  
- 
-useEffect(() => {
-  if (ridesData) {
-    
 
-    const totalRides = ridesData.length;
-const completedRides = ridesData.filter((ride) => ride.status === "completed").length;
-const cancelledRides = ridesData.filter((ride) => ride.status === "cancelled").length;
- 
-    // Update state
-    setTotalRides(totalRides);
-    setCompletedRides(completedRides);
-    setCancelledRides(cancelledRides);
-  }
-}, [ridesData]);
+    fetchRides();
+  }, [passenger, id]);
+
+  useEffect(() => {
+    if (ridesData.length > 0) {
+      setTotalRides(ridesData.length);
+      setCompletedRides(ridesData.filter((ride) => ride.status === 'completed').length);
+      setCancelledRides(ridesData.filter((ride) => ride.status === 'cancelled').length);
+    }
+  }, [ridesData]);
 
   const handleAvatarLoad = () => {
     setAvatarLoading(false);
   };
+
   const handleGoBack = () => {
-    const lastRoute = localStorage.getItem("lastVisitedRoute") || "/";
-    
-    console.log(localStorage.getItem("id"))
+    const lastRoute = localStorage.getItem('lastVisitedRoute') || '/';
     navigate(lastRoute);
   };
 
@@ -134,8 +104,11 @@ const cancelledRides = ridesData.filter((ride) => ride.status === "cancelled").l
         <div className="avatar-container">
           {passenger.imageUrl && avatarLoading && <CircularProgress />}
           <Avatar
-            alt={`${passenger.name}`}
-            src={passenger.imageUrl || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'}
+            alt={passenger.name}
+            src={
+              passenger.imageUrl ||
+              'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'
+            }
             onLoad={handleAvatarLoad}
             sx={{ width: 300, height: 300, display: avatarLoading ? 'none' : 'block' }}
           />
@@ -150,23 +123,18 @@ const cancelledRides = ridesData.filter((ride) => ride.status === "cancelled").l
           <Typography variant="h6"><strong>Cancelled Rides:</strong> {cancelledRides}</Typography>
           <Typography variant="h6"><strong>Ratings:</strong> {passenger.ratings || '0'}</Typography>
         </Box>
-        
       </Box>
       <Button
-            variant="contained"
-            color="secondary"
-            onClick={handleGoBack}
-            
-            sx={{
-             
-              padding: 2,
-             marginTop:4,
-            
-            
-            }}
-          >
-            Go Back
-          </Button>
+        variant="contained"
+        color="secondary"
+        onClick={handleGoBack}
+        sx={{
+          padding: 2,
+          marginTop: 4,
+        }}
+      >
+        Go Back
+      </Button>
     </div>
   );
 };

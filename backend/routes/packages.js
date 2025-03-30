@@ -43,11 +43,11 @@ router.get("/packages/:id", verifyToken,async (req, res) => {
   const { id } = req.params;
 
   try {
-    const package = await Package.findById(id);
-    if (!package) {
+    const pkg = await Package.findById(id);
+    if (!pkg) {
       return res.status(404).json({ message: "Package not found" });
     }
-    res.status(200).json(package);
+    res.status(200).json(pkg);
   } catch (error) {
     console.error("Error fetching package:", error);
     res.status(500).json({ message: "Server error" });
@@ -64,18 +64,18 @@ router.put("/packages/:id",verifyToken, async (req, res) => {
   }
 
   try {
-    const package = await Package.findById(id);
-    if (!package) {
+    const pkg = await Package.findById(id);
+    if (!pkg) {
       return res.status(404).json({ message: "Package not found" });
     }
 
-    package.name = name;
-    package.duration = duration;
-    package.discount = discount;
-    package.fee = fee;
-    package.updatedAt = Date.now();
+    pkg.name = name;
+    pkg.duration = duration;
+    pkg.discount = discount;
+    pkg.fee = fee;
+    pkg.updatedAt = Date.now();
 
-    const updatedPackage = await package.save();
+    const updatedPackage = await pkg.save();
     res.status(200).json(updatedPackage);
   } catch (error) {
     console.error("Error updating package:", error);

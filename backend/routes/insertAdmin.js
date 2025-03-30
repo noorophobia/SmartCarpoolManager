@@ -4,8 +4,8 @@ const Admin = require('../models/Admin');  // Path to your Admin model
 
 const insertAdmin = async () => {
   try {
-    const email = "admin@example.com";
-    const password = "adminpassword";  // Plain password for now
+    const email = "smartcarpool1@gmail.com";
+    const password = "1234";  // Plain password for now
 
     // Check if admin already exists
     const existingAdmin = await Admin.findOne({ email });

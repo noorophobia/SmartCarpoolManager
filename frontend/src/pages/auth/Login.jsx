@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "../../styles/login.css";
-import { useLocation } from "react-router-dom";
+import AuthService from "../../services/AuthService"; // ✅ Import the service
 
 const Loader = () => (
   <div className="loader-container">
@@ -48,27 +48,12 @@ const Login = () => {
     setErrorMessage("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/admin/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        setErrorMessage(errorData.error || "Failed to log in. Please try again.");
-        setLoading(false);
-        return;
-      }
-
-      const data = await res.json();
+      const data = await AuthService.login(email, password); // ✅ Use AuthService
       localStorage.setItem("token", data.token);
       document.body.style.backgroundColor = "white";
       navigate("/");
     } catch (err) {
-      setErrorMessage("An error occurred while logging in.");
+      setErrorMessage(err);
     } finally {
       setLoading(false);
     }
@@ -78,38 +63,22 @@ const Login = () => {
     event.preventDefault();
     setLoading(true);
     setErrorMessage("");
+    setSuccessMessage("");
 
     if (!email.trim()) {
       setErrorMessage("Please enter your email.");
-      setSuccessMessage("");
       setLoading(false);
       return;
     }
- 
 
     try {
-      const response = await fetch("http://localhost:5000/api/admin/reset-password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setSuccessMessage("Password reset successful! You can now log in with your new password.");
-        setEmail("");
-        setPassword("");
-        setConfirmPassword("");
-      } else {
-        setErrorMessage(data.error || "An error occurred. Please try again.");
-        setSuccessMessage("");
-      }
+      await AuthService.resetPassword(email); // ✅ Use AuthService
+      setSuccessMessage("Password reset successful! You can now log in with your new password.");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
     } catch (err) {
-      setErrorMessage("An error occurred. Please try again.");
-      setSuccessMessage("");
+      setErrorMessage(err);
     } finally {
       setLoading(false);
     }
@@ -118,7 +87,7 @@ const Login = () => {
   return (
     <div className="login-page">
       <div className="login-container">
-        {loading && <Loader />} 
+        {loading && <Loader />}
 
         {!showForgotPassword ? (
           <form onSubmit={handleSubmit}>
@@ -157,7 +126,7 @@ const Login = () => {
               onChange={(e) => setEmail(e.target.value)}
               required
             />
-             
+
             <button type="submit" className="btn-primary" disabled={loading}>
               {loading ? "Sending..." : "Reset Password"}
             </button>

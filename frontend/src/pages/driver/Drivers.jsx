@@ -1,122 +1,71 @@
-import  { useEffect, useState } from 'react';
-import { useLocation,useNavigate } from 'react-router-dom'; 
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { MenuItem, Select, InputLabel, FormControl } from "@mui/material";
-
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-
+import DriverService from '../../services/DriverService';  // Importing the service
 import '../../styles/tables.css';
 
 const Drivers = () => {
-  const [drivers, setDrivers] = useState([]); // State to hold the fetched drivers data
-   const navigate = useNavigate();
-// State for filtering
-const [filterStatus, setFilterStatus] = useState("all");
+  const [drivers, setDrivers] = useState([]);
+  const navigate = useNavigate();
+  const [filterStatus, setFilterStatus] = useState("all");
+  const location = useLocation();
 
-const handleFilterChange = (event) => {
-  setFilterStatus(event.target.value);
-};
-    const location = useLocation();
-   
-      useEffect(() => {
-        // Store the current route in localStorage
-        localStorage.setItem("lastVisitedRoute", location.pathname);
-      }, [location]);
-   
-  // Fetch drivers data from the Express server when the component mounts
+  useEffect(() => {
+    localStorage.setItem("lastVisitedRoute", location.pathname);
+  }, [location]);
+
   useEffect(() => {
     const fetchDrivers = async () => {
       try {
-        // Get the token from localStorage (or sessionStorage)
-        const token = localStorage.getItem('token');  // Or sessionStorage.getItem('token')
-        
-        //   alert('You are not authenticated');
-          if (!token) {
-            // If no token is found, redirect to the login page
-            navigate('/login');
-            return;
-          }
-          
-          console.log('Token:', token);
-
-        const response = await fetch('http://localhost:5000/drivers/approved', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`, // Add the token to the Authorization header
-            'Content-Type': 'application/json',
-          },
-        });
-        
-        const data = await response.json();
-        console.log(data);
- 
+        const data = await DriverService.getApprovedDrivers();
         const mappedData = Array.isArray(data)
-        ? data.map(driver => ({
-            id: driver._id,
-            compositeId: driver.compositeId, // Add compositeId here
-            name: driver.driverFirstName +" "+ driver.driverLastName,
-            gender: driver.gender && driver.gender.trim() !== null ? driver.gender : 'male',
-            email: driver.driverEmail,
-            phoneNumber: driver.driverPhone,
-            cnic: driver.driverCnic,
-            dateOfBirth: driver.driverDOB,
-            isBlocked: driver.isBlocked 
-
-          }))
-        : [];
-      
-
-        setDrivers(mappedData); // Update state with the mapped data
+          ? data.map(driver => ({
+              id: driver._id,
+              compositeId: driver.compositeId,
+              name: `${driver.driverFirstName} ${driver.driverLastName}`,
+              gender: driver.gender || 'male',
+              email: driver.driverEmail,
+              phoneNumber: driver.driverPhone,
+              cnic: driver.driverCnic,
+              dateOfBirth: driver.driverDOB,
+              isBlocked: driver.isBlocked
+            }))
+          : [];
+        setDrivers(mappedData);
       } catch (error) {
         console.error('Failed to fetch drivers:', error);
       }
     };
-  
-    fetchDrivers(); // Call the function to fetch data
+
+    fetchDrivers();
   }, []);
 
-   const handleViewDetails = (id) => {
+  const handleViewDetails = (id) => {
     navigate(`/drivers/${id}`);
   };
 
   const handleEdit = (id) => {
     navigate(`/edit-driver/${id}`);
-    console.log("editing "+id);
   };
 
-  // Handle delete action
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm('Are you sure you want to delete this driver?');
     if (confirmDelete) {
       try {
-        const token = localStorage.getItem('token');  // Retrieve token for delete request
-        
-        if (!token) {
-          alert('You are not authenticated');
-          return;
-        }
-
-        const response = await fetch(`http://localhost:5000/drivers/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`,  // Add the token to the Authorization header
-            'Content-Type': 'application/json',
-          },
-        });
-        if (response.ok) {
-            
-              
-            
-          setDrivers(drivers.filter(driver => driver.id !== id)); // Remove the deleted driver from state
-        } else {
-          alert('Failed to delete driver.');
-        }
+        await DriverService.deleteDriver(id);
+        setDrivers(drivers.filter(driver => driver.id !== id));
       } catch (error) {
         console.error('Error deleting driver:', error);
         alert('Error deleting driver.');
       }
     }
+  };
+
+  const handleFilterChange = (event) => {
+    setFilterStatus(event.target.value);
   };
 
   const columns = [
@@ -145,7 +94,7 @@ const handleFilterChange = (event) => {
       headerName: 'Actions',
       width: 150,
       renderCell: (params) => (
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '10px' }}>
           <Button
             style={{ padding: 0, minWidth: '40px', height: '40px', backgroundColor: 'transparent' }}
             onClick={() => handleEdit(params.row.id)}
@@ -157,25 +106,13 @@ const handleFilterChange = (event) => {
             />
           </Button>
           <Button
-            style={{
-              padding: 0,
-              minWidth: '40px',
-              height: '40px',
-              backgroundColor: 'transparent',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
+            style={{ padding: 0, minWidth: '40px', height: '40px', backgroundColor: 'transparent' }}
             onClick={() => handleDelete(params.row.id)}
           >
             <img
               src="/delete_icon.svg"
               alt="Delete Button"
-              style={{
-                width: '30px',
-                height: '30px',
-                objectFit: 'contain',
-              }}
+              style={{ width: '30px', height: '30px', objectFit: 'contain' }}
             />
           </Button>
         </div>
@@ -187,26 +124,24 @@ const handleFilterChange = (event) => {
     <div className="main-content">
       <div className="header">
         <h1>Drivers</h1>
-        <button className="button"  onClick={() => navigate('/add-driver')}>
+        <button className="button" onClick={() => navigate('/add-driver')}>
           Add New Driver
         </button>
-       
       </div>
-       <div style={{ marginBottom: "20px" }}>
-              <FormControl variant="outlined" sx={{ minWidth: 120 ,background:"white"}}>
-       <InputLabel>Filter</InputLabel>
-      <Select
-        value={filterStatus}
-        label="Filter"
-        onChange={handleFilterChange}
-        sx={{ width: 150 }}
-      >
-        <MenuItem value="all">All</MenuItem>
-        <MenuItem value="blocked">Blocked</MenuItem>
-      </Select>
-    </FormControl>
-    </div>
-
+      <div style={{ marginBottom: "20px" }}>
+        <FormControl variant="outlined" sx={{ minWidth: 120, background: "white" }}>
+          <InputLabel>Filter</InputLabel>
+          <Select
+            value={filterStatus}
+            label="Filter"
+            onChange={handleFilterChange}
+            sx={{ width: 150 }}
+          >
+            <MenuItem value="all">All</MenuItem>
+            <MenuItem value="blocked">Blocked</MenuItem>
+          </Select>
+        </FormControl>
+      </div>
       <div style={{ marginTop: '20px' }}>
         <Box sx={{ height: 500, width: '100%' }}>
           <DataGrid
@@ -216,18 +151,18 @@ const handleFilterChange = (event) => {
                 ? drivers.filter(driver => driver.isBlocked)
                 : drivers
             }
-             columns={columns}
-            getRowId={(row) => row.compositeId || row.id}  // Fallback to _id if compositeId is missing
-               slots={{ toolbar: GridToolbar }}
-                        slotProps={{
-                          toolbar: {
-                            showQuickFilter: true,
-                            quickFilterProps: { debounceMs: 500 },
-                          },
-                        }}
+            columns={columns}
+            getRowId={(row) => row.compositeId || row.id}
+            slots={{ toolbar: GridToolbar }}
+            slotProps={{
+              toolbar: {
+                showQuickFilter: true,
+                quickFilterProps: { debounceMs: 500 },
+              },
+            }}
             pageSizeOptions={[5, 10, 20, 100]}
-             disableRowSelectionOnClick
-             disableColumnSelector
+            disableRowSelectionOnClick
+            disableColumnSelector
           />
         </Box>
       </div>

@@ -1,62 +1,61 @@
-// backend/index.js
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
-  const dotenv = require("dotenv");
- dotenv.config();
- const helmet = require('helmet');
-     require('dotenv').config();
+const dotenv = require("dotenv");
+const helmet = require('helmet');
 
-    // routes
-    const passengerRatings= require("./routes/passenger-review")
-    const compositeIDRoutes=  require("./routes/composite-id");
- const notificationRoutes = require("./routes/notification");
- const rateSettingsRoute = require('./routes/rate-settings');  
+ const envFile = process.env.NODE_ENV === "test" ? ".env.test" : ".env";
+dotenv.config({ path: envFile });
+
+console.log(`Loaded environment file: ${envFile}`);
+console.log("JWT_SECRET:", process.env.JWT_SECRET);
+
+// Import routes
+const passengerRatings = require("./routes/passenger-review");
+const compositeIDRoutes = require("./routes/composite-id");
+const notificationRoutes = require("./routes/notification");
+const rateSettingsRoute = require('./routes/rate-settings');  
 const driversRoutes = require('./routes/driver');  
-const vehiclesRoutes=require('./routes/vehicle')
-const adminRoutes = require('./routes/admin');   
- const packagesRoutes=require('./routes/packages');
- const passengerRoutes=require('./routes/passengers');
-const complaintRoutes=require('./routes/complaints');
-const rideRoutes = require("./routes/ride");
-const singlerideRoutes = require("./routes/single-rides");
+ const adminRoutes = require('./routes/admin');   
+const packagesRoutes = require('./routes/packages');
+const passengerRoutes = require('./routes/passengers');
+const complaintRoutes = require('./routes/complaints');
+ const singlerideRoutes = require("./routes/single-rides");
 const carpoolrideRoutes = require("./routes/carpoolRide");
 const paymentRoutes = require("./routes/payment");
-//  insertAdmin function
+
+// Admin insertion function
 const { insertAdmin } = require('./routes/insertAdmin');   
 
 const app = express();
 const PORT = process.env.PORT || 5000;
- 
 
-// Set the Content Security Policy header using helmet
+// Set security policies
 app.use(helmet({
-  crossOriginResourcePolicy: false, // fixed getting image from backend server
-
+  crossOriginResourcePolicy: false,
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "maps.googleapis.com"], // Add this to allow Google Maps
-      styleSrc: ["'self'", "'unsafe-inline'"], // Add this for inline styles
-      imgSrc: ["'self'", "data:", "maps.gstatic.com", "*.googleusercontent.com"], // Allow images from specific sources
-      connectSrc: ["'self'", "maps.googleapis.com", "*.firebaseio.com"], // Allow connections to Firebase and Google Maps
-      fontSrc: ["'self'", "fonts.gstatic.com"], // Allow fonts from Google Fonts
+      scriptSrc: ["'self'", "maps.googleapis.com"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "maps.gstatic.com", "*.googleusercontent.com"],
+      connectSrc: ["'self'", "maps.googleapis.com", "*.firebaseio.com"],
+      fontSrc: ["'self'", "fonts.gstatic.com"],
     }
   }
 }));
 
 app.use(cors({
-  origin: 'http://localhost:5173' , // Allow only frontend domain
+  origin: 'http://localhost:5173',
   methods: ['GET', 'POST', 'DELETE', 'PUT','OPTIONS'],  
   allowedHeaders: ['Content-Type', 'Authorization']
-
 }));
 
-  
-app.use(express.json()); // Parse JSON request bodies
-// Use the drivers route
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Use routes
 app.use(compositeIDRoutes);
 app.use(driversRoutes);
 app.use(singlerideRoutes);
@@ -65,31 +64,32 @@ app.use(packagesRoutes);
 app.use(notificationRoutes);
 app.use(passengerRatings);
 app.use(passengerRoutes);
-app.use('/api',complaintRoutes);
+app.use('/api', complaintRoutes);
 app.use('/api', rateSettingsRoute);
-app.use(vehiclesRoutes);
-app.use("/api/admin", adminRoutes);
-app.use(rideRoutes);
-app.use(paymentRoutes);
+ app.use("/api/admin", adminRoutes);
+ app.use(paymentRoutes);
 
- 
 // MongoDB connection
 console.log('MongoDB URI:', process.env.MONGO_URI);
 mongoose.connect(process.env.MONGO_URI)
-.then(() => {
-  console.log('MongoDB connected');
-  //insertAdmin();  // Call insertAdmin 
-})  .catch((err) => console.log('Failed to connect to MongoDB:', err));
-  
+  .then(() => {
+    console.log('MongoDB connected');
+   // insertAdmin();
+  })
+  .catch((err) => console.log('Failed to connect to MongoDB:', err));
+
 // Test route
 app.get('/', (req, res) => {
   res.send('Welcome to the backend server!');
 });
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+// Start the server only if NOT in test mode
+let server;
+if (process.env.NODE_ENV !== "test") {
+  server = app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}
 
-
-
+// Export both app & server
+module.exports = { app, server };
