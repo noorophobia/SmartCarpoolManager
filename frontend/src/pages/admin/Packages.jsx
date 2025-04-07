@@ -359,7 +359,7 @@ const Packages = () => {
               name="fee"
               value={editingPackage.fee}
               type="number"
-              onChange={setCommission(e.target.value)}
+              onChange={handleEditInputChange}
               fullWidth
               margin="dense"
             />

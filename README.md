@@ -96,7 +96,4 @@ Ensure that your MongoDB instance is running. You can use a local MongoDB setup 
    - **Ride Management**: View and manage active, completed, and canceled rides.
    - **Analytics**: View ride, user, and financial analytics for reports.
 
-   test cases:
-
-   backend ->  npx jest --coverage --runInBand
-   npm test
+ 

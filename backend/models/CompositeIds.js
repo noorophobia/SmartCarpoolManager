@@ -11,7 +11,7 @@ const compositeIdSchema = new mongoose.Schema({
     enum: ["single", "carpool"],
     required: true,
   },
-  status: { type: String, enum: ["pending", "completed", "cancelled"], required: true },
+  status: { type: String, enum: ["pending", "completed", "cancelled","ongoing"], required: true },
     passengerId: [{ type: mongoose.Schema.Types.ObjectId, ref: "Passenger" }],
 
   compositeId: {

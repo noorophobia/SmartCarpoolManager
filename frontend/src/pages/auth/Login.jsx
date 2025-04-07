@@ -97,12 +97,14 @@ const Login = () => {
               type="email"
               placeholder="Enter Email"
               className="form-control"
+              name="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               required
             />
             <input
               type="password"
+              name="password"
               placeholder="Enter Password"
               className="form-control"
               value={password}

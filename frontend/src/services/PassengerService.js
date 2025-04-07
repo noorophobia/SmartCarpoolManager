@@ -4,8 +4,7 @@ const API_URL = 'http://localhost:5000';
 const token = localStorage.getItem('token');
 
 const axiosInstance = axios.create({
-  baseURL: API_URL,
-  headers: {
+   headers: {
     Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json',
   },
@@ -13,19 +12,19 @@ const axiosInstance = axios.create({
 
 // ✅ Get passenger by ID
 const getPassengerById = async (id) => {
-  const response = await axiosInstance.get(`/passengers/${id}`);
+  const response = await axiosInstance.get(`http://localhost:5000/passengers/${id}`);
   return response.data;
 };
 
 // ✅ Get rides by passenger ID
 const getRidesByPassengerId = async (passengerId) => {
-  const response = await axiosInstance.get(`/rides-with-composite-ids/passenger/${passengerId}`);
+  const response = await axiosInstance.get(`http://localhost:5000/rides-with-composite-ids/passenger/${passengerId}`);
   return response.data.rides;
 };
 
 // Other existing functions:
 const getAllPassengers = async () => {
-  const response = await axiosInstance.get('/passengers');
+  const response = await axiosInstance.get('http://localhost:5000/passengers');
   return response.data.map((passenger) => ({
     id: passenger._id,
     compositeId: passenger.compositeId,
@@ -37,7 +36,7 @@ const getAllPassengers = async () => {
 };
 
 const deletePassengerById = async (id) => {
-  await axiosInstance.delete(`/passengers/${id}`);
+  await axiosInstance.delete(`http://localhost:5000/passengers/${id}`);
 };
 
 const PassengerService = {
