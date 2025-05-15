@@ -25,6 +25,7 @@ const getRidesByPassengerId = async (passengerId) => {
 // Other existing functions:
 const getAllPassengers = async () => {
   const response = await axiosInstance.get('http://localhost:5000/passengers');
+  console.log("Get all passenger"+response)
   return response.data.map((passenger) => ({
     id: passenger._id,
     compositeId: passenger.compositeId,
