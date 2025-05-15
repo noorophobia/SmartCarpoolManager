@@ -52,7 +52,7 @@ export default class RidesService {
         this.fetchSingleRides(),
         this.fetchCarpoolRides(),
       ]);
-  
+      
       const passengerIds = [...new Set(singleRides.map((r) => r.passengerId))];
       const driverIds = [...new Set(singleRides.map((r) => r.driverID))];
       const carpoolPassengerIds = [...new Set(carpoolRides.flatMap((r) => r.passengerId))];

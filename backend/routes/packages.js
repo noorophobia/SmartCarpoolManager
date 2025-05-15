@@ -1,25 +1,24 @@
 const express = require("express");
-const Package = require("../models/Packages");
+const verifyToken = require('../middleware/auth');
+const {
+  createPackage,
+  getAllPackages,
+  getPackageById,
+  updatePackage,
+  deletePackage,
+} = require('../services/packageService');
+
 const router = express.Router();
-const verifyToken= require('../middleware/auth');
 
 // Create a new package
-router.post("/packages",verifyToken, async (req, res) => {
+router.post("/packages", verifyToken, async (req, res) => {
   const { name, duration, discount, fee } = req.body;
-
   if (!name || !duration || !discount || !fee) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
   try {
-    const newPackage = new Package({
-      name,
-      duration,
-      discount,
-      fee,
-    });
-
-    const savedPackage = await newPackage.save();
+    const savedPackage = await createPackage({ name, duration, discount, fee });
     res.status(201).json(savedPackage);
   } catch (error) {
     console.error("Error creating package:", error);
@@ -28,9 +27,9 @@ router.post("/packages",verifyToken, async (req, res) => {
 });
 
 // Get all packages
-router.get("/packages",verifyToken, async (req, res) => {
+router.get("/packages", verifyToken, async (req, res) => {
   try {
-    const packages = await Package.find();
+    const packages = await getAllPackages();
     res.status(200).json(packages);
   } catch (error) {
     console.error("Error fetching packages:", error);
@@ -39,14 +38,11 @@ router.get("/packages",verifyToken, async (req, res) => {
 });
 
 // Get package by ID
-router.get("/packages/:id", verifyToken,async (req, res) => {
+router.get("/packages/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
-
   try {
-    const pkg = await Package.findById(id);
-    if (!pkg) {
-      return res.status(404).json({ message: "Package not found" });
-    }
+    const pkg = await getPackageById(id);
+    if (!pkg) return res.status(404).json({ message: "Package not found" });
     res.status(200).json(pkg);
   } catch (error) {
     console.error("Error fetching package:", error);
@@ -55,7 +51,7 @@ router.get("/packages/:id", verifyToken,async (req, res) => {
 });
 
 // Update package
-router.put("/packages/:id",verifyToken, async (req, res) => {
+router.put("/packages/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
   const { name, duration, discount, fee } = req.body;
 
@@ -64,18 +60,8 @@ router.put("/packages/:id",verifyToken, async (req, res) => {
   }
 
   try {
-    const pkg = await Package.findById(id);
-    if (!pkg) {
-      return res.status(404).json({ message: "Package not found" });
-    }
-
-    pkg.name = name;
-    pkg.duration = duration;
-    pkg.discount = discount;
-    pkg.fee = fee;
-    pkg.updatedAt = Date.now();
-
-    const updatedPackage = await pkg.save();
+    const updatedPackage = await updatePackage(id, { name, duration, discount, fee });
+    if (!updatedPackage) return res.status(404).json({ message: "Package not found" });
     res.status(200).json(updatedPackage);
   } catch (error) {
     console.error("Error updating package:", error);
@@ -84,17 +70,13 @@ router.put("/packages/:id",verifyToken, async (req, res) => {
 });
 
 // Delete package
-router.delete("/packages/:id",verifyToken, async (req, res) => {
+router.delete("/packages/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
 
   try {
-     
-    const deletedPackage = await Package.findByIdAndDelete(id); // Deletes the package by its ID
-
-    if (!deletedPackage) {
-      return res.status(404).json({ message: "Package not found" });
-    }
-     res.status(200).json({ message: "Package deleted successfully" });
+    const deletedPackage = await deletePackage(id);
+    if (!deletedPackage) return res.status(404).json({ message: "Package not found" });
+    res.status(200).json({ message: "Package deleted successfully" });
   } catch (error) {
     console.error("Error deleting package:", error);
     res.status(500).json({ message: "Server error" });

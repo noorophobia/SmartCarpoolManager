@@ -8,15 +8,14 @@ const helmet = require('helmet');
  const envFile = process.env.NODE_ENV === "test" ? ".env.test" : ".env";
 dotenv.config({ path: envFile });
 
-console.log(`Loaded environment file: ${envFile}`);
-console.log("JWT_SECRET:", process.env.JWT_SECRET);
+//console.log(`Loaded environment file: ${envFile}`);
+//console.log("JWT_SECRET:", process.env.JWT_SECRET);
 
 // Import routes
 const passengerRatings = require("./routes/passenger-review");
-const compositeIDRoutes = require("./routes/composite-id");
+const compositeIDRoutes = require("./routes/allRides");
 const notificationRoutes = require("./routes/notification");
-const rateSettingsRoute = require('./routes/rate-settings');  
-const driversRoutes = require('./routes/driver');  
+ const driversRoutes = require('./routes/driver');  
  const adminRoutes = require('./routes/admin');   
 const packagesRoutes = require('./routes/packages');
 const passengerRoutes = require('./routes/passengers');
@@ -65,8 +64,7 @@ app.use(notificationRoutes);
 app.use(passengerRatings);
 app.use(passengerRoutes);
 app.use('/api', complaintRoutes);
-app.use('/api', rateSettingsRoute);
- app.use("/api/admin", adminRoutes);
+  app.use("/api/admin", adminRoutes);
  app.use(paymentRoutes);
 
 // MongoDB connection

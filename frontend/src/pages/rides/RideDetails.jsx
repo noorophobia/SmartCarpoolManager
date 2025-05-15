@@ -101,7 +101,7 @@ const RideDetails = () => {
                       style={{ color: "blue", marginLeft: "8px" }}
                       onClick={() => localStorage.setItem("driverId", ride.driverID)}
                     >
-                      {driverId}
+                      {ride.driverID}
                     </Link>
                   ) : "N/A"}
                 </Typography>
