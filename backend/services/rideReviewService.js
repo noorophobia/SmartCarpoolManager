@@ -2,19 +2,22 @@ const RideReview = require('../models/PassengerReview');
 const CompositeId = require('../models/CompositeIds');
 const Driver = require('../models/Driver');
 const Passenger = require('../models/Passenger');
-
+ 
 async function getAllReviewsWithCompositeIds() {
   const reviews = await RideReview.find().sort({ createdAt: -1 });
   const updatedReviews = [];
 
   for (const review of reviews) {
     let updated = false;
-
-    // Update rideCompositeId if missing
-    const rideComposite = await CompositeId.findOne({ rideID: review.rideId });
-    if (rideComposite && !review.rideCompositeId) {
+     // Update rideCompositeId if missing
+     
+const rideComposite = await CompositeId.findOne({ rideID: review.rideId });
+ 
+     
+     if (rideComposite) {
       review.rideCompositeId = rideComposite.compositeId;
       updated = true;
+      
     }
 
     // Update driverCompositeId if missing

@@ -1,48 +1,27 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const compositeIdSchema = new mongoose.Schema({
-  rideID: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  mode: {
-    type: String,
-    enum: ["single", "carpool"],
-    required: true,
-  },
-  status: { type: String, enum: ["pending", "completed", "cancelled","ongoing"], required: true },
-    passengerId: [{ type: mongoose.Schema.Types.ObjectId, ref: "Passenger" }],
+  rideID: { type: mongoose.Schema.Types.ObjectId, required: true},  
+  mode: { type: String, enum: ['single', 'carpool'], required: true },
+  status: { type: String, enum: ['ongoing', 'completed', 'cancelled'], required: true },
 
-  compositeId: {
-    type: String,
-    required: true,
-    unique: true,
-    default:null,
-  },
-  fare: {
-    type: Number,
-default:""
-  },
-  revenue: {
-    type: Number,
-default:""
-  },
-  driverID: {
-    type: mongoose.Schema.Types.ObjectId, // or String, depending on your model
-    default:""  },
-    driverCompositeId:{
-      type: String,
+  passengerId: [{ 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Passenger',
+    required: true
+  }],
 
-      default:""  },
+  compositeId: { type: String, required: true },   // e.g., "RIDE-025"
+  fare: { type: Number, required: true },
+  revenue: { type: Number },
 
-    date: { type: Date, default: " " },
+  driverID: { type: mongoose.Schema.Types.ObjectId, ref: 'Driver', required: true },
+  driverCompositeId: { type: String },
 
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  date: { type: Date, required: true },
+}, { timestamps: true });
 
-const CompositeId = mongoose.model("CompositeId", compositeIdSchema);
+ 
+
+const CompositeId = mongoose.model("compositeids", compositeIdSchema);
 module.exports = CompositeId;

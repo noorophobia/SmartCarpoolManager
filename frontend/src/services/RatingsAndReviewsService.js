@@ -22,6 +22,7 @@ const RatingsAndReviewsService = {
   getPassengerRideReviews: async () => {
     try {
       const response = await axiosInstance.get("/passenger-ride-reviews");
+      console.log(response.data.reviews)
       return response.data.reviews;
     } catch (error) {
       throw error.response?.data?.error || "Failed to fetch passenger reviews.";

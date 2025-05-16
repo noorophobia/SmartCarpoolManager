@@ -1,36 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const Ride = require('../models/Ride'); // Import Ride model
+const {
+  getAllRides,
+  getRideById
+} = require('../controllers/rideController');
 
-// Function to generate a composite ride ID
-const generateCompositeId = async () => {
-    const rideCount = await Ride.countDocuments();
-    return `RIDE-${String(rideCount + 1).padStart(3, '0')}`; // Generates IDs like PAY-001, PAY-002, etc.
-  };
+// Get all rides
+router.get('/rides', getAllRides);
 
- 
-
-// Get all rides (GET)
-router.get('/rides', async (req, res) => {
-    try {
-        const rides = await Ride.find().populate('paymentIds vehicleId driverId passengerIds');
-        res.status(200).json(rides);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Get a single ride by ID (GET)
-router.get('/rides/:id', async (req, res) => {
-    try {
-        const ride = await Ride.findById(req.params.id).populate('paymentIds vehicleId driverId passengerIds');
-        if (!ride) return res.status(404).json({ message: 'Ride not found' });
-        res.status(200).json(ride);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
- 
+// Get a single ride by ID
+router.get('/rides/:id', getRideById);
 
 module.exports = router;

@@ -80,7 +80,7 @@ const RideDetails = () => {
                       onClick={() => localStorage.setItem("id", ride.passengerId)}
                     >
                       {passengerId}
-                    </Link>
+                    </Link> 
                   ) : "N/A"}
                 </Typography>
                 <Typography variant="body1"><b>Location:</b> {ride.requestOrigin}</Typography>

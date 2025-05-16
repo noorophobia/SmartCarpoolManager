@@ -28,21 +28,24 @@ const RatingsAndReviews = () => {
   }, [location]);
 
   useEffect(() => {
-    const cached = localStorage.getItem(CACHE_KEY);
+   const cached = localStorage.getItem(CACHE_KEY);
     const timestamp = localStorage.getItem(`${CACHE_KEY}_timestamp`);
     const isCacheFresh = timestamp && Date.now() - Number(timestamp) < CACHE_EXPIRY_MINUTES * 60 * 1000;
 
     if (cached && isCacheFresh) {
       setPassengerRatings(JSON.parse(cached));
+      console.log(JSON.parse(cached))
     } else {
+     
       fetchRatings();
-    }
+   }
   }, []);
 
   const fetchRatings = async () => {
     try {
       const reviews = await RatingsAndReviewsService.getPassengerRideReviews(); // ✅ use service
       setPassengerRatings(reviews);
+      
       localStorage.setItem(CACHE_KEY, JSON.stringify(reviews));
       localStorage.setItem(`${CACHE_KEY}_timestamp`, Date.now().toString());
     } catch (err) {

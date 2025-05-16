@@ -1,15 +1,12 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const path = require('path');
 const dotenv = require("dotenv");
 const helmet = require('helmet');
 
  const envFile = process.env.NODE_ENV === "test" ? ".env.test" : ".env";
 dotenv.config({ path: envFile });
 
-//console.log(`Loaded environment file: ${envFile}`);
-//console.log("JWT_SECRET:", process.env.JWT_SECRET);
 
 // Import routes
 const passengerRatings = require("./routes/passenger-review");
@@ -23,6 +20,7 @@ const complaintRoutes = require('./routes/complaints');
  const singlerideRoutes = require("./routes/single-rides");
 const carpoolrideRoutes = require("./routes/carpoolRide");
 const paymentRoutes = require("./routes/payment");
+const rateSettingsRoute = require('./routes/rate-setting');  
 
 // Admin insertion function
 const { insertAdmin } = require('./routes/insertAdmin');   
@@ -66,6 +64,7 @@ app.use(passengerRoutes);
 app.use('/api', complaintRoutes);
   app.use("/api/admin", adminRoutes);
  app.use(paymentRoutes);
+app.use('/api', rateSettingsRoute);
 
 // MongoDB connection
 console.log('MongoDB URI:', process.env.MONGO_URI);

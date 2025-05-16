@@ -1,86 +1,19 @@
 const express = require("express");
 const verifyToken = require('../middleware/auth');
 const {
-  createPackage,
-  getAllPackages,
-  getPackageById,
-  updatePackage,
-  deletePackage,
-} = require('../services/packageService');
+  createNewPackage,
+  getPackages,
+  getPackage,
+  updateExistingPackage,
+  deleteExistingPackage,
+} = require('../controllers/packageController');
 
 const router = express.Router();
 
-// Create a new package
-router.post("/packages", verifyToken, async (req, res) => {
-  const { name, duration, discount, fee } = req.body;
-  if (!name || !duration || !discount || !fee) {
-    return res.status(400).json({ message: "All fields are required" });
-  }
-
-  try {
-    const savedPackage = await createPackage({ name, duration, discount, fee });
-    res.status(201).json(savedPackage);
-  } catch (error) {
-    console.error("Error creating package:", error);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-// Get all packages
-router.get("/packages", verifyToken, async (req, res) => {
-  try {
-    const packages = await getAllPackages();
-    res.status(200).json(packages);
-  } catch (error) {
-    console.error("Error fetching packages:", error);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-// Get package by ID
-router.get("/packages/:id", verifyToken, async (req, res) => {
-  const { id } = req.params;
-  try {
-    const pkg = await getPackageById(id);
-    if (!pkg) return res.status(404).json({ message: "Package not found" });
-    res.status(200).json(pkg);
-  } catch (error) {
-    console.error("Error fetching package:", error);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-// Update package
-router.put("/packages/:id", verifyToken, async (req, res) => {
-  const { id } = req.params;
-  const { name, duration, discount, fee } = req.body;
-
-  if (!name || !duration || !discount || !fee) {
-    return res.status(400).json({ message: "All fields are required" });
-  }
-
-  try {
-    const updatedPackage = await updatePackage(id, { name, duration, discount, fee });
-    if (!updatedPackage) return res.status(404).json({ message: "Package not found" });
-    res.status(200).json(updatedPackage);
-  } catch (error) {
-    console.error("Error updating package:", error);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-// Delete package
-router.delete("/packages/:id", verifyToken, async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const deletedPackage = await deletePackage(id);
-    if (!deletedPackage) return res.status(404).json({ message: "Package not found" });
-    res.status(200).json({ message: "Package deleted successfully" });
-  } catch (error) {
-    console.error("Error deleting package:", error);
-    res.status(500).json({ message: "Server error" });
-  }
-});
+router.post("/packages", verifyToken, createNewPackage);
+router.get("/packages", verifyToken, getPackages);
+router.get("/packages/:id", verifyToken, getPackage);
+router.put("/packages/:id", verifyToken, updateExistingPackage);
+router.delete("/packages/:id", verifyToken, deleteExistingPackage);
 
 module.exports = router;

@@ -6,7 +6,7 @@ async function insertAdmin(email = "smartcarpool1@gmail.com", password = "1234")
     // Check if admin already exists
     const existingAdmin = await Admin.findOne({ email });
     if (existingAdmin) {
-      console.log('Admin already exists!');
+     // console.log('Admin already exists!');
       return false;  // Or return something meaningful if you want
     }
 

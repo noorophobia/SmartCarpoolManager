@@ -43,21 +43,40 @@ const Rides = () => {
     { field: "mode", headerName: "Ride Mode", width: 120 },
     { field: "status", headerName: "Ride Status", width: 150 },
     {
-      field: "passengerCompositeId",
-      headerName: "Passenger ID",
-      flex: 1,
-      minWidth: 180,
-      renderCell: (params) => (
+  field: "passengerCompositeId",
+  headerName: "Passenger ID",
+  flex: 1,
+  minWidth: 180,
+  renderCell: (params) => (
+    <>
+      {Array.isArray(params.row.passengerCompositeId) ? (
+        params.row.passengerCompositeId.map((id, index) => (
+          <Link
+            key={index}
+            to={`/passenger-details`}
+            onClick={() => localStorage.setItem("id", params.row.passengerId[index])}
+            style={{ marginRight: 8 }}
+          >
+            <Button variant="text" color="primary" size="small">
+              {id}
+            </Button>
+          </Link>
+        ))
+      ) : (
         <Link
           to={`/passenger-details`}
           onClick={() => localStorage.setItem("id", params.row.passengerId)}
         >
           <Button variant="text" color="primary" size="small">
-            {params.value}
+            {params.row.passengerCompositeId}
           </Button>
         </Link>
-      ),
-    },
+      )}
+    </>
+  ),
+}
+,
+  
     {
       field: "driverCompositeId",
       headerName: "Driver ID",
