@@ -10,38 +10,38 @@ a {
   text-decoration: none;
   color: inherit;
 }
-
+ 
 body {
   font-family: "Inter", sans-serif;
-  background-color: var(--main-bg); /* Use the main background color */
-  color: var(--black); /* Ensure text is readable */
+  background-color: var(--main-bg);  
+  color: var(--black);  
 }
 
 .main {
   display: flex;
-  flex-direction: column; /* Stack children vertically: header, content, footer */
-  min-height: 100vh; /* Full viewport height to ensure footer stays at the bottom */
+  flex-direction: column;  
+  min-height: 100vh;  
 }
 
 .container {
   display: flex;
-  flex: 1; /* Fills available space between header and footer */
-  overflow: hidden; /* Prevents content overflow */
+  flex: 1; 
+  overflow: hidden; 
 }
 
 .menuContainer {
-  width: 350px; /* Fixed width for the sidebar */
-  padding: 20px; /* Padding for consistent spacing */
-  background-color: var(--menu-bg); /* Sidebar background */
-  box-shadow: 4px 0 6px rgba(0, 0, 0, 0.2); /* Elevation effect */
-  border-right: 2px solid var(--soft-color); /* Visual separation */
-  flex-shrink: 0; /* Prevents the menu from shrinking */
+  width: 350px;  
+  padding: 20px;  
+  background-color: var(--menu-bg); 
+  box-shadow: 4px 0 6px rgba(0, 0, 0, 0.2); 
+  border-right: 2px solid var(--soft-color); 
+  flex-shrink: 0;  
 }
 
 .contentContainer {
-  flex: 1; /* Fills remaining space after menu */
-  padding: 20px; /* Inner spacing for content */
-  background-color: var(--content-bg); /* Add a distinct content background color */
-  overflow-y: auto; /* Ensure scrolling for long content */
+  flex: 1;  
+  padding: 20px;  
+  background-color: var(--content-bg);  
+  overflow-y: auto; 
 }
  

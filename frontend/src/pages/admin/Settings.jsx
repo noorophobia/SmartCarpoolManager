@@ -1,65 +1,65 @@
 import React, { useState, useEffect } from "react";
-import '../../styles/setting.css'
+import "../../styles/setting.css";
+import SettingsService from "../../services/SettingsService"; // ✅ Import service
+
 const Settings = () => {
-  // State variables for settings
-  const [theme, setTheme] = useState("light"); // Default theme
-  const [language, setLanguage] = useState("en"); // Default language
-  const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone); // Default timezone
-  const [password, setPassword] = useState(""); // New password
-  const [email, setEmail] = useState("");  
-  const [confirmPassword, setConfirmPassword] = useState(""); // Confirm password
-  const [passwordError, setPasswordError] = useState(""); // Error message for password mismatch
+  const [theme, setTheme] = useState("light");
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // Save settings to localStorage
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    const savedLanguage = localStorage.getItem("language");
-    const savedTimezone = localStorage.getItem("timezone");
-
-    if (savedTheme) setTheme(savedTheme);
-    if (savedLanguage) setLanguage(savedLanguage);
-    if (savedTimezone) setTimezone(savedTimezone);
+    const savedTheme = localStorage.getItem("theme") || "light";
+    setTheme(savedTheme);
+    document.body.setAttribute("data-theme", savedTheme);
   }, []);
 
   const handleThemeChange = (event) => {
     const selectedTheme = event.target.value;
     setTheme(selectedTheme);
-    document.body.setAttribute("data-theme", selectedTheme); // Update the app theme dynamically
+    document.body.setAttribute("data-theme", selectedTheme);
     localStorage.setItem("theme", selectedTheme);
   };
 
-  const handleLanguageChange = (event) => {
-    const selectedLanguage = event.target.value;
-    setLanguage(selectedLanguage);
-    localStorage.setItem("language", selectedLanguage);
-  };
-
-  const handlePasswordChange = (event) => {
-    setPassword(event.target.value);
-  };
-  const handleEmailChange = (event) => {
-    setEmail(event.target.value);
-  };
-  const handleConfirmPasswordChange = (event) => {
-    setConfirmPassword(event.target.value);
-  };
-
-  const handlePasswordSubmit = (event) => {
+  const handlePasswordSubmit = async (event) => {
     event.preventDefault();
+
+    if (!email.trim() || !password.trim() || !confirmPassword.trim()) {
+      setPasswordError("All fields are required.");
+      setSuccessMessage("");
+      return;
+    }
+
     if (password !== confirmPassword) {
       setPasswordError("Passwords do not match.");
-    } else {
-      setPasswordError("");
-      alert("Password changed successfully!");
-      setPassword(""); // Reset fields
+      setSuccessMessage("");
+      return;
+    }
+
+    setPasswordError("");
+    setLoading(true);
+
+    try {
+      await SettingsService.updatePassword(email, password); // ✅ Use service
+      setSuccessMessage("Password updated successfully!");
+      setPassword("");
       setConfirmPassword("");
+      setEmail("");
+    } catch (err) {
+      setPasswordError(err);
+      setSuccessMessage("");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="admin-settings">
       <h2>Admin Settings</h2>
-      
+
       {/* Theme Settings */}
       <div className="setting">
         <label htmlFor="theme">Theme:</label>
@@ -69,54 +69,70 @@ const Settings = () => {
         </select>
       </div>
 
-      {/* Language Settings */}
-      <div className="setting">
-        <label htmlFor="language">Language:</label>
-        <select id="language" value={language} onChange={handleLanguageChange}>
-          <option value="en">English</option>
-          <option value="es">Spanish</option>
-          <option value="fr">French</option>
-          <option value="de">German</option>
-        </select>
-      </div>
-
       {/* Password Change Form */}
-
       <div className="password-change">
-        <h3>Change Password</h3>
+        <h3
+          style={{
+            display: "block",
+            marginBottom: "15px",
+            marginTop: "10px",
+            fontSize: "20px",
+          }}
+        >
+          Change Password
+        </h3>
         <form onSubmit={handlePasswordSubmit}>
-        <div className="form-group">
-            <label htmlFor="email">Email :</label>
+          <div className="form-group">
+            <label htmlFor="email" style={{ marginBottom: "10px", display: "block" }}>
+              Email:
+            </label>
             <input
               type="email"
               id="email"
               value={email}
-              onChange={handleEmailChange}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
           <div className="form-group">
-            <label htmlFor="password">New Password:</label>
+            <label
+              htmlFor="password"
+              style={{ marginBottom: "10px", display: "block", marginTop: "10px" }}
+            >
+              New Password:
+            </label>
             <input
               type="password"
               id="password"
               value={password}
-              onChange={handlePasswordChange}
+              onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
           <div className="form-group">
-            <label htmlFor="confirmPassword">Confirm Password:</label>
+            <label
+              htmlFor="confirmPassword"
+              style={{ marginBottom: "10px", display: "block", marginTop: "10px" }}
+            >
+              Confirm Password:
+            </label>
             <input
               type="password"
               id="confirmPassword"
               value={confirmPassword}
-              onChange={handleConfirmPasswordChange}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               required
             />
           </div>
           {passwordError && <p className="error">{passwordError}</p>}
-          <button type="submit">Update Password</button>
+          {successMessage && (
+            <p className="success" style={{ color: "green", marginTop: "10px", marginBottom: "10px" }}>
+              {successMessage}
+            </p>
+          )}
+          <button type="submit" disabled={loading}>
+            {loading ? "Updating..." : "Update Password"}
+          </button>
         </form>
       </div>
     </div>

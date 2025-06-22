@@ -6,6 +6,10 @@ import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRo
 import '../../styles/tables.css';
 
 const RateSetting = () => {
+  const token = localStorage.getItem('token'); // Retrieve token from localStorage
+
+
+  
   const [rateSettings, setRateSettings] = useState({
     'AC Car': {
       distanceRatePerKm: 0,
@@ -57,8 +61,7 @@ const RateSetting = () => {
   });
 
   useEffect(() => {
-    const token = localStorage.getItem('token'); // Retrieve token from localStorage
-   if (!token) {
+    if (!token) {
     // If no token is found, redirect to the login page
     navigate('/login');
     return;
@@ -152,8 +155,7 @@ const RateSetting = () => {
       });
       } catch (error) {
       console.error('Error updating rate settings:', error);
-      alert('Failed to update rate settings. Please try again later.');
-    }
+     }
   
     // Here we just log the data instead of sending it to a server
     console.log('Updated Rate Settings:', rateSettings);

@@ -1,2 +1,12 @@
 npm install bcryptjs express-session
-axios 
+axios npm install jwt-decode frontend
+npm install firebase-admin
+
+npm install express body-parser cors nodemailer dotenv
+
+
+
+cd frontend
+npm install react-quill
+npm install quill-image-resize-module-react
+npm install quill

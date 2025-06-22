@@ -1,21 +1,16 @@
-import React from 'react';
- import {Link} from 'react-router-dom';
+  import {Link} from 'react-router-dom';
 import '../styles/menu.css'
 const Menu = () => {
   return (
     <div className="menu">
          <div className="item">
           <div className="title">Main</div>
-          <Link to="/home" className="listItem"> 
+          <Link to="/" className="listItem"> 
             <img src="/public/home.svg" alt="icon" className="icon" />
              <span className="listItemTitle">Home </span>
           </Link>
 
-       {/*  <Link to="/profile" className="listItem"> 
-            <img src="profile.svg" alt="icon" className="icon" />
-             <span className="listItemTitle">Profile </span>
-          </Link>
-         </div> */ } 
+        
          </div>
        
          <div className="item">
@@ -41,12 +36,24 @@ const Menu = () => {
             <img src="/public/ratings_icon.svg" alt="icon" className="icon" />
              <span className="listItemTitle">Ratings and Reviews </span>
           </Link>
-          <Link to="/rate-setting" className="listItem"> 
+         {/** <Link to="/rate-setting" className="listItem"> 
             <img src="/public/rate_setting.svg" alt="icon" className="icon" />
-             <span className="listItemTitle">Vehicle Rate Settings </span>
+             <span className="listItemTitle">Vehicle Rates        </span>
           </Link>
-         </div>
+          */} 
+          <Link to="/contact-us" className="listItem" >
+  <img src="/public/complaint.svg" alt="icon" className="icon" />
+   <span className="listItemTitle">Complaints </span>
+</Link>
+ 
+<Link to="/packages" className="listItem" >
+  <img src="/public/package.svg" alt="icon" className="icon" />
+   <span className="listItemTitle">Packages </span>
+</Link>
 
+         </div>
+    
+           
          <div className="item">
  
           <div className="title">Revenue Report</div>
@@ -67,6 +74,11 @@ const Menu = () => {
             <img src="/public/settings.svg" alt="icon" className="icon" />
              <span className="listItemTitle">Settings </span>
           </Link>
+          <Link to="/push-notification" className="listItem" >
+  <img src="/public/notifications.svg" alt="icon" className="icon" />
+   <span className="listItemTitle">Push Notification </span>
+</Link>
+ 
 
          
          </div>

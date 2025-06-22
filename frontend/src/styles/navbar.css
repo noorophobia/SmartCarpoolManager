@@ -1,12 +1,66 @@
-.logo{
-    width: 250px;
+ 
+.navbar {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background: var(--soft-color);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;  
+    top: 0;
+    position: absolute;
+    
+    height: 90px;  
+}
+ 
+ body {
+    margin: 0; /* Reset any default margin */
+    padding-top: 90px; /* Match the navbar height */
+}
+
+.logo {
+    width: 250px; 
     height: auto;
 }
-.navbar{
+
+.settings-dropdown {
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.settings-icon {
+    width: 40px;
+    height: 40px;
+    margin-left: 10px;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 70px;
+    right: 0;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    z-index: 1100;  
+    overflow: hidden;
+}
+
+.dropdown-item {
+    padding: 10px 20px;
     width: 100%;
-     display: flex;
-    padding: 10px 20px; /* Adjust padding as needed */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adjust the shadow for elevation effect */
-  z-index: 10; /* Ensures navbar stays above other elements if necessary */
-   top: 0;
+    text-align: left;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background-color: #f0f0f0;
+}
+
+.dropdown-item:active {
+    background-color: #e0e0e0;
 }
