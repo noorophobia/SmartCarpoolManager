@@ -97,6 +97,6 @@ Ensure that your MongoDB instance is running. You can use a local MongoDB setup 
    - **Analytics**: View ride, user, and financial analytics for reports.
      
 ## Working Demo 
-[Watch demo video]([media](https://drive.google.com/file/d/1sCxci3EuzwdQ5CPi9YCnn4y0NluqEUcx/view)
+[Watch demo video](https://drive.google.com/file/d/1sCxci3EuzwdQ5CPi9YCnn4y0NluqEUcx/view)
 
  
